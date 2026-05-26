@@ -21,6 +21,11 @@ builder.Services.AddSession(options =>
 });
 
 // ĐĂNG KÝ AUTHENTICATION VÀ GOOGLE LOGIC Ở ĐÂY
+// ĐỌC MÃ BẢO MẬT TỪ APPSETTINGS.JSON RA BIẾN CỤC BỘ (TRÁNH LỖI SCOPE BUILDER)
+var googleClientId = builder.Configuration["Authentication:Google:ClientId"] ?? "";
+var googleClientSecret = builder.Configuration["Authentication:Google:ClientSecret"] ?? "";
+
+// ĐĂNG KÝ AUTHENTICATION VÀ GOOGLE LOGIC Ở ĐÂY
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
@@ -32,9 +37,9 @@ builder.Services.AddAuthentication(options =>
 })
 .AddGoogle(options =>
 {
-    
-    options.ClientId = "NHAP_CLIENT_ID_CUA_BAN_VAO_DAY";
-    options.ClientSecret = "NHAP_CLIENT_SECRET_CUA_BAN_VAO_DAY";
+    // Sử dụng 2 biến cục bộ đã lấy ở trên
+    options.ClientId = googleClientId;
+    options.ClientSecret = googleClientSecret;
 });
 
 
