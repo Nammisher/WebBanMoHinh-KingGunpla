@@ -1,0 +1,634 @@
+﻿@using Microsoft.AspNetCore.Http
+@using System.Text.Json
+@using WebBanMoHinh.MVC.Models
+
+@{
+    int cartCount = 0;
+    var sessionData = Context.Session.GetString("GioHang");
+    if (!string.IsNullOrEmpty(sessionData))
+    {
+        try
+        {
+            var cart = JsonSerializer.Deserialize<List<CartItemViewModel>>(sessionData);
+            if (cart != null)
+            {
+                cartCount = cart.Sum(c => c.SoLuong);
+            }
+        }
+        catch { }
+    }
+}
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <script>
+        (function () {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.documentElement.setAttribute('data-bs-theme', savedTheme);
+        })();
+    </script>
+    
+    <title>@ViewData["Title"] - KingGunpla Model Shop</title>
+    
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <link rel="stylesheet" href="~/css/mecha-theme.css" asp-append-version="true" />
+    
+    <style>
+        /* ================= BIẾN MÀU TOÀN CỤC CHO KHUNG LAYOUT CHUNG ================= */
+        :root, [data-bs-theme="light"] {
+            --bg-body: #f1f5f9;
+            --text-body: #334155;
+            --bg-header: rgba(255, 255, 255, 0.85);
+            --border-layout: rgba(15, 23, 42, 0.08);
+            --text-nav: #475569;
+            --text-nav-hover: #0072ff;
+            --bg-dropdown: #ffffff;
+            --text-dropdown: #334155;
+            --bg-search: #ffffff;
+            --text-search: #0f172a;
+            --border-search: rgba(15, 23, 42, 0.15);
+            --bg-cart: rgba(15, 23, 42, 0.05);
+            --text-cart: #0f172a;
+            --bg-footer: #ffffff;
+            --text-footer-h5: #0f172a;
+            --text-footer-p: #64748b;
+            --text-footer-a: #475569;
+            --glow-brand: 0 0 10px rgba(0, 114, 255, 0.2);
+            --glow-cart-hover: 0 0 12px rgba(0, 114, 255, 0.2);
+        }
+
+        [data-bs-theme="dark"] {
+            --bg-body: #0f172a;
+            --text-body: #f8fafc;
+            --bg-header: rgba(15, 23, 42, 0.9);
+            --border-layout: rgba(255, 255, 255, 0.08);
+            --text-nav: #cbd5e1;
+            --text-nav-hover: #00c6ff;
+            --bg-dropdown: #1e293b;
+            --text-dropdown: #cbd5e1;
+            --bg-search: rgba(255, 255, 255, 0.05);
+            --text-search: #ffffff;
+            --border-search: rgba(255, 255, 255, 0.15);
+            --bg-cart: rgba(255, 255, 255, 0.04);
+            --text-cart: #ffffff;
+            --bg-footer: #020617;
+            --text-footer-h5: #f8fafc;
+            --text-footer-p: #cbd5e1;
+            --text-footer-a: #94a3b8;
+            --glow-brand: 0 0 10px rgba(0, 198, 255, 0.5);
+            --glow-cart-hover: 0 0 15px rgba(0, 198, 255, 0.4);
+        }
+
+        html, body {
+            margin: 0 !important;
+            padding: 0 !important;
+            min-height: 100vh;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            background-color: var(--bg-body) !important;
+            color: var(--text-body);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        main {
+            flex: 1;
+        }
+        
+        /* HEADER GLASSMORPHISM ĐA MÀU */
+        .king-header {
+            background: var(--bg-header) !important;
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border-layout);
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .navbar-brand {
+            font-weight: 900;
+            letter-spacing: 1px;
+            font-size: 1.4rem;
+            color: var(--text-footer-h5) !important;
+            text-shadow: var(--glow-brand);
+        }
+
+        .brand-highlight {
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .nav-link {
+            font-weight: 600;
+            color: var(--text-nav) !important;
+            font-size: 0.95rem;
+            transition: all 0.2s ease;
+        }
+
+        .nav-link:hover {
+            color: var(--text-nav-hover) !important;
+            transform: translateY(-1px);
+        }
+
+        .dropdown-menu {
+            background-color: var(--bg-dropdown);
+            border: 1px solid var(--border-layout);
+            border-radius: 12px;
+        }
+
+        .dropdown-item {
+            color: var(--text-dropdown);
+            font-weight: 500;
+        }
+
+        .dropdown-item:hover {
+            background: linear-gradient(135deg, #00c6ff, #0072ff);
+            color: #ffffff !important;
+        }
+
+        /* ================= Ô TÌM KIẾM HIỆU ỨNG MỞ RỘNG (STYLE BANDAI NAMCO) ================= */
+        .search-wrapper {
+            position: relative;
+            width: 44px;
+            height: 44px;
+            transition: width 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            margin-left: auto;
+        }
+        .search-wrapper.active {
+            width: 300px;
+            max-width: 100%;
+        }
+
+        /* Nút Kính Lúp (Trạng thái đóng ban đầu) */
+        .btn-trigger-tech {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 44px;
+            height: 44px;
+            border-radius: 50% !important;
+            background: linear-gradient(135deg, #00c6ff, #0072ff) !important;
+            color: #ffffff !important;
+            border: none !important;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2;
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.3s;
+            box-shadow: 0 4px 10px rgba(0, 114, 255, 0.3);
+        }
+        .btn-trigger-tech:hover {
+            box-shadow: 0 0 15px rgba(0, 198, 255, 0.6);
+            transform: scale(1.05);
+        }
+        /* Hiệu ứng xoay và biến mất khi mở */
+        .search-wrapper.active .btn-trigger-tech {
+            transform: scale(0) rotate(180deg);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Khung chứa Input và Mũi tên (Trạng thái mở) */
+        .search-expanded {
+            position: absolute;
+            right: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--bg-search);
+            border: 1.5px solid var(--text-nav-hover);
+            border-radius: 50px;
+            overflow: hidden;
+            opacity: 0;
+            pointer-events: none;
+            transform: scaleX(0); /* Bóp nhỏ từ bên phải */
+            transform-origin: right center;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 0 12px rgba(0, 198, 255, 0.3);
+        }
+        /* Hiệu ứng bung ra khi mở */
+        .search-wrapper.active .search-expanded {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scaleX(1);
+        }
+
+        /* Ô nhập liệu Text Input */
+        .search-input-tech {
+            flex: 1;
+            height: 100%;
+            background: transparent;
+            border: none;
+            color: var(--text-search);
+            padding: 0 10px 0 20px;
+            outline: none;
+            font-size: 0.95rem;
+            width: calc(100% - 44px);
+        }
+        .search-input-tech::placeholder {
+            color: #64748b;
+        }
+
+        /* Nút Mũi Tên Đóng (Tương tự ảnh Bandai) */
+        .btn-close-tech {
+            background: transparent;
+            border: none;
+            color: var(--text-nav);
+            width: 44px;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: color 0.2s, transform 0.2s;
+            border-radius: 0 50px 50px 0;
+        }
+        .btn-close-tech:hover {
+            color: var(--text-nav-hover);
+            transform: translateX(2px);
+        }
+
+        /* GIỎ HÀNG HÌNH TRÒN & NÚT ĐỔI THEME */
+        .btn-cart-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50% !important;
+            display: flex !important;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-cart) !important;
+            border: 1px solid var(--border-layout) !important;
+            color: var(--text-cart) !important;
+            padding: 0 !important;
+            transition: all 0.3s ease;
+        }
+
+        .btn-cart-circle:hover {
+            background: rgba(0, 198, 255, 0.15) !important;
+            border-color: var(--text-nav-hover) !important;
+            color: var(--text-nav-hover) !important;
+            box-shadow: var(--glow-cart-hover);
+            transform: scale(1.05);
+        }
+
+        /* NÚT ĐĂNG NHẬP CYBER */
+        .btn-login-tech {
+            background: linear-gradient(135deg, #00c6ff, #0072ff, #7c3aed) !important;
+            background-size: 200% auto !important;
+            border: none !important;
+            font-weight: 700;
+            color: #ffffff !important;
+            box-shadow: 0 4px 15px rgba(0, 114, 255, 0.2);
+            transition: all 0.4s ease;
+        }
+
+        .btn-login-tech:hover {
+            background-position: right center !important;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 198, 255, 0.5);
+        }
+
+        /* PHAO CỨU HỘ LIÊN HỆ GẮN MÀN HÌNH */
+        .floating-contact-box {
+            position: fixed;
+            bottom: 40px;
+            right: 25px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .contact-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff !important;
+            text-decoration: none;
+            font-size: 24px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        .contact-btn:hover { transform: scale(1.15) translateY(-3px); }
+        .btn-phone { background: linear-gradient(135deg, #2ecc71, #27ae60); animation: phone-pulse 2s infinite; }
+        .btn-messenger { background: linear-gradient(135deg, #006aff, #00c6ff); }
+        .btn-zalo { background: #0084ff; font-size: 11px; font-weight: 900; letter-spacing: -0.3px; }
+
+        @@keyframes phone-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0.5); }
+            70% { box-shadow: 0 0 0 15px rgba(46, 204, 113, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+        }
+
+        /* ================= FOOTER ĐA GIAO DIỆN HOÀNG GIA ================= */
+        .king-footer {
+            background-color: var(--bg-footer) !important;
+            border-top: 1px solid var(--border-layout);
+            padding-top: 4.5rem !important;
+            padding-bottom: 3.5rem !important;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .king-footer h5 {
+            color: var(--text-footer-h5) !important;
+            font-weight: 800;
+            font-size: 1.05rem;
+            letter-spacing: 1px;
+            position: relative;
+            padding-bottom: 14px;
+            margin-bottom: 22px;
+            text-shadow: var(--glow-brand);
+        }
+
+        .king-footer h5::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 2.5px;
+            background: linear-gradient(90deg, #00c6ff, #0072ff, transparent);
+            border-radius: 2px;
+        }
+
+        .footer-text-secondary {
+            color: var(--text-footer-p) !important;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .king-footer a {
+            color: var(--text-footer-a) !important;
+            text-decoration: none;
+            display: inline-block;
+            font-weight: 500;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .king-footer a:hover {
+            color: var(--text-nav-hover) !important;
+            text-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+            transform: translateX(6px);
+        }
+
+        .king-footer .bi-geo-alt-fill, 
+        .king-footer .bi-telephone-fill, 
+        .king-footer .bi-envelope-fill {
+            color: var(--text-nav-hover) !important;
+            font-size: 1.05rem;
+            transition: all 0.2s;
+        }
+
+        .king-footer .bi-facebook, 
+        .king-footer .bi-instagram, 
+        .king-footer .bi-youtube {
+            color: #475569 !important;
+            transition: all 0.3s ease;
+        }
+        .king-footer .bi-facebook:hover { color: #1877f2 !important; filter: drop-shadow(0 0 8px #1877f2); transform: scale(1.15); }
+        .king-footer .bi-instagram:hover { color: #e1306c !important; filter: drop-shadow(0 0 8px #e1306c); transform: scale(1.15); }
+        .king-footer .bi-youtube:hover { color: #ff0000 !important; filter: drop-shadow(0 0 8px #ff0000); transform: scale(1.15); }
+    </style>
+</head>
+<body>
+
+    <header class="sticky-top king-header">
+        <nav class="navbar navbar-expand-lg py-3 bg-transparent">
+            <div class="container">
+                <a class="navbar-brand text-uppercase d-flex align-items-center" href="/">
+                    <i class="bi bi-robot me-2 text-info fs-3"></i>King<span class="brand-highlight">Gunpla</span>
+                </a>
+                
+                <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#kingNavbar">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <div class="collapse navbar-collapse" id="kingNavbar">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0 ms-lg-5 gap-3">
+                        <li class="nav-item d-flex align-items-center">
+                            <a class="nav-link fw-bold" style="font-size: 1.2rem; letter-spacing: 0.5px;" href="/">
+                                Trang Chủ
+                            </a>
+                        </li>
+                        
+                        <li class="nav-item d-flex align-items-center">
+                            <a class="nav-link fw-bold" style="font-size: 1.2rem; letter-spacing: 0.5px;" href="/SanPham/Index">
+                                Sản Phẩm
+                            </a>
+                        </li>
+                    </ul>
+
+                    <div class="search-wrapper mx-lg-4 my-2 my-lg-0" id="searchWrapper">
+                        <form action="/SanPham/Index" method="get" class="w-100 h-100 position-relative m-0 p-0">
+                            <div class="search-expanded d-flex align-items-center">
+                                <input type="search" 
+                                       name="search" 
+                                       class="search-input-tech" 
+                                       placeholder="Tìm kiếm Gunpla, Sentai..." 
+                                       id="searchInput"
+                                       value="@Context.Request.Query["search"]">
+                                       
+                                <button type="button" class="btn-close-tech" id="closeSearchBtn" title="Thu gọn">
+                                    <i class="bi bi-chevron-right fw-bold"></i>
+                                </button>
+                            </div>
+                            
+                            <button type="button" class="btn-trigger-tech" id="triggerSearchBtn" title="Mở tìm kiếm">
+                                <i class="bi bi-search fw-bold"></i>
+                            </button>
+                        </form>
+                    </div>
+                    <div class="d-flex align-items-center gap-3">
+                        <button id="themeToggle" class="btn btn-cart-circle" type="button">
+                            <i class="bi bi-moon-stars fs-5" id="themeIcon"></i>
+                        </button>
+                        
+                        <a href="/Cart" class="btn-cart circle position-relative btn-cart-circle">
+                            <i class="bi bi-bag-check fs-5"></i>
+                            @if (cartCount > 0)
+                            {
+                                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 0.68rem; margin-top: 2px; margin-left: -2px;">
+                                    @cartCount
+                                </span>
+                            }
+                        </a>
+                        
+                        @if (Context.Session.GetString("UserSession") == null)
+                        {
+                            <a href="/Account/Login" class="btn btn-login-tech text-white rounded-pill px-4 btn-sm">
+                                <i class="bi bi-person-bounding-box me-1"></i>Đăng Nhập
+                            </a>
+                        }
+                        else
+                        {
+                            <div class="dropdown">
+                                <button class="btn btn-outline-info dropdown-toggle rounded-pill px-3 py-1 btn-sm fw-bold d-flex align-items-center gap-2" type="button" data-bs-toggle="dropdown" aria-expanded="false" style="border-width: 1.5px;">
+                                    @{
+                                        var pilotName = Context.Session.GetString("UserSession");
+                                        var pilotAvatar = Context.Session.GetString("UserAvatar");
+                                    }
+                                    @if (!string.IsNullOrEmpty(pilotAvatar))
+                                    {
+                                        <img src="~/images/@pilotAvatar" class="rounded-circle object-fit-cover bg-white" style="width: 22px; height: 22px;" onerror="this.src='https://placehold.co/22x22/1e293b/cbd5e1?text=P'" alt="Pilot">
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-person-circle fs-6 mb-0"></i>
+                                    }
+                                    <span>@pilotName</span>
+                                </button>
+                                
+                                <ul class="dropdown-menu dropdown-menu-end shadow">
+                                    <li><a class="dropdown-item small" href="/Profile/Index"><i class="bi bi-person-badge me-2"></i>Hồ sơ Pilot</a></li>
+                                    <li><a class="dropdown-item small" href="/Order/History"><i class="bi bi-clock-history me-2"></i>Lịch sử đơn hàng</a></li>
+                                    <li><hr class="dropdown-divider"></li>
+                                    <li>
+                                        <a class="dropdown-item small text-danger fw-bold" href="/Account/Logout">
+                                            <i class="bi bi-box-arrow-right me-2"></i>Đăng Xuất
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <main role="main">
+        @RenderBody()
+    </main>
+
+    <div class="floating-contact-box">
+        <a href="tel:0981260096" class="contact-btn btn-phone" title="Gọi điện thoại Hotline">
+            <i class="bi bi-telephone-fill"></i>
+        </a>
+        <a href="https://m.me/YourShopUsername" target="_blank" class="contact-btn btn-messenger" title="Chat Facebook Messenger">
+            <i class="bi bi-messenger"></i>
+        </a>
+        <a href="https://zalo.me/0981260096" target="_blank" class="contact-btn btn-zalo" title="Nhắn tin qua Zalo">
+            ZALO
+        </a>
+    </div>
+
+    <footer class="king-footer py-5 mt-auto">
+        <div class="container">
+            <div class="row g-4">
+                <div class="col-md-5">
+                    <h5 class="text-uppercase mb-3 d-flex align-items-center fw-bold">
+                        <i class="bi bi-robot me-2 text-info"></i>KING GUNPLA SHOP
+                    </h5>
+                    <p class="small footer-text-secondary lh-base" style="max-width: 400px;">
+                        Hệ thống phân phối và đấu giá các dòng sản phẩm mô hình lắp ráp Gunpla, Figure chính hãng hàng đầu Việt Nam. Chất lượng tối thượng, dịch vụ hoàng gia.
+                    </p>
+                </div>
+                <div class="col-md-3 ms-auto">
+                    <h5 class="mb-3 text-uppercase fw-bold">Hỗ trợ khách hàng</h5>
+                    <ul class="list-unstyled small d-grid gap-2">
+                        <li><a href="/Home/HuongDanRunner">Hướng dẫn kiểm tra Runner-nhựa</a></li>
+                        <li><a href="/Home/ChinhSachBaoHanh">Chính sách bảo hành gãy hỏng</a></li>
+                        <li><a href="/Home/DieuKhoanDauGia">Điều khoản sử dụng sàn Đấu giá</a></li>
+                    </ul>
+                </div>
+                <div class="col-md-3">
+                    <h5 class="mb-3 text-uppercase fw-bold">Tổng hành dinh</h5>
+                    <p class="small footer-text-secondary mb-1"><i class="bi bi-geo-alt-fill me-2 text-danger"></i> 65 Đồng Tâm,Trung Chánh, Hóc Môn, TP.HCM</p>
+                    <p class="small footer-text-secondary mb-1"><i class="bi bi-telephone-fill me-2 text-success"></i> 0981 260 096</p>
+                    <p class="small footer-text-secondary"><i class="bi bi-envelope-fill me-2 text-info"></i> contact@kinggunpla.com</p>
+                </div>
+            </div>
+            
+            <hr class="border-secondary my-4 opacity-10">
+            
+            <div class="row align-items-center">
+                <div class="col-md-6 text-center text-md-start">
+                    <p class="small footer-text-secondary mb-0">
+                        &copy; @DateTime.Now.Year - <span style="color: var(--text-nav-hover); font-weight: 600;">KingGunpla.com</span>. Dự án được phát triển bởi Katyusha aka Nam.
+                    </p>
+                </div>
+                <div class="col-md-6 text-center text-md-end mt-3 mt-md-0">
+                    <a href="#" class="me-3 fs-5"><i class="bi bi-facebook"></i></a>
+                    <a href="#" class="me-3 fs-5"><i class="bi bi-instagram"></i></a>
+                    <a href="#" class="fs-5"><i class="bi bi-youtube"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            
+            // 1. LOGIC ĐỔI THEME (SÁNG / TỐI)
+            const themeToggle = document.getElementById('themeToggle');
+            const themeIcon = document.getElementById('themeIcon');
+
+            function updateThemeUI(theme) {
+                if (theme === 'dark') {
+                    themeIcon.className = 'bi bi-sun fs-5 text-warning';
+                    themeToggle.className = 'btn btn-cart-circle text-white';
+                    themeToggle.setAttribute('title', 'Chuyển sang giao diện Sáng');
+                } else {
+                    themeIcon.className = 'bi bi-moon-stars fs-5 text-dark';
+                    themeToggle.className = 'btn btn-cart-circle text-dark';
+                    themeToggle.setAttribute('title', 'Chuyển sang giao diện Tối');
+                }
+            }
+
+            const currentTheme = document.documentElement.getAttribute('data-bs-theme') || 'dark';
+            updateThemeUI(currentTheme);
+
+            themeToggle.addEventListener('click', function () {
+                const activeTheme = document.documentElement.getAttribute('data-bs-theme');
+                const targetTheme = activeTheme === 'dark' ? 'light' : 'dark';
+                
+                document.documentElement.setAttribute('data-bs-theme', targetTheme);
+                localStorage.setItem('theme', targetTheme);
+                updateThemeUI(targetTheme);
+            });
+
+            // =========================================================================
+            // 2. LOGIC ANIMATION THANH TÌM KIẾM (MỚI THÊM)
+            // =========================================================================
+            const searchWrapper = document.getElementById('searchWrapper');
+            const triggerSearchBtn = document.getElementById('triggerSearchBtn');
+            const closeSearchBtn = document.getElementById('closeSearchBtn');
+            const searchInput = document.getElementById('searchInput');
+
+            // Khi click vào nút Kính lúp gốc
+            triggerSearchBtn.addEventListener('click', function(e) {
+                e.preventDefault(); // Tránh submit form
+                searchWrapper.classList.add('active'); // Kích hoạt CSS mở rộng
+                // Tự động focus con trỏ chuột vào ô nhập chữ sau khi bung xong (300ms)
+                setTimeout(() => searchInput.focus(), 300);
+            });
+
+            // Khi click vào nút Mũi tên
+            closeSearchBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                searchWrapper.classList.remove('active'); // Gỡ class để thu nhỏ lại
+                searchInput.value = ''; // Tùy chọn: Xóa trắng chữ khi người dùng đóng khung
+            });
+            // =========================================================================
+        });
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

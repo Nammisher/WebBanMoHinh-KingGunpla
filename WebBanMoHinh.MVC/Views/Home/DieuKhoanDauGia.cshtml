@@ -1,0 +1,61 @@
+@{
+    ViewData["Title"] = "Điều Khoản Cấu Hình Sàn Đấu Giá Mô Hình";
+}
+
+<div class="container my-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Trang chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Điều khoản đấu giá</li>
+        </ol>
+    </nav>
+
+    <div class="text-center mb-5">
+        <h2 class="text-uppercase fw-bold" style="color: var(--text-nav-hover); text-shadow: var(--glow-brand);">
+            <i class="bi bi-gavel me-2"></i> LUẬT ĐẤU GIÁ VŨ TRỤ GUNPLA
+        </h2>
+        <p style="color: var(--text-muted);">Quy định minh bạch bảo vệ quyền lợi của các nhà sưu tầm và Builder chân chính</p>
+    </div>
+
+    <div class="card border-0 shadow rounded-4 p-4 p-md-5 mx-auto" style="max-width: 900px; background-color: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-layout) !important;">
+        
+        <div class="mb-5">
+            <h5 class="fw-bold text-uppercase border-bottom border-secondary border-opacity-25 pb-2 mb-3 text-info">
+                <i class="bi bi-person-check-fill me-2"></i>1. Tư cách tham gia sàn đấu giá
+            </h5>
+            <p class="small text-muted lh-base">
+                Mọi tài khoản Pilot đã đăng nhập hợp lệ trên hệ thống <span class="text-info fw-bold">KingGunpla</span> và có trạng thái hoạt động bình thường đều có quyền trả giá công khai. Các tài khoản có lịch sử "bùng đơn" hệ thống hoặc bị báo cáo vi phạm sẽ bị khóa quyền truy cập sàn đấu tự động.
+            </p>
+        </div>
+
+        <div class="mb-5">
+            <h5 class="fw-bold text-uppercase border-bottom border-secondary border-opacity-25 pb-2 mb-3 text-warning">
+                <i class="bi bi-currency-dollar me-2"></i>2. Cơ chế trả giá & Bước giá (Bid Increment)
+            </h5>
+            <ul class="lh-lg small">
+                <li>Mỗi phiên đấu giá sẽ có quy định rõ ràng về <strong>Giá khởi điểm (Start Price)</strong> và <strong>Bước giá tối thiểu (Min Bid)</strong>.</li>
+                <li>Lượt trả giá hợp lệ phải có giá trị: <span class="text-warning fw-bold">Giá hiện tại + Bước giá tối thiểu</span>.</li>
+                <li>Hệ thống áp dụng công nghệ <span class="text-info fw-bold">Sniper Protection</span>: Nếu có lệnh đặt giá xuất hiện trong 2 phút cuối cùng của phiên đấu giá, thời gian kết thúc của phiên đấu sẽ tự động gia hạn thêm 2 phút để đảm bảo tính cạnh tranh công bằng.</li>
+            </ul>
+        </div>
+
+        <div class="mb-4">
+            <h5 class="fw-bold text-uppercase border-bottom border-secondary border-opacity-25 pb-2 mb-3 text-danger">
+                <i class="bi bi-shield-slash-fill me-2"></i>3. Trách nhiệm thanh toán & Chế tài xử phạt
+            </h5>
+            <div class="p-3 rounded-3 small mb-3" style="background-color: rgba(220, 53, 69, 0.05); border: 1px solid rgba(220, 53, 69, 0.2);">
+                <h6 class="fw-bold text-danger"><i class="bi bi-alarm-fill me-2"></i>Thời hạn hoàn tất giao dịch:</h6>
+                <p class="mb-0 text-muted">Pilot chiến thắng phiên đấu giá (Winner) có trách nhiệm vào mục Giỏ hàng / Thanh toán đơn hàng trúng đấu giá trong vòng <strong class="text-danger">48 giờ</strong> kể từ thời điểm tiếng chuông kết thúc phiên đấu vang lên.</p>
+            </div>
+            
+            <div class="p-3 rounded-3 small" style="background-color: rgba(225, 193, 7, 0.05); border: 1px solid rgba(225, 193, 7, 0.2);">
+                <h6 class="fw-bold text-warning"><i class="bi bi-slash-circle-fill me-2"></i>Chế tài nghiêm khắc đối với hành vi bùng đơn (Sniper Ban):</h6>
+                <p class="mb-0 text-muted">Mọi hành vi hủy kèo, bùng đơn trúng đấu giá hoặc cố tình không thanh toán sau 48h sẽ dẫn đến việc <strong class="text-danger">Khóa tài khoản Pilot vĩnh viễn không cần báo trước</strong>, địa chỉ IP và số điện thoại liên kết sẽ bị đưa vào danh sách đen (Blacklist) toàn hệ thống tổng kho.</p>
+            </div>
+        </div>
+
+        <div class="text-center mt-5">
+            <a href="/" class="btn btn-primary rounded-pill px-5 btn-sm fw-bold text-uppercase shadow">Tôi đã hiểu rõ quy tắc sàn đấu</a>
+        </div>
+    </div>
+</div>

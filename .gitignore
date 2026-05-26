@@ -1,0 +1,12 @@
+# Bỏ qua các thư mục rác khi build C#
+[Bb]in/
+[Oo]bj/
+.vs/
+.vscode/
+
+# Bỏ qua file cấu hình chứa mật khẩu Database
+appsettings.json
+appsettings.Development.json
+client_secret_*.json
+# Bỏ qua thư mục chứa ảnh do người dùng upload (nếu có)
+wwwroot/images/avatars/

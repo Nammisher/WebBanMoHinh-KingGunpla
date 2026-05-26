@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="WebBanMoHinh.API/WebBanMoHinh.API.csproj" />
+  <Project Path="WebBanMoHinh.MVC/WebBanMoHinh.MVC.csproj" />
+</Solution>

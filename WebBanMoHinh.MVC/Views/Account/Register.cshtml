@@ -1,0 +1,122 @@
+@model WebBanMoHinh.MVC.Models.RegisterViewModel
+@{
+    Layout = null;
+    ViewData["Title"] = "Đăng Ký Tài Khoản Pilot - KingGunpla";
+}
+<!DOCTYPE html>
+<html lang="vi" data-bs-theme="dark">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px 0;
+        }
+        .register-card {
+            background: rgba(30, 41, 59, 0.4);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 650px;
+            padding: 40px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.5);
+        }
+        .form-control-cyber {
+            background: #111827 !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: #ffffff !important;
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 0.95rem;
+        }
+        .form-control-cyber:focus {
+            border-color: #3b82f6 !important;
+            box-shadow: 0 0 12px rgba(59, 130, 246, 0.3);
+        }
+        .btn-cyber {
+            background: linear-gradient(135deg, #00c6ff, #0072ff) !important;
+            border: none !important;
+            color: white !important;
+            font-weight: 700;
+            border-radius: 50px;
+            padding: 12px;
+            transition: all 0.3s;
+            letter-spacing: 0.5px;
+        }
+        .btn-cyber:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(0, 198, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div class="register-card">
+        <div class="text-center mb-4">
+            <h3 class="fw-bold mb-2 text-uppercase tracking-wider text-info"><i class="bi bi-person-plus-fill me-2"></i>Pilot Registration</h3>
+            <p class="text-muted small mb-0">Đăng ký thành viên để nhận đặc quyền tích điểm và chốt đơn nhanh chóng</p>
+        </div>
+
+        <form asp-action="Register" asp-controller="Account" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger small mb-3 list-unstyled text-center fw-bold"></div>
+
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size:0.75rem;">Họ và Tên</label>
+                        <input asp-for="HoTen" class="form-control form-control-cyber" placeholder="Nguyễn Văn A" autocomplete="off" />
+                        <span asp-validation-for="HoTen" class="text-danger small" style="font-size: 0.8rem;"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size:0.75rem;">Địa chỉ Email</label>
+                        <input asp-for="Email" class="form-control form-control-cyber" placeholder="pilot@gmail.com" autocomplete="off" />
+                        <span asp-validation-for="Email" class="text-danger small" style="font-size: 0.8rem;"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size:0.75rem;">Số Điện Thoại</label>
+                        <input asp-for="SoDienThoai" class="form-control form-control-cyber" placeholder="0912xxxxxx" autocomplete="off" />
+                        <span asp-validation-for="SoDienThoai" class="text-danger small" style="font-size: 0.8rem;"></span>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size:0.75rem;">Tên Đăng Nhập</label>
+                        <input asp-for="TenDangNhap" class="form-control form-control-cyber" placeholder="Nhập tài khoản viết liền..." autocomplete="off" />
+                        <span asp-validation-for="TenDangNhap" class="text-danger small" style="font-size: 0.8rem;"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size:0.75rem;">Mật Khẩu</label>
+                        <input asp-for="MatKhau" class="form-control form-control-cyber" placeholder="Tối thiểu 6 ký tự..." />
+                        <span asp-validation-for="MatKhau" class="text-danger small" style="font-size: 0.8rem;"></span>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size:0.75rem;">Xác Nhận Mật Khẩu</label>
+                        <input asp-for="NhapLaiMatKhau" class="form-control form-control-cyber" placeholder="Nhập lại mật khẩu..." />
+                        <span asp-validation-for="NhapLaiMatKhau" class="text-danger small" style="font-size: 0.8rem;"></span>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-cyber w-100 text-uppercase my-3">Khởi Tạo Tài Khoản Pilot</button>
+            
+            <div class="text-center small text-muted">
+                Đã có tài khoản cơ trưởng? <a href="/Account/Login" class="text-info text-decoration-none fw-bold">Đăng nhập tại đây</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>

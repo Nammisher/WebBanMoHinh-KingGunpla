@@ -1,0 +1,270 @@
+@model IEnumerable<WebBanMoHinh.MVC.Models.SanPhamViewModel>
+
+@{
+    ViewData["Title"] = "Tất cả sản phẩm Gunpla";
+}
+
+<style>
+    /* Custom Style cho Checkbox/Radio chuẩn Cyber */
+    .cyber-radio .form-check-input {
+        background-color: transparent;
+        border: 2px solid var(--text-muted);
+        transition: all 0.3s ease;
+    }
+    .cyber-radio .form-check-input:checked {
+        background-color: var(--text-nav-hover);
+        border-color: var(--text-nav-hover);
+        box-shadow: 0 0 10px rgba(0, 198, 255, 0.4);
+    }
+    .cyber-radio .form-check-label {
+        color: var(--text-main);
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: color 0.2s;
+    }
+    .cyber-radio:hover .form-check-label { color: var(--text-nav-hover); }
+    
+    /* Thanh sắp xếp ngang */
+    .sort-bar {
+        background-color: rgba(128,128,128,0.05);
+        border: 1px solid var(--border-layout);
+        border-radius: 8px;
+    }
+    
+    /* Card Sản phẩm chuẩn */
+    .product-card {
+        background-color: var(--bg-card);
+        border: 1px solid var(--border-layout);
+        transition: transform 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+        position: relative;
+    }
+    .product-card:hover {
+        transform: translateY(-5px);
+        border-color: var(--text-nav-hover);
+        box-shadow: 0 8px 20px rgba(0, 198, 255, 0.15);
+    }
+    .product-img-wrapper {
+        height: 250px;
+        width: 100%;
+        background-color: rgba(128, 128, 128, 0.05);
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px 8px 0 0;
+    }
+    .product-img-wrapper img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        transition: transform 0.5s ease;
+    }
+    .product-card:hover .product-img-wrapper img { transform: scale(1.05); }
+    .badge-discount { position: absolute; top: 10px; right: 10px; z-index: 2; }
+    
+    /* Ép tên sản phẩm luôn 2 dòng để các Card bằng nhau tăm tắp */
+    .text-truncate-2lh {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-height: 1.4;
+        min-height: 2.8em;
+    }
+
+    /* Tối ưu riêng cho Mobile: Thu nhỏ ảnh và chữ để 2 cột cân đối */
+    @@media (max-width: 768px) {
+        .product-img-wrapper { height: 170px; }
+        .mobile-fs-price { font-size: 1.1rem !important; }
+        .mobile-fs-title { font-size: 0.9rem !important; }
+        .btn-custom-action { font-size: 0.8rem; padding: 0.3rem; }
+    }
+</style>
+
+<div class="container my-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb small">
+            <li class="breadcrumb-item"><a href="/" class="text-decoration-none text-info">Trang chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page" style="color: var(--text-muted);">Tất cả sản phẩm</li>
+        </ol>
+    </nav>
+
+    <form id="filterForm" action="/SanPham/Index" method="get">
+        
+        @if (!string.IsNullOrEmpty(ViewBag.Search?.ToString()))
+        {
+            <input type="hidden" name="search" value="@ViewBag.Search" />
+        }
+        
+        @if (ViewBag.MaDong != null)
+        {
+            <input type="hidden" name="maDong" value="@ViewBag.MaDong" />
+        }
+
+        <div class="row g-4">
+            
+            <div class="col-lg-3">
+                <div class="card border-0 p-3 p-md-4 rounded-4 sticky-top" style="background-color: var(--bg-card); top: 90px; border: 1px solid var(--border-layout) !important;">
+                    
+                    <h5 class="fw-bold text-uppercase mb-1" style="color: var(--text-main); letter-spacing: 0.5px;">BỘ LỌC SẢN PHẨM</h5>
+                    <p class="small fst-italic mb-4" style="color: var(--text-muted);">Giúp lọc nhanh sản phẩm bạn tìm kiếm</p>
+
+                    <h6 class="fw-bold mt-2 mb-3" style="color: var(--text-main);">Thương hiệu</h6>
+                    <div class="d-flex flex-column gap-2 mb-4">
+                        <div class="form-check cyber-radio">
+                            <input class="form-check-input" type="radio" name="maNsx" value="" id="brandAll" @(ViewBag.MaNsx == null ? "checked" : "")>
+                            <label class="form-check-label" for="brandAll">Tất cả hãng</label>
+                        </div>
+                        <div class="form-check cyber-radio">
+                            <input class="form-check-input" type="radio" name="maNsx" value="2" id="brand1" @(ViewBag.MaNsx == 2 ? "checked" : "")>
+                            <label class="form-check-label" for="brand1">Bandai Namco</label>
+                        </div>
+                        <div class="form-check cyber-radio">
+                            <input class="form-check-input" type="radio" name="maNsx" value="5" id="brand2" @(ViewBag.MaNsx == 5 ? "checked" : "")>
+                            <label class="form-check-label" for="brand2">Motor Nuclear</label>
+                        </div>
+                        <div class="form-check cyber-radio">
+                            <input class="form-check-input" type="radio" name="maNsx" value="3" id="brand3" @(ViewBag.MaNsx == 3 ? "checked" : "")>
+                            <label class="form-check-label" for="brand3">Kotobukiya</label>
+                        </div>
+                    </div>
+
+                    <h6 class="fw-bold mb-3" style="color: var(--text-main);">Lọc giá</h6>
+                    <div class="d-flex flex-column gap-2 mb-3">
+                        <div class="form-check cyber-radio">
+                            <input class="form-check-input" type="radio" name="priceRange" value="" id="priceAll" @(string.IsNullOrEmpty(ViewBag.PriceRange?.ToString()) ? "checked" : "")>
+                            <label class="form-check-label" for="priceAll">Mọi mức giá</label>
+                        </div>
+                        <div class="form-check cyber-radio">
+                            <input class="form-check-input" type="radio" name="priceRange" value="under500" id="price1" @(ViewBag.PriceRange?.ToString() == "under500" ? "checked" : "")>
+                            <label class="form-check-label" for="price1">Giá dưới 500.000đ</label>
+                        </div>
+                        <div class="form-check cyber-radio">
+                            <input class="form-check-input" type="radio" name="priceRange" value="500-1000" id="price2" @(ViewBag.PriceRange?.ToString() == "500-1000" ? "checked" : "")>
+                            <label class="form-check-label" for="price2">500.000đ - 1.000.000đ</label>
+                        </div>
+                        <div class="form-check cyber-radio">
+                            <input class="form-check-input" type="radio" name="priceRange" value="1000-2000" id="price3" @(ViewBag.PriceRange?.ToString() == "1000-2000" ? "checked" : "")>
+                            <label class="form-check-label" for="price3">1.000.000đ - 2.000.000đ</label>
+                        </div>
+                        <div class="form-check cyber-radio">
+                            <input class="form-check-input" type="radio" name="priceRange" value="over2000" id="price4" @(ViewBag.PriceRange?.ToString() == "over2000" ? "checked" : "")>
+                            <label class="form-check-label" for="price4">Trên 2.000.000đ</label>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-outline-info w-100 mt-2 btn-sm rounded-pill fw-bold shadow-sm">
+                        <i class="bi bi-funnel-fill me-1"></i> ÁP DỤNG LỌC
+                    </button>
+                </div>
+            </div>
+
+            <div class="col-lg-9">
+                
+                <div class="mb-4">
+                    <h4 class="fw-bold text-uppercase mb-3 mt-0" style="color: var(--text-main); letter-spacing: 1px;">
+                        @(string.IsNullOrEmpty(ViewBag.Search?.ToString()) ? "TẤT CẢ SẢN PHẨM" : $"KẾT QUẢ TÌM KIẾM: '{ViewBag.Search}'")
+                    </h4>
+                    
+                    <div class="sort-bar d-flex flex-wrap align-items-center gap-3 p-3">
+                        <span class="fw-bold small me-2" style="color: var(--text-main);">Sắp xếp:</span>
+                        
+                        <div class="form-check cyber-radio form-check-inline mb-0">
+                            <input class="form-check-input" type="radio" name="sortBy" value="newest" id="sort5" onchange="this.form.submit()" @(ViewBag.SortBy?.ToString() == "newest" ? "checked" : "")>
+                            <label class="form-check-label" for="sort5">Hàng mới nhất</label>
+                        </div>
+                        <div class="form-check cyber-radio form-check-inline mb-0">
+                            <input class="form-check-input" type="radio" name="sortBy" value="price_asc" id="sort3" onchange="this.form.submit()" @(ViewBag.SortBy?.ToString() == "price_asc" ? "checked" : "")>
+                            <label class="form-check-label" for="sort3">Giá tăng dần</label>
+                        </div>
+                        <div class="form-check cyber-radio form-check-inline mb-0">
+                            <input class="form-check-input" type="radio" name="sortBy" value="price_desc" id="sort4" onchange="this.form.submit()" @(ViewBag.SortBy?.ToString() == "price_desc" ? "checked" : "")>
+                            <label class="form-check-label" for="sort4">Giá giảm dần</label>
+                        </div>
+                        <div class="form-check cyber-radio form-check-inline mb-0">
+                            <input class="form-check-input" type="radio" name="sortBy" value="az" id="sort1" onchange="this.form.submit()" @(ViewBag.SortBy?.ToString() == "az" ? "checked" : "")>
+                            <label class="form-check-label" for="sort1">Tên A &rarr; Z</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-2 g-md-4">
+                    
+                    @if (!Model.Any())
+                    {
+                        <div class="col-12">
+                            <div class="alert text-center border-0 p-5 rounded-4 shadow-sm" style="background-color: rgba(220, 53, 69, 0.05);">
+                                <i class="bi bi-box-seam text-danger opacity-50" style="font-size: 3rem;"></i>
+                                <h5 class="text-danger mt-3 fw-bold">Kho chưa có dữ liệu</h5>
+                                <p class="text-muted">Không tìm thấy sản phẩm nào phù hợp với bộ lọc của bạn.</p>
+                                <a href="/SanPham/Index" class="btn btn-outline-danger rounded-pill btn-sm mt-2 px-4 fw-bold">Bỏ lọc & Tải lại</a>
+                            </div>
+                        </div>
+                    }
+                    else
+                    {
+                        @foreach (var item in Model)
+                        {
+                            <div class="col-6 col-md-4 col-lg-3 mb-3">
+                                <div class="card product-card h-100 rounded-4 overflow-hidden shadow-sm">
+                                    
+                                    @if (item.GiaGiam > 0 && item.GiaBan > 0)
+                                    {
+                                        decimal percent = 100 - ((item.GiaGiam.Value / item.GiaBan.Value) * 100);
+                                        <span class="badge bg-danger badge-discount shadow">-@Math.Round(percent)%</span>
+                                    }
+
+                                    <a href="/SanPham/ChiTiet/@item.MaSp" class="product-img-wrapper text-decoration-none">
+                                        <img src="~/images/@item.HinhAnhChinh" 
+                                             onerror="this.src='https://placehold.co/400x400/1e293b/cbd5e1?text=No+Image'" 
+                                             alt="@item.TenSp">
+                                    </a>
+                                    
+                                    <div class="card-body d-flex flex-column justify-content-between p-2 p-md-3">
+                                        <div>
+                                            <a href="/SanPham/ChiTiet/@item.MaSp" class="text-decoration-none">
+                                                <h6 class="card-title fw-bold text-truncate-2lh mobile-fs-title mb-1 mb-md-2" style="color: var(--text-main);" title="@item.TenSp">@item.TenSp</h6>
+                                            </a>
+                                            <div class="d-flex gap-2 mb-2 mb-md-3 text-muted" style="font-size: 0.7rem;">
+                                                <span class="text-truncate">Grade: @(string.IsNullOrEmpty(item.TiLe) ? "N/A" : item.TiLe)</span>
+                                            </div>
+                                        </div>
+                                        <div class="mt-auto">
+                                            <div class="d-flex justify-content-between align-items-end align-items-md-center flex-wrap gap-1 mb-2 mb-md-3">
+                                                @if (item.GiaGiam > 0)
+                                                {
+                                                    <div>
+                                                        <span class="fw-bold text-danger fs-5 mobile-fs-price d-block">@String.Format("{0:N0}", item.GiaGiam)đ</span>
+                                                        <span class="text-muted text-decoration-line-through" style="font-size: 0.75rem;">@String.Format("{0:N0}", item.GiaBan)đ</span>
+                                                    </div>
+                                                }
+                                                else
+                                                {
+                                                    <span class="fw-bold text-info fs-5 mobile-fs-price">@String.Format("{0:N0}", item.GiaBan)đ</span>
+                                                }
+                                                <span class="bg-dark bg-opacity-25 px-2 py-1 rounded border border-secondary border-opacity-25" style="font-size: 0.7rem;">Kho: @item.SoLuongTon</span>
+                                            </div>
+                                            <a href="/SanPham/ChiTiet/@item.MaSp" class="btn btn-outline-primary btn-custom-action w-100 fw-bold">Xem Chi Tiết</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+
+                </div>
+                
+                @if (Model.Any())
+                {
+                    <nav class="mt-5">
+                        <ul class="pagination justify-content-center">
+                            <li class="page-item active"><a class="page-link border-info" style="background-color: var(--text-nav-hover);" href="#">Trang 1</a></li>
+                        </ul>
+                    </nav>
+                }
+
+            </div>
+        </div>
+    </form>
+</div>

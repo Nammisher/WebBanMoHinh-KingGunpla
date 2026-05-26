@@ -1,0 +1,79 @@
+@{
+    ViewData["Title"] = "Thanh toán Online";
+}
+
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-6">
+            <div class="card border-0 rounded-4 shadow-lg overflow-hidden" style="background-color: var(--bg-card); border: 1px solid var(--border-layout) !important;">
+                
+                <div class="bg-primary bg-gradient p-4 text-center text-white">
+                    <i class="bi bi-qr-code-scan display-4 mb-2"></i>
+                    <h4 class="fw-bold text-uppercase mb-0">Thanh toán chuyển khoản</h4>
+                    <p class="mb-0 opacity-75 small">Vui lòng quét mã QR qua ứng dụng ngân hàng</p>
+                </div>
+
+                <div class="card-body p-4 p-md-5 text-center">
+                    
+                    <div class="alert alert-info rounded-3 mb-4 text-start shadow-sm border-0">
+                        <div class="d-flex align-items-center gap-3">
+                            <i class="bi bi-info-circle-fill fs-3 text-info"></i>
+                            <div>
+                                <strong class="d-block mb-1" style="color: var(--text-main);">Mã đơn hàng của bạn:</strong>
+                                <span class="fs-4 fw-black text-primary" style="letter-spacing: 1px;">#@ViewBag.OrderId</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-2 rounded-4 d-inline-block shadow mb-4 border" style="background-color: var(--bg-card); border-color: rgba(0, 198, 255, 0.3) !important; position: relative;">
+                        @{
+                            // Chuẩn bị URL API QR (Ép kiểu bỏ số thập phân)
+                            var rawAmount = Math.Round((decimal)ViewBag.Amount, 0).ToString();
+                            // Dùng Uri.EscapeDataString để mã hóa URL an toàn cho khoảng trắng và tiếng việt
+                            var addInfo = Uri.EscapeDataString(ViewBag.TransferContent);
+                            var accountName = Uri.EscapeDataString("VO HOANG DUY NAM");
+                            
+                            // Cấu trúc API VietQR: [Tên Ngân Hàng]-[STK]-[Template].png?amount=[Số tiền]&addInfo=[Lời nhắn]&accountName=[Tên Tài Khoản]
+                            var qrUrl = $"https://img.vietqr.io/image/techcombank-19075257337015-compact2.png?amount={rawAmount}&addInfo={addInfo}&accountName={accountName}";
+                        }
+
+                        <img src="@qrUrl" 
+                             alt="QR Code" 
+                             class="img-fluid rounded-3 position-relative z-1" 
+                             style="max-width: 280px; height: auto;" 
+                             onerror="this.src='https://placehold.co/280x400/1e293b/cbd5e1?text=Lỗi+tạo+QR'">
+                    </div>
+
+                    <div class="text-start p-4 rounded-3 border" style="background-color: var(--bg-card); border-color: var(--border-layout) !important;">
+                        <h6 class="fw-bold text-uppercase mb-3" style="color: var(--text-main);">
+                            <i class="bi bi-wallet2 me-2"></i>Chi tiết thanh toán
+                        </h6>
+                        <ul class="list-unstyled small mb-0" style="color: var(--text-muted); line-height: 1.8;">
+                            <li class="mb-2" style="color: var(--text-main);">
+                                <i class="bi bi-cash-coin text-info me-2 fs-5 align-middle"></i>
+                                <strong>Số tiền:</strong> <span class="fw-bold text-danger fs-6">@String.Format("{0:N0}", ViewBag.Amount) VNĐ</span>
+                            </li>
+                            <li class="mb-2" style="color: var(--text-main);">
+                                <i class="bi bi-chat-square-text text-info me-2 fs-5 align-middle"></i>
+                                <strong>Lời nhắn:</strong> 
+                                <span class="fw-bold user-select-all text-primary">@ViewBag.TransferContent</span>
+                            </li>
+                            <li class="mb-2 mt-3" style="color: var(--text-main);">
+                                <i class="bi bi-phone text-success me-2 fs-5 align-middle"></i>Mở app quét mã để <strong>tự động điền</strong> thông tin.
+                            </li>
+                            <li style="color: var(--text-main);">
+                                <i class="bi bi-check2-circle text-success me-2 fs-5 align-middle"></i>Đội ngũ KingGunpla sẽ duyệt đơn ngay khi nhận được tiền!
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-transparent border-top p-4 text-center">
+                    <a href="/Order/History" class="btn btn-outline-primary rounded-pill px-5 py-2 fw-bold shadow-sm">
+                        <i class="bi bi-bag-check me-2"></i>Xem lịch sử đơn hàng
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

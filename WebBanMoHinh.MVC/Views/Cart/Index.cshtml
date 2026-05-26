@@ -1,0 +1,205 @@
+@model List<WebBanMoHinh.MVC.Models.CartItemViewModel>
+
+@{
+    ViewData["Title"] = "Giỏ Hàng Của Bạn";
+}
+
+<style>
+    /* ================= THIẾT KẾ CARD & THÀNH PHẦN TRONG GIỎ HÀNG ================= */
+    .cart-title {
+        color: var(--text-main) !important;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .cart-bay-wrapper {
+        background-color: var(--bg-card) !important;
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        box-shadow: var(--shadow-glow);
+        overflow: hidden;
+    }
+
+    .cart-table {
+        margin-bottom: 0 !important;
+    }
+
+    .cart-table thead tr {
+        border-bottom: 2px solid var(--border-color) !important;
+        background: transparent !important;
+    }
+
+    .cart-table th {
+        color: var(--text-main) !important;
+        font-weight: 700;
+        text-transform: uppercase;
+        font-size: 0.8rem;
+        letter-spacing: 0.8px;
+        padding: 16px !important;
+        border: none !important;
+    }
+
+    .cart-table td {
+        padding: 16px !important;
+        color: var(--text-muted) !important;
+        border-bottom: 1px solid var(--border-color) !important;
+    }
+
+    .cart-table tr:last-child td {
+        border-bottom: none !important;
+    }
+
+    .cart-item-name {
+        color: var(--text-main) !important;
+        font-weight: 600;
+        transition: color 0.2s ease;
+        text-decoration: none;
+    }
+    .cart-item-name:hover {
+        color: var(--btn-accent) !important;
+    }
+
+    /* ĐÃ SỬA: Khung bọc ảnh giỏ hàng chuẩn 90x90 */
+    .cart-img-frame {
+        width: 90px;
+        height: 90px;
+        background-color: rgba(255,255,255,0.05) !important;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden; /* Cắt phần ảnh thừa */
+        flex-shrink: 0; /* Đảm bảo khung ảnh luôn là 90px, không bị bóp méo khi tên sản phẩm quá dài */
+    }
+
+    /* ĐÃ SỬA: Scale ảnh đầy khung 100% */
+    .cart-img-frame img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover; /* Ép ảnh tự động thu phóng và cắt vuông vức */
+    }
+
+    /* KHỐI TÓM TẮT ĐƠN HÀNG VŨ TRỤ */
+    .summary-bay {
+        background-color: var(--bg-card) !important;
+        border: 1px solid var(--border-color);
+        border-radius: 16px;
+        padding: 25px;
+        box-shadow: var(--shadow-glow);
+    }
+
+    .summary-title {
+        color: var(--text-main) !important;
+        font-weight: 700;
+        letter-spacing: 0.5px;
+    }
+
+    .summary-row {
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 12px;
+        margin-bottom: 15px;
+    }
+
+    .summary-label {
+        color: var(--text-muted) !important;
+        font-size: 0.9rem;
+    }
+
+    .summary-value {
+        color: var(--text-main) !important;
+        font-weight: 700;
+    }
+
+    /* TRẠNG THÁI GIỎ TRỐNG */
+    .empty-cart-bay {
+        background: var(--bg-bay) !important;
+        backdrop-filter: blur(10px);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        box-shadow: var(--shadow-glow);
+    }
+</style>
+
+<div class="container my-5">
+    <h2 class="fw-bold mb-4 cart-title"><i class="bi bi-cart4 me-2 text-info"></i>Giỏ Hàng Của Bạn</h2>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="table-responsive cart-bay-wrapper p-2">
+                    <table class="table align-middle cart-table">
+                        <thead>
+                            <tr>
+                                <th>Mô hình</th>
+                                <th>Giá bán</th>
+                                <th style="width: 110px;" class="text-center">Số lượng</th>
+                                <th>Thành tiền</th>
+                                <th class="text-center">Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td>
+                                        <div class="d-flex align-items-center gap-3">
+                                            <div class="cart-img-frame">
+                                                <img src="~/images/@item.HinhAnhChinh" 
+                                                     onerror="this.src='https://placehold.co/90x90/1e293b/cbd5e1?text=No+Img'" 
+                                                     alt="@item.TenSp">
+                                            </div>
+                                            <a href="/SanPham/ChiTiet/@item.MaSp" class="cart-item-name small text-truncate" style="max-width: 240px;" title="@item.TenSp">
+                                                @item.TenSp
+                                            </a>
+                                        </div>
+                                    </td>
+                                    <td class="fw-semibold">@String.Format("{0:N0}", item.GiaBan) đ</td>
+                                    <td class="text-center fw-bold text-main">@item.SoLuong</td>
+                                    <td class="text-danger fw-bold fs-6">@String.Format("{0:N0}", item.ThanhTien) đ</td>
+                                    <td class="text-center">
+                                        <a href="/Cart/Remove/@item.MaSp" class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold btn-sm text-uppercase" style="font-size: 0.72rem; letter-spacing: 0.3px;">
+                                            <i class="bi bi-trash3 me-1"></i>Xóa
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="summary-bay">
+                    <h5 class="text-uppercase fs-6 mb-4 summary-title"><i class="bi bi-receipt me-2 text-primary"></i>Tóm tắt đơn hàng</h5>
+                    
+                    <div class="d-flex justify-content-between summary-row">
+                        <span class="summary-label">Tổng số lượng:</span>
+                        <span class="summary-value">@Model.Sum(c => c.SoLuong) sản phẩm</span>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <span class="summary-label fs-5">Tổng tiền thanh toán:</span>
+                        <span class="text-danger fw-bold fs-4">@String.Format("{0:N0}", Model.Sum(c => c.ThanhTien)) đ</span>
+                    </div>
+                    
+                    <a asp-controller="Checkout" asp-action="Index" class="btn btn-primary w-100 fw-bold">
+                        <i class="bi bi-credit-card me-2"></i> TIẾN HÀNH ĐẶT HÀNG
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="text-center py-5 empty-cart-bay p-4">
+            <div class="text-muted display-1 mb-3 opacity-25"><i class="bi bi-bag-x"></i></div>
+            <p class="fs-5 mb-4 text-main fw-semibold">Giỏ hàng của Pilot đang trống trơn!</p>
+            <a href="/" class="btn btn-buy-now rounded-pill px-4 py-2 fw-bold text-uppercase btn-sm">
+                <i class="bi bi-arrow-left me-2"></i>Quay lại tổng kho mua sắm
+            </a>
+        </div>
+    }
+</div>

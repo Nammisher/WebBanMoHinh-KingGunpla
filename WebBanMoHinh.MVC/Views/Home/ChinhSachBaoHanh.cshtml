@@ -1,0 +1,82 @@
+@{
+    ViewData["Title"] = "Chính Sách Bảo Hành Gãy Hỏng & Thiếu Part";
+}
+
+<div class="container my-5">
+    <nav aria-label="breadcrumb" class="mb-4">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="/" class="text-decoration-none">Trang chủ</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Chính sách bảo hành</li>
+        </ol>
+    </nav>
+
+    <div class="text-center mb-5">
+        <h2 class="text-uppercase fw-bold" style="color: var(--text-nav-hover); text-shadow: var(--glow-brand);">
+            <i class="bi bi-shield-check me-2"></i> CHÍNH SÁCH BẢO HÀNH CƠ ĐIỂM
+        </h2>
+        <p style="color: var(--text-muted);">Cam kết đồng hành và xử lý mọi sự cố Runner/Runner lỗi từ phía nhà sản xuất</p>
+    </div>
+
+    <div class="card border-0 shadow rounded-4 p-4 p-md-5 mx-auto" style="max-width: 900px; background-color: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-layout) !important;">
+        
+        <h5 class="fw-bold text-uppercase border-bottom border-secondary border-opacity-25 pb-2 mb-4 text-info">
+            <i class="bi bi-check-circle-fill me-2"></i>1. Điều kiện áp dụng bảo hành
+        </h5>
+        <ul class="lh-lg mb-5 small">
+            <li>Sản phẩm được mua trực tiếp tại hệ thống cửa hàng hoặc website <span class="text-info fw-bold">KingGunpla.com</span>.</li>
+            <li>Có <a href="/Home/HuongDanRunner" class="fw-bold text-warning text-decoration-none">Video Unbox</a> quay rõ các góc cạnh, mã vận đơn và tình trạng hộp khi vừa nhận từ shipper.</li>
+            <li><strong class="text-danger">Túi nilon (Seal) chứa runner chứa chi tiết lỗi/thiếu PHẢI CÒN NGUYÊN VẸN</strong>, chưa bị xé rách hay cắt bóc. Hãng Bandai và các hãng Mecha Trung Quốc từ chối bảo hành nếu túi nhựa đã mở.</li>
+        </ul>
+
+        <h5 class="fw-bold text-uppercase border-bottom border-secondary border-opacity-25 pb-2 mb-4 text-warning">
+            <i class="bi bi-plus-circle-fill me-2"></i>2. Các trường hợp được hỗ trợ gạch bù part
+        </h5>
+        <div class="row g-3 mb-5 small">
+            <div class="col-md-6">
+                <div class="p-3 rounded-3 h-100" style="background-color: rgba(128,128,128,0.05); border: 1px solid var(--border-layout);">
+                    <h6 class="fw-bold text-success"><i class="bi bi-cpu me-2"></i>Lỗi từ nhà máy (Hãng)</h6>
+                    <p class="mb-0 text-muted">Hộp kit bị thiếu hẳn 1 vỉ runner, runner bị đúc thiếu chi tiết (thiếu nhựa), hoặc các chi tiết clear bị đục, biến dạng dị thường.</p>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="p-3 rounded-3 h-100" style="background-color: rgba(128,128,128,0.05); border: 1px solid var(--border-layout);">
+                    <h6 class="fw-bold text-success"><i class="bi bi-truck me-2"></i>Sự cố do vận chuyển</h6>
+                    <p class="mb-0 text-muted">Runner bị gãy vỡ các chốt nối quan trọng hoặc gãy đôi các part lớn do va đập mạnh trong quá trình shipper giao hàng.</p>
+                </div>
+            </div>
+        </div>
+
+        <h5 class="fw-bold text-uppercase border-bottom border-secondary border-opacity-25 pb-2 mb-4 text-danger">
+            <i class="bi bi-hourglass-split me-2"></i>3. Quy trình gửi yêu cầu xin bù Part gãy hỏng
+        </h5>
+        <div class="table-responsive small">
+            <table class="table table-bordered align-middle" style="color: var(--text-main); border-color: var(--border-layout);">
+                <thead style="background-color: rgba(128,128,128,0.08);">
+                    <tr class="text-info">
+                        <th style="width: 25%">Tiến trình</th>
+                        <th>Nội dung thực hiện</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td class="fw-bold">Bước 1: Tiếp nhận</td>
+                        <td>Pilot liên hệ qua Hotline/Zalo <strong class="text-warning">0981 260 096</strong>, gửi video khui hàng và hình ảnh chụp cận cảnh part lỗi nằm trong túi seal.</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Bước 2: Xác minh</td>
+                        <td>Ban quản trị KingGunpla đối chiếu thông tin đơn hàng và gửi biên bản xác nhận lỗi sang kho tổng của hãng (Bandai, Motor Nuclear, v.v.).</td>
+                    </tr>
+                    <tr>
+                        <td class="fw-bold">Bước 3: Chờ hãng ship</td>
+                        <td>Thời gian hãng xử lý gạch part đúc bù dao động từ <span class="text-info fw-bold">3 - 6 tuần</span> tùy thuộc vào tiến độ biên giới và kho linh kiện của hãng tại nước ngoài.</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="text-center mt-5">
+            <a href="/Home/HuongDanRunner" class="btn btn-primary rounded-pill px-4 btn-sm fw-bold text-uppercase me-2">Xem lại quy trình unbox</a>
+            <a href="/" class="btn btn-outline-secondary rounded-pill px-4 btn-sm fw-bold text-uppercase">Trở về trang chủ</a>
+        </div>
+    </div>
+</div>

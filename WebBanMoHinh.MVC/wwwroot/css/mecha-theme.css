@@ -1,0 +1,422 @@
+/* =========================================================================
+   1. HỆ THỐNG BIẾN MÀU TOÀN CỤC (LIGHT / DARK MODE CO GIÃN)
+   ========================================================================= */
+:root,
+[data-bs-theme="light"] {
+  --bg-body: #f1f5f9; /* Xám trắng màu giáp mecha */
+  --bg-card: #ffffff; /* Card màu trắng tinh khiết */
+  --bg-bay: rgba(255, 255, 255, 0.65); /* Khoang chứa lớn kính mờ sáng */
+  --bg-image-box: #f8fafc; /* Khung nền ảnh sáng */
+  --text-main: #0f172a; /* Chữ tiêu đề xanh đen Slate đậm đà */
+  --text-muted: #475569; /* Chữ mô tả xám Slate dịu mắt */
+  --border-color: rgba(15, 23, 42, 0.08); /* Viền xám mảnh */
+  --shadow-glow: 0 10px 30px rgba(15, 23, 42, 0.05); /* Bóng đổ chìm mềm mại */
+  --btn-accent: #1d4ed8; /* Xanh dương đại dương đậm sắc nét */
+  --carousel-cap-bg: rgba(255, 255, 255, 0.85);
+}
+
+[data-bs-theme="dark"] {
+  --bg-body: #0f172a; /* Đen vũ trụ sâu thẳm */
+  --bg-card: rgba(17, 24, 39, 0.5); /* Card tối trong suốt */
+  --bg-bay: rgba(30, 41, 59, 0.4); /* Khoang chứa tối mờ ảo */
+  --bg-image-box: #111827; /* Khung nền ảnh tối vũ trụ */
+  --text-main: #ffffff; /* Trắng bạc ánh kim cực sang */
+  --text-muted: #94a3b8; /* Xám Slate kim loại */
+  --border-color: rgba(255, 255, 255, 0.06); /* Viền mờ tinh tế */
+  --shadow-glow: 0 12px 35px rgba(0, 0, 0, 0.5); /* Bóng đổ mạnh mẽ 3D */
+  --btn-accent: #3b82f6; /* Xanh neon công nghệ */
+  --carousel-cap-bg: rgba(15, 23, 42, 0.75);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-body) !important;
+  color: var(--text-muted);
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* =========================================================================
+   2. KHUNG CHỨA COMPONENT BAY (MECHA BAY LAYOUT)
+   ========================================================================= */
+.tech-section-bay,
+.detail-container,
+.mecha-bay {
+  background: var(--bg-bay) !important;
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border-color);
+  border-radius: 20px;
+  padding: 30px;
+  margin-bottom: 40px;
+  box-shadow: var(--shadow-glow);
+  transition: all 0.3s ease;
+}
+
+.tech-section-title-wrapper {
+  border-bottom: 1px solid var(--border-color) !important;
+  padding-bottom: 15px;
+  margin-bottom: 30px;
+}
+
+.tech-section-title,
+.detail-title {
+  font-weight: 800 !important;
+  font-size: 1.35rem !important;
+  letter-spacing: 0.8px !important;
+  text-transform: uppercase !important;
+  color: var(--text-main) !important;
+  margin-bottom: 0 !important;
+}
+
+/* =========================================================================
+   3. BANNER CAROUSEL ĐIỆN ẢNH & NÚT BẤM
+   ========================================================================= */
+.carousel-item {
+  height: 420px;
+  overflow: hidden;
+}
+.carousel-fade .carousel-item {
+  opacity: 0;
+  transition-property: opacity;
+  transition-duration: 1.2s !important;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.carousel-fade .carousel-item.active {
+  opacity: 1;
+}
+.carousel-item .w-100 {
+  transition: transform 4s cubic-bezier(0.1, 0.8, 0.3, 1) !important;
+  transform: scale(1);
+}
+.carousel-item.active .w-100 {
+  transform: scale(1.05);
+}
+
+.carousel-caption {
+  background: var(--carousel-cap-bg) !important;
+  border: 1px solid var(--border-color);
+  border-radius: 24px;
+  padding: 40px !important;
+  backdrop-filter: blur(10px);
+  box-shadow: var(--shadow-glow);
+  color: var(--text-main) !important;
+  z-index: 2;
+  transition: all 0.3s ease;
+}
+.carousel-caption h1 {
+  color: var(--text-main) !important;
+}
+.carousel-caption p {
+  color: var(--text-muted) !important;
+}
+.carousel-control-prev,
+.carousel-control-next {
+  z-index: 10 !important;
+  width: 8%;
+}
+
+.btn-banner-blue {
+  background: transparent !important;
+  border: 2px solid var(--btn-accent) !important;
+  color: var(--btn-accent) !important;
+  border-radius: 50px;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  padding: 11px 30px;
+  transition: all 0.3s ease-in-out;
+}
+.btn-banner-blue:hover {
+  background: rgba(59, 130, 246, 0.15) !important;
+  color: var(--btn-accent) !important;
+  box-shadow: 0 0 20px rgba(59, 130, 246, 0.4);
+  transform: translateY(-3px);
+}
+.btn-banner-white {
+  background: transparent !important;
+  border: 2px solid var(--text-main) !important;
+  color: var(--text-main) !important;
+  border-radius: 50px;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+  padding: 11px 30px;
+  transition: all 0.3s ease-in-out;
+}
+.btn-banner-white:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  transform: translateY(-3px);
+}
+
+/* THANH CAM KẾT DỊCH VỤ */
+.tech-commitment-bar {
+  background: var(--bg-bay) !important;
+  backdrop-filter: blur(8px);
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--btn-accent) !important;
+  border-radius: 16px;
+  box-shadow: var(--shadow-glow);
+  transition: all 0.3s ease;
+}
+.tech-commitment-bar h6 {
+  color: var(--text-main) !important;
+}
+.tech-commitment-bar p {
+  color: var(--text-muted) !important;
+}
+
+/* =========================================================================
+   4. KHOANG DANH MỤC NỔI BẬT (ICON TRÒN)
+   ========================================================================= */
+.category-circle-item {
+  text-decoration: none !important;
+  display: block;
+  text-align: center;
+}
+.category-icon-wrap {
+  width: 76px;
+  height: 76px;
+  border-radius: 50%;
+  background: var(--bg-body);
+  border: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px auto;
+  font-size: 24px;
+  color: var(--text-muted);
+  transition: all 0.3s ease;
+}
+.category-circle-item:hover .category-icon-wrap {
+  color: var(--btn-accent);
+  border-color: var(--btn-accent);
+  transform: scale(1.08) translateY(-3px);
+}
+.category-title {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+.category-circle-item:hover .category-title {
+  color: var(--btn-accent);
+}
+
+/* =========================================================================
+   5. CARD SẢN PHẨM & KHUNG CHỨA ẢNH ĐỘNG
+   ========================================================================= */
+.product-card {
+  border: 1px solid var(--border-color) !important;
+  border-radius: 16px;
+  overflow: hidden;
+  background: var(--bg-card) !important;
+  backdrop-filter: blur(5px);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.product-card:hover {
+  transform: translateY(-8px);
+  border-color: var(--btn-accent) !important;
+  box-shadow: var(--shadow-glow) !important;
+}
+
+.image-container,
+.image-detail-box {
+  height: 230px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--bg-image-box) !important;
+  position: relative;
+  padding: 20px;
+  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.3s ease;
+}
+.image-detail-box {
+  height: 450px;
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+}
+
+.product-image,
+.image-detail-box img {
+  max-height: 100%;
+  max-width: 100%;
+  object-fit: contain;
+  transition: transform 0.5s ease;
+}
+.product-card:hover .product-image,
+.image-detail-box:hover img {
+  transform: scale(1.08);
+}
+.product-card h6 {
+  color: var(--text-main) !important;
+}
+
+.btn-custom-action {
+  border-radius: 50px;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.5px;
+  padding: 10px 20px;
+  background: transparent;
+  color: var(--btn-accent) !important;
+  border: 1px solid var(--btn-accent) !important;
+  transition: all 0.2s;
+}
+.product-card:hover .btn-custom-action {
+  background: linear-gradient(135deg, #00c6ff, #0072ff);
+  color: #ffffff !important;
+  border-color: #00c6ff !important;
+}
+.text-truncate-2lh {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  height: 44px;
+  line-height: 1.4;
+}
+
+/* =========================================================================
+   6. CHI TIẾT SẢN PHẨM & BẢNG THÔNG SỐ (SPEC TABLE)
+   ========================================================================= */
+.spec-table-bay {
+  background: var(--bg-card) !important;
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  overflow: hidden;
+  margin-bottom: 25px;
+}
+.spec-table {
+  margin-bottom: 0 !important;
+  color: var(--text-muted) !important;
+}
+.spec-table td {
+  padding: 12px 20px !important;
+  border-color: var(--border-color) !important;
+  background: transparent !important;
+  color: var(--text-muted) !important;
+}
+.spec-table tr:last-child td {
+  border-bottom: none !important;
+}
+
+.spec-label {
+  font-weight: 700;
+  color: var(--text-main) !important;
+  width: 35%;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  letter-spacing: 0.5px;
+}
+
+.description-box h5 {
+  color: var(--text-main) !important;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+.description-text {
+  color: var(--text-muted) !important;
+  line-height: 1.6;
+  font-size: 0.92rem;
+}
+.breadcrumb-item a {
+  color: var(--btn-accent) !important;
+  text-decoration: none;
+  font-weight: 600;
+}
+.breadcrumb-item.active {
+  color: var(--text-muted) !important;
+}
+
+.quantity-input {
+  background-color: var(--bg-card) !important;
+  color: var(--text-main) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 8px;
+  font-weight: 700;
+}
+.quantity-input:focus {
+  border-color: var(--btn-accent) !important;
+  box-shadow: 0 0 0 0.25rem rgba(59, 130, 246, 0.25) !important;
+}
+
+.btn-add-cart {
+  border: 2px solid var(--btn-accent) !important;
+  color: var(--btn-accent) !important;
+  background: transparent !important;
+  transition: all 0.3s ease;
+}
+.btn-add-cart:hover {
+  background: rgba(59, 130, 246, 0.1) !important;
+  transform: translateY(-2px);
+}
+
+.btn-buy-now {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8) !important;
+  color: #ffffff !important;
+  border: none !important;
+  transition: all 0.3s ease;
+}
+.btn-buy-now:hover {
+  box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4) !important;
+  transform: translateY(-2px);
+}
+
+/* =========================================================================
+   7. CARD TIN TỨC & BADGE NGÀY THÁNG
+   ========================================================================= */
+.news-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+}
+.news-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--btn-accent);
+}
+.news-card h6 {
+  color: var(--text-main) !important;
+}
+
+.news-img-wrap {
+  height: 180px;
+  position: relative;
+  background: var(--bg-image-box);
+  overflow: hidden;
+  transition: background-color 0.3s ease;
+}
+.news-img-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s;
+}
+.news-card:hover .news-img-wrap img {
+  transform: scale(1.06);
+}
+
+.news-date-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: #dc3545;
+  color: #fff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: bold;
+  font-size: 0.8rem;
+  text-align: center;
+  line-height: 1.1;
+  z-index: 5;
+}

@@ -1,0 +1,266 @@
+@model WebBanMoHinh.MVC.Models.CheckoutViewModel
+
+@{
+    ViewData["Title"] = "Thanh toán";
+    var cartItems = ViewBag.Cart as List<WebBanMoHinh.MVC.Models.CartItemViewModel>; 
+    decimal phivanchuyen = 30000;
+    decimal tamTinh = cartItems?.Sum(x => x.ThanhTien) ?? 0;
+    decimal tongCong = tamTinh + phivanchuyen;
+}
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/21.2.4/css/intlTelInput.css">
+<link href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.bootstrap5.min.css" rel="stylesheet">
+
+<style>
+    /* CSS đồng bộ Dark Mode */
+    .checkout-card { background-color: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-layout) !important; }
+    .form-control { background-color: var(--bg-card) !important; color: var(--text-main) !important; border: 1px solid var(--border-layout) !important; }
+    .form-control:focus { border-color: #0d6efd !important; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important; }
+    .form-control::placeholder { color: var(--text-muted, #6c757d) !important; }
+
+    /* ====================================================
+       FIX TUYỆT ĐỐI: CHỐNG CHỒNG CHỮ & CẮT CHỮ
+       ==================================================== */
+    .ts-control {
+        background-color: var(--bg-card) !important;
+        color: var(--text-main) !important;
+        border: 1px solid var(--border-layout) !important;
+        border-radius: 6px !important;
+        min-height: 42px !important;
+        display: flex !important;
+        align-items: center !important;
+        /* Cho phép rớt dòng hoặc co giãn linh hoạt */
+        flex-wrap: wrap !important;
+    }
+    
+    .ts-wrapper.focus .ts-control { border-color: #0d6efd !important; box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important; }
+    
+    /* Ép khung chọn chữ không bị lệch */
+    .ts-control > .item {
+        white-space: normal !important; /* CHO PHÉP RỚT DÒNG */
+        word-break: break-word !important;
+        margin: 0 !important;
+    }
+
+    .ts-dropdown {
+        background-color: var(--bg-card) !important;
+        color: var(--text-main) !important;
+        border: 1px solid var(--border-layout) !important;
+        border-radius: 8px !important;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.6) !important;
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        margin-top: 5px !important;
+        padding: 5px 0 !important;
+    }
+    
+    .ts-dropdown .option { padding: 10px !important; color: var(--text-main) !important; }
+    .ts-dropdown .option:hover, .ts-dropdown .option.active { background-color: rgba(13, 110, 253, 0.2) !important; color: var(--text-main) !important; }
+    
+    .ts-dropdown .dropdown-input-wrap { padding: 4px 12px 8px 12px !important; }
+    .ts-dropdown .dropdown-input { background-color: rgba(128,128,128,0.1) !important; color: var(--text-main) !important; border: 1px solid var(--border-layout) !important; border-radius: 6px !important; padding: 8px 12px !important; width: 100% !important; box-sizing: border-box !important; }
+    .ts-dropdown .dropdown-input:focus { outline: none !important; border-color: #0d6efd !important; }
+
+    /* Fix SĐT */
+    .iti { width: 100%; display: block; position: relative !important; --iti-bg: var(--bg-card); --iti-text-color: var(--text-main); --iti-hover-color: rgba(13, 110, 253, 0.2); --iti-border-color: var(--border-layout); }
+    .iti__dropdown-content { background-color: var(--bg-card) !important; border: 1px solid var(--border-layout) !important; box-shadow: 0 8px 30px rgba(0,0,0,0.6) !important; border-radius: 8px !important; width: 320px !important; max-width: 90vw !important; margin-top: 5px !important; backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+    .iti__country-list { background-color: transparent !important; border: none !important; box-shadow: none !important; overflow-x: hidden !important; }
+    .iti__search-input { background-color: rgba(128,128,128,0.1) !important; color: var(--text-main) !important; border: 1px solid var(--border-layout) !important; border-radius: 6px !important; padding: 10px 12px !important; margin: 8px !important; width: calc(100% - 16px) !important; box-sizing: border-box !important; }
+    .iti__search-input:focus { outline: none !important; border-color: #0d6efd !important; }
+    
+    .payment-option { cursor: pointer; transition: background-color 0.2s; }
+    .payment-option:hover { background-color: rgba(13, 110, 253, 0.05); }
+    .form-check-input:checked { background-color: #0d6efd; border-color: #0d6efd; }
+    
+    .product-img-sm { width: 65px; height: 65px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border-layout); }
+</style>
+
+<div class="container my-5">
+    <form id="checkoutForm" asp-action="ThanhToan" asp-controller="Checkout" method="post">
+        <div class="row g-3">
+            <div class="col-lg-5">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h5 class="fw-bold m-0" style="color: var(--text-main);">Thông tin mua hàng</h5>
+                </div>
+                
+                <div class="row g-3">
+                    <div class="col-12"><input type="email" class="form-control py-2" name="Email" placeholder="Email (tùy chọn)" /></div>
+                    <div class="col-12"><input type="text" class="form-control py-2" name="HoTen" placeholder="Họ và tên" required /></div>
+                    <div class="col-12" style="position: relative; z-index: 9999;"><input type="tel" id="phoneInput" class="form-control py-2" required /> <input type="hidden" id="SoDienThoai_Hidden" asp-for="SoDienThoai" /></div>
+                    <div class="col-12"><input type="text" class="form-control py-2" id="diachi" placeholder="Địa chỉ chi tiết" required /> <input type="hidden" id="DiaChiGiaoHang" asp-for="DiaChiGiaoHang" /></div>
+                    
+                    <div class="col-12"><select id="province" placeholder="Tỉnh thành"></select></div>
+                    <div class="col-6"><select id="district" placeholder="Quận huyện"></select></div>
+                    <div class="col-6"><select id="ward" placeholder="Phường xã"></select></div>
+
+                    <div class="col-12"><textarea class="form-control py-2" name="GhiChu" rows="3" placeholder="Ghi chú"></textarea></div>
+                </div>
+            </div>
+            
+            <div class="col-lg-3">
+                <h5 class="fw-bold mb-4" style="color: var(--text-main);">Vận chuyển</h5>
+                <div class="card checkout-card rounded-3 mb-4">
+                    <label class="payment-option d-flex align-items-center p-3 border-bottom m-0" for="ship1">
+                        <input class="form-check-input m-0 ms-2 me-3" type="radio" name="Shipping" id="ship1" checked>
+                        <span class="flex-grow-1">Giao hàng tận nơi</span>
+                        <span class="fw-bold text-primary">@phivanchuyen.ToString("N0")đ</span>
+                    </label>
+
+                    <label class="payment-option d-flex align-items-center p-3 m-0" for="ship2">
+                        <input class="form-check-input m-0 ms-2 me-3" type="radio" name="Shipping" id="ship2">
+                        <span class="flex-grow-1">Tới cửa hàng nhận</span>
+                        <span class="fw-bold text-success small">Miễn phí</span>
+                    </label>
+                </div>
+
+                <h5 class="fw-bold mb-4" style="color: var(--text-main);">Thanh toán</h5>
+                <div class="card checkout-card rounded-3">
+                    <label class="payment-option d-flex align-items-center p-3 border-bottom m-0" for="payOnline">
+                        <input class="form-check-input m-0 ms-2 me-3" type="radio" asp-for="PhuongThucThanhToan" value="Online" id="payOnline" checked>
+                        <span class="flex-grow-1">Thanh toán qua VietQR</span>
+                        <i class="bi bi-qr-code text-primary fs-5"></i>
+                    </label>
+
+                    <label class="payment-option d-flex align-items-center p-3 m-0" for="payCOD">
+                        <input class="form-check-input m-0 ms-2 me-3" type="radio" asp-for="PhuongThucThanhToan" value="COD" id="payCOD">
+                        <span class="flex-grow-1">Thanh toán khi nhận (COD)</span>
+                        <i class="bi bi-cash-stack text-success fs-5"></i>
+                    </label>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <h5 class="fw-bold mb-4" style="color: var(--text-main);">Đơn hàng (@(cartItems?.Sum(x => x.SoLuong) ?? 0) sản phẩm)</h5>
+                
+                <div class="card checkout-card p-4 rounded-4 shadow-sm sticky-top" style="top: 20px;">
+                    
+                    <div class="product-list-wrapper mb-4" style="max-height: 350px; overflow-y: auto; overflow-x: hidden; padding-top: 12px; padding-right: 15px; padding-left: 5px;">
+                        @if (cartItems != null && cartItems.Any())
+                        {
+                            foreach (var item in cartItems)
+                            {
+                                <div class="d-flex align-items-center mb-3">
+                                    <div class="position-relative me-3">
+                                        <img src="~/images/products/@item.HinhAnhChinh" class="product-img-sm" alt="@item.TenSp" onerror="this.src='https://placehold.co/65x65/212529/f8f9fa?text=SP'">
+                                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary border border-light">@item.SoLuong</span>
+                                    </div>
+                                    <div class="flex-grow-1">
+                                        <h6 class="mb-0 small fw-bold" style="color: var(--text-main); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                            @item.TenSp
+                                        </h6>
+                                    </div>
+                                    <div class="ms-3 text-end">
+                                        <span class="fw-bold" style="font-size: 0.95rem;">@item.ThanhTien.ToString("N0")đ</span>
+                                    </div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p class="text-muted small mb-0 text-center">Giỏ hàng của bạn đang trống.</p>
+                        }
+                    </div>
+
+                    <hr style="border-color: var(--border-layout); margin-top: 0;">
+
+                    <div class="input-group mb-4">
+                        <input type="text" class="form-control" placeholder="Nhập mã giảm giá">
+                        <button class="btn btn-primary text-white fw-bold" style="background-color: #6a9ce4; border:none;" type="button">Áp dụng</button>
+                    </div>
+
+                    <div class="d-flex justify-content-between mb-2 small">
+                        <span style="color: var(--text-muted);">Tạm tính</span>
+                        <span class="fw-semibold">@tamTinh.ToString("N0")đ</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3 small">
+                        <span style="color: var(--text-muted);">Phí vận chuyển</span>
+                        <span class="fw-semibold">@phivanchuyen.ToString("N0")đ</span>
+                    </div>
+                    
+                    <hr style="border-color: var(--border-layout);">
+
+                    <div class="d-flex justify-content-between align-items-center mb-4 mt-2">
+                        <span class="fw-bold" style="color: var(--text-main);">Tổng cộng</span>
+                        <span class="fw-bold fs-4 text-primary">@tongCong.ToString("N0")đ</span>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100 py-3 fw-bold rounded-3 shadow-sm mb-3" style="font-size: 1.1rem;">
+                        ĐẶT HÀNG
+                    </button>
+
+                    <div class="text-center">
+                        <a href="/Cart" class="text-decoration-none small fw-semibold" style="color: #6a9ce4;">
+                            <i class="bi bi-chevron-left me-1"></i>Quay về giỏ hàng
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </form>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/21.2.4/js/intlTelInput.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Init SĐT
+        window.intlTelInput(document.querySelector("#phoneInput"), {
+            initialCountry: "vn",
+            separateDialCode: true,
+            utilsScript: "https://cdnjs.cloudflare.com/ajax/libs/intl-tel-input/21.2.4/js/utils.js"
+        });
+
+        // Init TomSelect
+        const tsConfig = { valueField: 'code', labelField: 'name', searchField: 'name', plugins: ['dropdown_input'] };
+        let prov = new TomSelect("#province", tsConfig);
+        let dist = new TomSelect("#district", tsConfig); dist.disable();
+        let ward = new TomSelect("#ward", tsConfig); ward.disable();
+
+        const apiHost = "https://provinces.open-api.vn/api/";
+        fetch(apiHost).then(r => r.json()).then(d => prov.addOptions(d));
+
+        prov.on('change', function(val) {
+            dist.clear(); dist.clearOptions(); dist.disable();
+            ward.clear(); ward.clearOptions(); ward.disable();
+            if(val) {
+                fetch(apiHost + "p/" + val + "?depth=2").then(r => r.json()).then(d => {
+                    dist.addOptions(d.districts); dist.enable();
+                });
+            }
+        });
+
+        dist.on('change', function(val) {
+            ward.clear(); ward.clearOptions(); ward.disable();
+            if(val) {
+                fetch(apiHost + "d/" + val + "?depth=2").then(r => r.json()).then(d => {
+                    ward.addOptions(d.wards); ward.enable();
+                });
+            }
+        });
+        
+        document.getElementById("checkoutForm").addEventListener("submit", function(e) {
+            let provVal = prov.getValue();
+            let distVal = dist.getValue();
+            let wardVal = ward.getValue();
+
+            if (!provVal || !distVal || !wardVal) {
+                e.preventDefault();
+                alert("Vui lòng chọn đầy đủ Tỉnh thành, Quận huyện và Phường xã!");
+                return;
+            }
+
+            let provinceName = prov.options[provVal].name;
+            let districtName = dist.options[distVal].name;
+            let wardName = ward.options[wardVal].name;
+            let detailAddress = document.querySelector("#diachi").value.trim();
+
+            let fullAddress = `${detailAddress}, ${wardName}, ${districtName}, ${provinceName}`;
+            document.querySelector("#DiaChiGiaoHang").value = fullAddress;
+            
+            // Xử lý lấy SĐT chuẩn quốc tế
+            const iti = window.intlTelInputGlobals.getInstance(document.querySelector("#phoneInput"));
+            document.querySelector("#SoDienThoai_Hidden").value = iti.getNumber();
+        });
+    });
+</script>

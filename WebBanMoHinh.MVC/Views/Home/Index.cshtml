@@ -1,0 +1,497 @@
+﻿@model IEnumerable<WebBanMoHinh.MVC.Models.SanPhamViewModel>
+
+@{
+    ViewData["Title"] = "Trang Chủ - KingGunpla Model Shop";
+    
+    // ===================================================================================
+    // BỘ LỌC ĐỘNG TỪ DATABASE THEO CỜ ISHOT VÀ MÃ DÒNG SẢN PHẨM (MA DONG)
+    // ===================================================================================
+    var sanPhamBanChay   = Model?.Where(p => p.IsHot == true).Take(4).ToList() ?? new List<WebBanMoHinh.MVC.Models.SanPhamViewModel>();
+    var môHìnhGundamDynamic = Model?.Where(p => p.MaDong == 1).Take(4).ToList() ?? new List<WebBanMoHinh.MVC.Models.SanPhamViewModel>();
+    var dsDragonBall      = Model?.Where(p => p.MaDong == 2).Take(4).ToList() ?? new List<WebBanMoHinh.MVC.Models.SanPhamViewModel>();
+    var dsOnePiece        = Model?.Where(p => p.MaDong == 3).Take(4).ToList() ?? new List<WebBanMoHinh.MVC.Models.SanPhamViewModel>();
+    var dsSuperSentai     = Model?.Where(p => p.MaDong == 4).Take(4).ToList() ?? new List<WebBanMoHinh.MVC.Models.SanPhamViewModel>();
+    var dsMotorNuclear    = Model?.Where(p => p.MaNsx == 5).Take(4).ToList() ?? new List<WebBanMoHinh.MVC.Models.SanPhamViewModel>();
+}
+
+<div id="kingBanner" class="carousel slide carousel-fade mb-5 shadow" data-bs-ride="carousel" data-bs-interval="3000">
+    <div class="carousel-indicators">
+        <button type="button" data-bs-target="#kingBanner" data-bs-slide-to="0" class="active" aria-current="true"></button>
+        <button type="button" data-bs-target="#kingBanner" data-bs-slide-to="1"></button>
+    </div>
+    <div class="carousel-inner text-white">
+        <div class="carousel-item active">
+            <div class="w-100 h-100" style="background: url('https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?q=80&w=1920') center/cover;">
+                <div class="container h-100 d-flex align-items-center">
+                    <div class="carousel-caption text-start ms-md-5">
+                        <span class="badge bg-primary mb-2 text-uppercase px-3 py-2 fw-bold" style="background-color: #3b82f6 !important;">New Era</span>
+                        <h1 class="fw-black display-5">KING GUNPLA SHOP</h1>
+                        <p class="fs-6 mb-4">Chào mừng Builder đến với tổng kho Robot lắp ráp mô hình tối thượng.<br>Cam kết box sắc nét, full runner nhựa nhập khẩu trực tiếp.</p>
+                        <a href="#shop-now" class="btn btn-banner-blue shadow">SĂN KIT NGAY</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="carousel-item">
+            <div class="w-100 h-100" style="background: url('https://images.unsplash.com/photo-1563089145-599997674d42?q=80&w=1920') center/cover;">
+                <div class="container h-100 d-flex align-items-center justify-content-end">
+                    <div class="carousel-caption text-end me-md-5">
+                        <span class="badge bg-danger mb-2 text-uppercase px-3 py-2 fw-bold">Live Bidding</span>
+                        <h1 class="fw-black display-5">SÀN ĐẤU GIÁ MÔ HÌNH</h1>
+                        <p class="fs-6 mb-4">Nơi các tay chơi đích thực săn tìm các phiên bản giới hạn, mạ vàng P-Bandai cực hiếm với mức giá tự quyết định.</p>
+                        <a href="/Home/DieuKhoanDauGia" class="btn btn-banner-white shadow">TÌM HIỂU HỆ THỐNG</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <button class="carousel-control-prev" type="button" data-bs-target="#kingBanner" data-bs-slide="prev"><span class="carousel-control-prev-icon"></span></button>
+    <button class="carousel-control-next" type="button" data-bs-target="#kingBanner" data-bs-slide="next"><span class="carousel-control-next-icon"></span></button>
+</div>
+
+<div class="container mb-5" id="shop-now">
+    <div class="row g-4 text-center mb-5 tech-commitment-bar py-4 mx-1">
+        <div class="col-md-4 border-end border-secondary border-opacity-25">
+            <div class="fs-2 mb-2 text-info"><i class="bi bi-shield-lock-fill"></i></div>
+            <h6 class="fw-bold mb-1">100% Authentic Bandai</h6>
+            <p class="small mb-0">Hàng chính hãng bồi hoàn x2 nếu phát hiện fake</p>
+        </div>
+        <div class="col-md-4 border-end border-secondary border-opacity-25">
+            <div class="text-success fs-2 mb-2"><i class="bi bi-box-seam-fill"></i></div>
+            <h6 class="fw-bold mb-1">Hộp Giấy Bảo Vệ 3 Lớp</h6>
+            <p class="small mb-0">Bọc bubble chống móp méo góc box kit tối đa</p>
+        </div>
+        <div class="col-md-4">
+            <div class="text-info fs-2 mb-2"><i class="bi bi-cpu-fill"></i></div>
+            <h6 class="fw-bold mb-1">Cộng Đồng Builder Vip</h6>
+            <p class="small mb-0">Hỗ trợ hướng dẫn ráp, độ sơn, chia sẻ part hư gãy</p>
+        </div>
+    </div>
+
+    <div class="tech-section-bay">
+        <div class="tech-section-title-wrapper">
+            <h5 class="tech-section-title">Danh Mục Nổi Bật</h5>
+        </div>
+        
+        <div class="d-flex flex-nowrap overflow-auto pb-3 gap-3 d-lg-grid grid-cols-pc" style="scrollbar-width: none; -ms-overflow-style: none;">
+            <style>
+                .overflow-auto::-webkit-scrollbar { display: none; }
+                @@media (min-width: 992px) {
+                    .grid-cols-pc {
+                        display: grid !important;
+                        grid-template-columns: repeat(7, minmax(0, 1fr)) !important;
+                        gap: 1.5rem !important;
+                    }
+                }
+                .category-mobile-fixed {
+                    flex: 0 0 100px;
+                    width: 100px;
+                }
+            </style>
+            
+            <div class="category-mobile-fixed w-100">
+                <a href="/SanPham/Index" class="category-circle-item m-0">
+                    <div class="category-icon-wrap"><i class="bi bi-grid-fill"></i></div>
+                    <div class="category-title text-truncate">Tất Cả</div>
+                </a>
+            </div>
+            
+            <div class="category-mobile-fixed w-100">
+                <a href="/SanPham/Index?maDong=4" class="category-circle-item m-0">
+                    <div class="category-icon-wrap"><i class="bi bi-robot"></i></div>
+                    <div class="category-title text-truncate">DX Sentai</div>
+                </a>
+            </div>
+
+            <div class="category-mobile-fixed w-100">
+                <a href="/SanPham/Index?maDong=7" class="category-circle-item m-0">
+                    <div class="category-icon-wrap"><i class="bi bi-gear-wide-connected"></i></div>
+                    <div class="category-title text-truncate">SMP Sentai</div>
+                </a>
+            </div>
+
+            <div class="category-mobile-fixed w-100">
+                <a href="/SanPham/Index?maDong=8" class="category-circle-item m-0">
+                    <div class="category-icon-wrap"><i class="bi bi-bug-fill"></i></div>
+                    <div class="category-title text-truncate">Kamen Rider</div>
+                </a>
+            </div>
+            
+            <div class="category-mobile-fixed w-100">
+                <a href="/SanPham/Index?maNsx=2" class="category-circle-item m-0">
+                    <div class="category-icon-wrap"><i class="bi bi-box-seam-fill"></i></div>
+                    <div class="category-title text-truncate">Bandai</div>
+                </a>
+            </div>
+            
+            <div class="category-mobile-fixed w-100">
+                <a href="/SanPham/Index?maDong=1" class="category-circle-item m-0">
+                    <div class="category-icon-wrap"><i class="bi bi-rocket-takeoff-fill"></i></div>
+                    <div class="category-title text-truncate">Gundam</div>
+                </a>
+            </div>
+            
+            <div class="category-mobile-fixed w-100">
+                <a href="/SanPham/Index?maDong=2" class="category-circle-item m-0">
+                    <div class="category-icon-wrap"><i class="bi bi-star-fill"></i></div>
+                    <div class="category-title text-truncate">Dragon Ball</div>
+                </a>
+            </div>
+            
+            <div class="category-mobile-fixed w-100">
+                <a href="/SanPham/Index?maDong=3" class="category-circle-item m-0">
+                    <div class="category-icon-wrap"><i class="bi bi-water"></i></div>
+                    <div class="category-title text-truncate">One Piece</div>
+                </a>
+            </div>
+
+            <div class="category-mobile-fixed w-100">
+                <a href="/SanPham/Index?maDong=5" class="category-circle-item m-0">
+                    <div class="category-icon-wrap"><i class="bi bi-lightning-fill"></i></div>
+                    <div class="category-title text-truncate">Pokemon</div>
+                </a>
+            </div>
+            
+            <div class="category-mobile-fixed w-100">
+                <a href="/SanPham/Index?maNsx=5" class="category-circle-item m-0">
+                    <div class="category-icon-wrap"><i class="bi bi-lightning-charge-fill"></i></div>
+                    <div class="category-title text-truncate">Motor Nuclear</div>
+                </a>
+            </div>
+            
+            <div class="category-mobile-fixed w-100">
+                <a href="/SanPham/Index?maDong=6" class="category-circle-item m-0">
+                    <div class="category-icon-wrap"><i class="bi bi-shield-shaded"></i></div>
+                    <div class="category-title text-truncate">LBX</div>
+                </a>
+            </div>
+            
+            <div class="category-mobile-fixed w-100">
+                <a href="/SanPham/Index?maNsx=3" class="category-circle-item m-0">
+                    <div class="category-icon-wrap"><i class="bi bi-gem"></i></div>
+                    <div class="category-title text-truncate">Kotobukiya</div>
+                </a>
+            </div>
+            
+            <div class="category-mobile-fixed w-100">
+                <a href="/SanPham/Index?search=Metal" class="category-circle-item m-0">
+                    <div class="category-icon-wrap"><i class="bi bi-award-fill"></i></div>
+                    <div class="category-title text-truncate">Metal Build</div>
+                </a>
+            </div>
+            
+            <div class="category-mobile-fixed w-100">
+                <a href="/SanPham/Index?search=Dụng+cụ" class="category-circle-item m-0">
+                    <div class="category-icon-wrap"><i class="bi bi-tools"></i></div>
+                    <div class="category-title text-truncate">Dụng Cụ</div>
+                </a>
+            </div>
+            
+        </div>
+    </div>
+
+
+    <div class="tech-section-bay">
+        <div class="tech-section-title-wrapper d-flex justify-content-between align-items-center">
+            <h4 class="tech-section-title">KHO MÔ HÌNH SẴN HÀNG</h4>
+            <span class="badge px-3 py-2 rounded-pill fw-bold" style="background-color: rgba(59, 130, 246, 0.15); color: #3b82f6; border: 1px solid rgba(59, 130, 246, 0.3);">Total: @(Model?.Count() ?? 0) Kits</span>
+        </div>
+        
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-2 g-md-4">
+            @if (Model != null && Model.Any())
+            {
+                foreach (var item in Model)
+                {
+                    <div class="col">
+                        <div class="card h-100 product-card">
+                            <div class="product-card-img position-relative" style="height: 250px; width: 100%; overflow: hidden; background-color: rgba(255,255,255,0.02); border-radius: 8px 8px 0 0; display: flex; align-items: center; justify-content: center;">
+                                <img src="~/images/@item.HinhAnhChinh" onerror="this.src='https://placehold.co/300x250/1e293b/cbd5e1?text=Gunpla'" style="width: 100%; height: 100%; object-fit: cover;" alt="@item.TenSp" />
+                            </div>
+                            <div class="card-body d-flex flex-column justify-content-between p-3">
+                                <div>
+                                    <h6 class="card-title fw-bold text-truncate-2lh" title="@item.TenSp">@item.TenSp</h6>
+                                    <div class="d-flex gap-2 mb-3" style="font-size: 0.75rem;">
+                                        <span>Grade: @(string.IsNullOrEmpty(item.TiLe) ? "N/A" : item.TiLe)</span>
+                                        <span>|</span>
+                                        <span>@item.ChatLieu</span>
+                                    </div>
+                                </div>
+                                <div class="mt-auto">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span class="fw-bold fs-5" style="color: #38bdf8;">@String.Format("{0:N0}", item.GiaBan) đ</span>
+                                        <span class="small bg-dark bg-opacity-25 px-2 py-1 rounded border border-secondary border-opacity-25">Stock: @item.SoLuongTon</span>
+                                    </div>
+                                    <a href="/SanPham/ChiTiet/@item.MaSp" class="btn btn-outline-primary btn-custom-action w-100 btn-sm">Xem Chi Tiết</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center py-5">
+                    <p class="text-muted mb-0 small"><i class="bi bi-box-seam me-2"></i>Sản phẩm đang cập nhật...</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="tech-section-bay">
+        <div class="tech-section-title-wrapper d-flex justify-content-between align-items-center">
+            <h4 class="tech-section-title">SẢN PHẨM BÁN CHẠY</h4>
+            <a href="/SanPham/Index" class="btn btn-sm btn-outline-secondary rounded-pill px-3 opacity-75">Xem Tất Cả</a>
+        </div>
+        
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-2 g-md-4">
+            @if (sanPhamBanChay.Any())
+            {
+                foreach (var item in sanPhamBanChay)
+                {
+                    <div class="col">
+                        <div class="card h-100 product-card">
+                            <div class="product-card-img position-relative" style="height: 250px; width: 100%; overflow: hidden; background-color: rgba(255,255,255,0.02); border-radius: 8px 8px 0 0; display: flex; align-items: center; justify-content: center;">
+                                <img src="~/images/@item.HinhAnhChinh" onerror="this.src='https://placehold.co/300x250/1e293b/cbd5e1?text=Gunpla'" style="width: 100%; height: 100%; object-fit: cover;" alt="@item.TenSp" />
+                                <span class="position-absolute top-0 end-0 m-3 badge bg-danger px-2 py-1.5 rounded-pill small fw-bold shadow">HOT SELL</span>
+                            </div>
+                            <div class="card-body d-flex flex-column justify-content-between p-3">
+                                <div>
+                                    <h6 class="card-title fw-bold text-truncate-2lh">@item.TenSp</h6>
+                                    <div class="d-flex gap-2 mb-3" style="font-size: 0.75rem;">
+                                        <span>@(item.MaNsxNavigation?.TenNsx ?? "Bandai Genuine")</span>
+                                    </div>
+                                </div>
+                                <div class="mt-auto">
+                                    <div class="d-flex justify-content-between align-items-center mb-3">
+                                        <span class="fw-bold fs-5" style="color: #38bdf8;">@String.Format("{0:N0}", item.GiaBan) đ</span>
+                                    </div>
+                                    <a href="/SanPham/ChiTiet/@item.MaSp" class="btn btn-outline-primary btn-custom-action w-100 btn-sm">Xem Chi Tiết</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center py-5">
+                    <p class="text-muted mb-0 small"><i class="bi bi-box-seam me-2"></i>Sản phẩm đang cập nhật...</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="tech-section-bay">
+        <div class="tech-section-title-wrapper d-flex justify-content-between align-items-center">
+            <h4 class="tech-section-title">DX-SUPER SENTAI</h4>
+            <a href="/SanPham/Index?maDong=4" class="btn btn-sm btn-outline-secondary rounded-pill px-3 opacity-75">Xem Tất Cả</a>
+        </div>
+        
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-2 g-md-4">
+            @if (dsSuperSentai.Any())
+            {
+                foreach (var item in dsSuperSentai)
+                {
+                    <div class="col">
+                        <div class="card h-100 product-card">
+                            <div class="product-card-img position-relative" style="height: 250px; width: 100%; overflow: hidden; background-color: rgba(255,255,255,0.02); border-radius: 8px 8px 0 0; display: flex; align-items: center; justify-content: center;">
+                                <img src="~/images/@item.HinhAnhChinh" onerror="this.src='https://placehold.co/300x250/1e293b/cbd5e1?text=Gunpla'" style="width: 100%; height: 100%; object-fit: cover;" alt="@item.TenSp" />
+                            </div>
+                            <div class="card-body d-flex flex-column justify-content-between p-3">
+                                <h6 class="card-title fw-bold text-truncate-2lh" title="@item.TenSp">@item.TenSp</h6>
+                                <span class="fw-bold fs-5 mb-2" style="color: #38bdf8;">@String.Format("{0:N0}", item.GiaBan) đ</span>
+                                <a href="/SanPham/ChiTiet/@item.MaSp" class="btn btn-outline-primary btn-custom-action btn-sm">Xem Chi Tiết</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center py-5">
+                    <p class="text-muted mb-0 small"><i class="bi bi-box-seam me-2"></i>Sản phẩm đang cập nhật...</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="tech-section-bay">
+        <div class="tech-section-title-wrapper d-flex justify-content-between align-items-center">
+            <h4 class="tech-section-title">MÔ HÌNH DRAGON BALL</h4>
+            <a href="/SanPham/Index?maDong=2" class="btn btn-sm btn-outline-secondary rounded-pill px-3 opacity-75">Xem Tất Cả</a>
+        </div>
+        
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-2 g-md-4">
+            @if (dsDragonBall.Any())
+            {
+                foreach (var item in dsDragonBall)
+                {
+                    <div class="col">
+                        <div class="card h-100 product-card">
+                            <div class="product-card-img position-relative" style="height: 250px; width: 100%; overflow: hidden; background-color: rgba(255,255,255,0.02); border-radius: 8px 8px 0 0; display: flex; align-items: center; justify-content: center;">
+                                <img src="~/images/@item.HinhAnhChinh" onerror="this.src='https://placehold.co/300x250/1e293b/cbd5e1?text=Gunpla'" style="width: 100%; height: 100%; object-fit: cover;" alt="@item.TenSp" />
+                            </div>
+                            <div class="card-body d-flex flex-column justify-content-between p-3">
+                                <h6 class="card-title fw-bold text-truncate-2lh" title="@item.TenSp">@item.TenSp</h6>
+                                <span class="fw-bold fs-5 mb-2" style="color: #38bdf8;">@String.Format("{0:N0}", item.GiaBan) đ</span>
+                                <a href="/SanPham/ChiTiet/@item.MaSp" class="btn btn-outline-primary btn-custom-action btn-sm">Xem Chi Tiết</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center py-5">
+                    <p class="text-muted mb-0 small"><i class="bi bi-box-seam me-2"></i>Sản phẩm đang cập nhật...</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="tech-section-bay">
+        <div class="tech-section-title-wrapper d-flex justify-content-between align-items-center">
+            <h4 class="tech-section-title">MÔ HÌNH ONE PIECE</h4>
+            <a href="/SanPham/Index?maDong=3" class="btn btn-sm btn-outline-secondary rounded-pill px-3 opacity-75">Xem Tất Cả</a>
+        </div>
+        
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-2 g-md-4">
+            @if (dsOnePiece.Any())
+            {
+                foreach (var item in dsOnePiece)
+                {
+                    <div class="col">
+                        <div class="card h-100 product-card">
+                            <div class="product-card-img position-relative" style="height: 250px; width: 100%; overflow: hidden; background-color: rgba(255,255,255,0.02); border-radius: 8px 8px 0 0; display: flex; align-items: center; justify-content: center;">
+                                <img src="~/images/@item.HinhAnhChinh" onerror="this.src='https://placehold.co/300x250/1e293b/cbd5e1?text=Gunpla'" style="width: 100%; height: 100%; object-fit: cover;" alt="@item.TenSp" />
+                            </div>
+                            <div class="card-body d-flex flex-column justify-content-between p-3">
+                                <h6 class="card-title fw-bold text-truncate-2lh" title="@item.TenSp">@item.TenSp</h6>
+                                <span class="fw-bold fs-5 mb-2" style="color: #38bdf8;">@String.Format("{0:N0}", item.GiaBan) đ</span>
+                                <a href="/SanPham/ChiTiet/@item.MaSp" class="btn btn-outline-primary btn-custom-action btn-sm">Xem Chi Tiết</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center py-5">
+                    <p class="text-muted mb-0 small"><i class="bi bi-box-seam me-2"></i>Sản phẩm đang cập nhật...</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="tech-section-bay">
+        <div class="tech-section-title-wrapper d-flex justify-content-between align-items-center">
+            <h4 class="tech-section-title">MÔ HÌNH GUNDAM</h4>
+            <a href="/SanPham/Index?maDong=1" class="btn btn-sm btn-outline-secondary rounded-pill px-3 opacity-75">Xem Tất Cả</a>
+        </div>
+        
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-2 g-md-4">
+            @if (môHìnhGundamDynamic != null && môHìnhGundamDynamic.Any())
+            {
+                foreach(var item in môHìnhGundamDynamic)
+                {
+                    <div class="col">
+                        <div class="card h-100 product-card">
+                            <div class="product-card-img position-relative" style="height: 250px; width: 100%; overflow: hidden; background-color: rgba(255,255,255,0.02); border-radius: 8px 8px 0 0; display: flex; align-items: center; justify-content: center;">
+                                <img src="~/images/@item.HinhAnhChinh" onerror="this.src='https://placehold.co/300x250/1e293b/cbd5e1?text=Gunpla'" style="width: 100%; height: 100%; object-fit: cover;" alt="@item.TenSp" />
+                            </div>
+                            <div class="card-body d-flex flex-column justify-content-between p-3">
+                                <h6 class="card-title fw-bold text-truncate-2lh" title="@item.TenSp">@item.TenSp</h6>
+                                <span class="fw-bold fs-5 text-primary mb-2">@String.Format("{0:N0}", item.GiaBan) đ</span>
+                                <a href="/SanPham/ChiTiet/@item.MaSp" class="btn btn-outline-primary btn-custom-action btn-sm">Xem Chi Tiết</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center py-5">
+                    <p class="text-muted mb-0 small"><i class="bi bi-box-seam me-2"></i>Sản phẩm đang cập nhật...</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="tech-section-bay">
+        <div class="tech-section-title-wrapper d-flex justify-content-between align-items-center">
+            <h4 class="tech-section-title">MOTOR NUCLEAR</h4>
+            <a href="/SanPham/Index?maNsx=5" class="btn btn-sm btn-outline-secondary rounded-pill px-3 opacity-75">Xem Tất Cả</a>
+        </div>
+        
+        <div class="row row-cols-2 row-cols-md-3 row-cols-lg-4 g-2 g-md-4">
+            @if (dsMotorNuclear.Any())
+            {
+                foreach (var item in dsMotorNuclear)
+                {
+                    <div class="col">
+                        <div class="card h-100 product-card">
+                            <div class="product-card-img position-relative" style="height: 250px; width: 100%; overflow: hidden; background-color: rgba(255,255,255,0.02); border-radius: 8px 8px 0 0; display: flex; align-items: center; justify-content: center;">
+                                <img src="~/images/@item.HinhAnhChinh" onerror="this.src='https://placehold.co/300x250/1e293b/cbd5e1?text=Gunpla'" style="width: 100%; height: 100%; object-fit: cover;" alt="@item.TenSp" />
+                            </div>
+                            <div class="card-body d-flex flex-column justify-content-between p-3">
+                                <h6 class="card-title fw-bold text-truncate-2lh" title="@item.TenSp">@item.TenSp</h6>
+                                <span class="fw-bold fs-5 mb-2" style="color: #38bdf8;">@String.Format("{0:N0}", item.GiaBan) đ</span>
+                                <a href="/SanPham/ChiTiet/@item.MaSp" class="btn btn-outline-primary btn-custom-action btn-sm">Xem Chi Tiết</a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            }
+            else
+            {
+                <div class="col-12 text-center py-5">
+                    <p class="text-muted mb-0 small"><i class="bi bi-box-seam me-2"></i>Sản phẩm đang cập nhật...</p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="tech-section-bay mb-4">
+        <div class="tech-section-title-wrapper">
+            <h4 class="tech-section-title">TIN TỨC - HÀNG MỚI - HÀNG VỀ</h4>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="news-card h-100">
+                    <div class="news-img-wrap">
+                        <div class="news-date-badge">11<br><span style="font-size:0.6rem">05/2026</span></div>
+                        <div class="d-flex h-100 align-items-center justify-content-center text-muted small"><i class="bi bi-image fs-3"></i></div>
+                    </div>
+                    <div class="p-3">
+                        <h6 class="fw-bold mb-2 text-truncate" style="font-size:0.95rem">List Siêu Phẩm Bandai Tháng 5 Vừa Cập Bến</h6>
+                        <p class="small mb-0">Lô hàng hot bao gồm các mẫu HG và RG cháy hàng đã chính thức cập kho...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="news-card h-100">
+                    <div class="news-img-wrap">
+                        <div class="news-date-badge">14<br><span style="font-size:0.6rem">03/2026</span></div>
+                        <div class="d-flex h-100 align-items-center justify-content-center text-muted small"><i class="bi bi-image fs-3"></i></div>
+                    </div>
+                    <div class="p-3">
+                        <h6 class="fw-bold mb-2 text-truncate" style="font-size:0.95rem">Mở Pre-Order Bandai Tháng 3/2026</h6>
+                        <p class="small mb-0">Nhận đặt trước siêu phẩm giới hạn Ver.Ka và dòng Gundam đặc biệt đợt...</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="news-card h-100">
+                    <div class="news-img-wrap">
+                        <div class="news-date-badge">21<br><span style="font-size:0.6rem">07/2025</span></div>
+                        <div class="d-flex h-100 align-items-center justify-content-center text-muted small"><i class="bi bi-image fs-3"></i></div>
+                    </div>
+                    <div class="p-3">
+                        <h6 class="fw-bold mb-2 text-truncate" style="font-size:0.95rem">Lịch Trả Hàng Mô Hình MG Sazabi</h6>
+                        <p class="small mb-0">Thông tin về thời gian đóng gói và vận chuyển đợt hàng MG Sazabi Ver.Ka...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

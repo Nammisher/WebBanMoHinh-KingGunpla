@@ -1,0 +1,117 @@
+@model List<WebBanMoHinh.MVC.Models.OrderHistoryViewModel>
+
+@{
+    ViewData["Title"] = "Lịch sử đơn hàng của Pilot";
+}
+
+<div class="container my-5">
+    <h3 class="mb-4 text-uppercase fw-bold" style="color: var(--text-nav-hover); text-shadow: var(--glow-brand);">
+        <i class="bi bi-clock-history me-2"></i> Lịch sử đơn hàng của Pilot
+    </h3>
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert border border-secondary p-5 text-center rounded-4 shadow" style="background-color: var(--bg-card); color: var(--text-main);">
+            <div class="display-1 text-warning mb-3"><i class="bi bi-exclamation-triangle-fill"></i></div>
+            <h4 class="fw-bold">Chưa ghi nhận dữ liệu chuyến bay!</h4>
+            <p style="color: var(--text-muted);">Hệ thống chưa tìm thấy bất kỳ đơn đặt hàng nào từ tài khoản Pilot của bạn.</p>
+            <a href="/Home/Index" class="btn btn-outline-info mt-3 rounded-pill px-4">Khám phá tổng kho Gunpla</a>
+        </div>
+    }
+    else
+    {
+        <div class="row g-4">
+            @foreach (var donHang in Model)
+            {
+                <div class="col-12">
+                    <div class="card border-0 shadow rounded-4 overflow-hidden mb-3" style="background-color: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-layout) !important;">
+                        
+                        <div class="card-header p-3 d-flex flex-wrap justify-content-between align-items-center gap-3" style="background-color: rgba(128, 128, 128, 0.05); border-bottom: 1px solid var(--border-layout);">
+                            <div>
+                                <span class="small text-uppercase d-block" style="color: var(--text-muted);">Mã Đơn Hàng</span>
+                                <span class="fw-bold text-info fs-5">#@donHang.MaDonHang</span>
+                            </div>
+                            <div>
+                                <span class="small text-uppercase d-block" style="color: var(--text-muted);">Thời Gian Đặt</span>
+                                <span class="fw-semibold">@(donHang.NgayDat?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")</span>
+                            </div>
+                            <div>
+                                <span class="small text-uppercase d-block" style="color: var(--text-muted);">Giao Dịch</span>
+                                <span class="badge bg-secondary px-3 py-2">@donHang.PhuongThucThanhToan</span>
+                            </div>
+                            <div>
+                                <span class="small text-uppercase d-block" style="color: var(--text-muted);">Trạng Thái Hệ Thống</span>
+                                @if (donHang.TrangThaiDonHang == "Chờ xác nhận")
+                                {
+                                    <span class="badge bg-warning text-dark fw-bold px-3 py-2"><i class="bi bi-hourglass-split me-1"></i>Chờ xác nhận</span>
+                                }
+                                else if (donHang.TrangThaiDonHang == "Đang giao")
+                                {
+                                    <span class="badge bg-info text-dark fw-bold px-3 py-2"><i class="bi bi-truck me-1"></i>Đang vận chuyển</span>
+                                }
+                                else if (donHang.TrangThaiDonHang == "Đã giao" || donHang.TrangThaiDonHang == "Thành công")
+                                {
+                                    <span class="badge bg-success fw-bold px-3 py-2"><i class="bi bi-check-circle-fill me-1"></i>Hoàn thành</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-danger fw-bold px-3 py-2">@donHang.TrangThaiDonHang</span>
+                                }
+                            </div>
+                            <div class="text-lg-end">
+                                <span class="small text-uppercase d-block" style="color: var(--text-muted);">Tổng Chi Phí</span>
+                                <span class="fw-bold text-warning fs-5">@(donHang.TongTien?.ToString("N0") ?? "0") đ</span>
+                            </div>
+                        </div>
+
+                        <div class="card-body p-4">
+                            <div class="mb-3 pb-3 border-bottom border-secondary border-opacity-25 ps-3">
+                                 <span class="small d-block mb-1" style="color: var(--text-muted);"><i class="bi bi-geo-alt-fill text-danger me-1"></i>Địa chỉ nhận hàng tòa cứ điểm:</span>
+                                <span class="small fw-medium fs-6" style="color: var(--text-main);">@donHang.DiaChiGiaoHang</span>
+                            </div>
+
+                            <div class="table-responsive mt-2">
+                                <table class="table table-hover table-borderless align-middle mb-0" style="color: var(--text-main);">
+                                    <thead class="small" style="border-bottom: 1px solid var(--border-layout);">
+                                        <tr class="text-nowrap" style="color: var(--text-muted);">
+                                            <th scope="col" class="text-center" style="width: 100px;">Hình Ảnh</th>
+                                            <th scope="col" style="min-width: 250px;">Mô Hình</th>
+                                            <th scope="col" class="text-end" style="width: 15%">Đơn Giá</th>
+                                            <th scope="col" class="text-center" style="width: 12%">Số Lượng</th>
+                                            <th scope="col" class="text-end" style="width: 18%">Thành Tiền</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var chiTiet in donHang.ChiTietDonHang)
+                                        {
+                                            var tenSp = chiTiet.MaSpNavigation?.TenSp ?? "Mô hình Gunpla hệ thống";
+                                            var hinhAnh = chiTiet.MaSpNavigation?.HinhAnhChinh ?? "no-image.jpg";
+                                            var thanhTien = (chiTiet.SoLuong ?? 0) * (chiTiet.DonGia ?? 0);
+
+                                            <tr style="border-bottom: 1px solid rgba(128,128,128,0.1);">
+                                                <td class="text-center">
+                                                    <div style="width: 70px; height: 70px; margin: 0 auto; background-color: rgba(128,128,128,0.1); border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
+                                                        <img src="~/images/@hinhAnh" 
+                                                             onerror="this.src='https://placehold.co/70x70/1e293b/cbd5e1?text=No+Img'" 
+                                                             style="width: 100%; height: 100%; object-fit: cover;" 
+                                                             alt="Gunpla" />
+                                                    </div>
+                                                </td>
+                                                <td class="fw-semibold text-info pe-3">@tenSp</td>
+                                                
+                                                <td class="text-end text-nowrap" style="color: var(--text-main);">@(chiTiet.DonGia?.ToString("N0") ?? "0") đ</td>
+                                                <td class="text-center fw-bold text-warning text-nowrap">x @chiTiet.SoLuong</td>
+                                                <td class="text-end fw-bold text-success fs-6 text-nowrap">@thanhTien.ToString("N0") đ</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

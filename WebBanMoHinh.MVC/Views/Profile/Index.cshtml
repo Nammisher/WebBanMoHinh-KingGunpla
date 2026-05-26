@@ -1,0 +1,142 @@
+@model WebBanMoHinh.MVC.Models.UserProfileViewModel
+
+@{
+    ViewData["Title"] = "Hồ sơ cá nhân Pilot";
+}
+
+<div class="container my-5">
+    <h3 class="mb-4 text-uppercase fw-bold" style="color: var(--text-nav-hover); text-shadow: var(--glow-brand);">
+        <i class="bi bi-person-badge-fill me-2"></i> Thông Tin Cơ Trưởng
+    </h3>
+
+    <form asp-action="Index" asp-controller="Profile" method="post" enctype="multipart/form-data" autocomplete="off">
+        <div class="row g-4">
+            
+            <div class="col-lg-4">
+                <div class="card border-0 shadow rounded-4 p-4 text-center h-100" style="background-color: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-layout) !important;">
+                    
+                    <div class="position-relative mx-auto mb-3" style="width: 130px; height: 130px; cursor: pointer;" onclick="document.getElementById('avatarInput').click()" title="Bấm để thay đổi Avatar">
+                        <img id="avatarPreview" 
+                             src="@(string.IsNullOrEmpty(Model.Avatar) ? "https://placehold.co/130x130/1e293b/cbd5e1?text=Pilot" : "/images/" + Model.Avatar)" 
+                             class="rounded-circle object-fit-cover w-100 h-100 shadow" 
+                             style="border: 3px solid var(--text-nav-hover);"
+                             onerror="this.src='https://placehold.co/130x130/1e293b/cbd5e1?text=Pilot'" alt="Avatar" />
+                        
+                        <div class="position-absolute bottom-0 end-0 bg-primary rounded-circle shadow d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; transform: translate(-5px, -5px);">
+                            <i class="bi bi-camera-fill text-white small"></i>
+                        </div>
+                    </div>
+                    
+                    <input type="file" id="avatarInput" asp-for="AvatarUpload" accept="image/*" class="d-none" onchange="previewAvatar(event)" />
+                    <input type="hidden" asp-for="Avatar" />
+
+                    <div id="btnSaveAvatarWrapper" class="d-none mb-3">
+                        <button type="submit" class="btn btn-sm btn-success rounded-pill px-4 shadow fw-bold text-uppercase">
+                            <i class="bi bi-cloud-arrow-up-fill me-1"></i> Lưu Ảnh Đại Diện
+                        </button>
+                    </div>
+
+                    <h4 class="fw-bold mb-1">@Model.HoTen</h4>
+                    <p class="badge bg-primary px-3 py-1.5 rounded-pill mb-3 small">@Model.VaiTro</p>
+                    
+                    <hr class="w-100 opacity-25" style="color: var(--text-muted);">
+                    
+                    <div class="text-start w-100 small">
+                        <div class="mb-2 d-flex justify-content-between">
+                            <span style="color: var(--text-muted);">Mật danh đăng nhập:</span>
+                            <span class="fw-bold text-info">@Model.TenDangNhap</span>
+                        </div>
+                        <div class="d-flex justify-content-between">
+                            <span style="color: var(--text-muted);">Ngày gia nhập:</span>
+                            <span class="fw-medium">@(Model.NgayTao?.ToString("dd/MM/yyyy") ?? "N/A")</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="card border-0 shadow rounded-4 p-4" style="background-color: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-layout) !important;">
+                    
+                    @if (TempData["Success"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show rounded-3 small fw-semibold" role="alert">
+                            <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    @if (TempData["Error"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show rounded-3 small fw-semibold" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+
+                    <h5 class="fw-bold text-uppercase border-bottom border-secondary border-opacity-25 pb-2 mb-4"><i class="bi bi-sliders me-2 text-warning"></i>Cấu hình hệ thống cá nhân</h5>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Họ và tên hiển thị</label>
+                            <input type="text" asp-for="HoTen" class="form-control rounded-3" style="background-color: rgba(128,128,128,0.05); color: var(--text-main); border: 1px solid var(--border-layout);" required />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Số điện thoại liên lạc</label>
+                            <input type="text" asp-for="SoDienThoai" class="form-control rounded-3" style="background-color: rgba(128,128,128,0.05); color: var(--text-main); border: 1px solid var(--border-layout);" />
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Địa chỉ hòm thư (Email)</label>
+                            <input type="email" asp-for="Email" class="form-control rounded-3" style="background-color: rgba(128,128,128,0.05); color: var(--text-main); border: 1px solid var(--border-layout);" required />
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold text-uppercase border-bottom border-secondary border-opacity-25 pb-2 mt-5 mb-4"><i class="bi bi-shield-lock-fill me-2 text-danger"></i>Thiết lập mật mã bảo mật</h5>
+                    
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label small text-muted">Nếu không có nhu cầu thay đổi mật mã đăng nhập, vui lòng bỏ trống các ô bên dưới.</label>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label small fw-bold">Mật khẩu hiện tại</label>
+                            <input type="password" asp-for="MatKhauCu" class="form-control rounded-3" style="background-color: rgba(128,128,128,0.05); color: var(--text-main); border: 1px solid var(--border-layout);" placeholder="Nhập mật khẩu cũ nếu muốn đổi" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Mật khẩu mới</label>
+                            <input type="password" asp-for="MatKhauMoi" class="form-control rounded-3" style="background-color: rgba(128,128,128,0.05); color: var(--text-main); border: 1px solid var(--border-layout);" placeholder="Tối thiểu 6 ký tự" />
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label small fw-bold">Xác nhận mật khẩu mới</label>
+                            <input type="password" asp-for="NhapLaiMatKhauMoi" class="form-control rounded-3" style="background-color: rgba(128,128,128,0.05); color: var(--text-main); border: 1px solid var(--border-layout);" placeholder="Nhập lại mật khẩu mới" />
+                        </div>
+                    </div>
+
+                    <div class="mt-4 pt-2 text-end">
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold text-uppercase btn-sm shadow">
+                            <i class="bi bi-save2 me-2"></i>Lưu cấu hình hồ sơ
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    <script>
+        function previewAvatar(event) {
+            var input = event.target;
+            
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+                reader.onload = function(e){
+                    var output = document.getElementById('avatarPreview');
+                    output.src = e.target.result;
+                    
+                    // XÓA CLASS D-NONE ĐỂ HIỂN THỊ NÚT LƯU
+                    document.getElementById('btnSaveAvatarWrapper').classList.remove('d-none');
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+}
