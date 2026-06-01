@@ -16,7 +16,7 @@ namespace WebBanMoHinh.MVC.Controllers
         }
 
         // ========================================================
-        // ĐÃ SỬA: HÀM INDEX HIỂN THỊ TRANG THANH TOÁN KÈM GIỎ HÀNG
+        // HÀM INDEX HIỂN THỊ TRANG THANH TOÁN KÈM GIỎ HÀNG
         // ========================================================
         [HttpGet]
         public IActionResult Index()
@@ -31,14 +31,30 @@ namespace WebBanMoHinh.MVC.Controllers
                 cartItems = JsonConvert.DeserializeObject<List<CartItemViewModel>>(cartJson) ?? new List<CartItemViewModel>();
             }
 
-            // 3. Nạp vào ViewBag để truyền sang Index.cshtml
-            ViewBag.Cart = cartItems;
+            // 3. Khởi tạo ViewModel và nạp Item giỏ hàng vào cột OrderItems bên phải giao diện
+            var viewModel = new CheckoutViewModel();
+            
+            if (cartItems.Any())
+            {
+                viewModel.OrderItems = cartItems.Select(c => new OrderItemViewModel {
+                    Image = c.HinhAnhChinh ?? "fas fa-box", 
+                    ProductName = c.TenSp,
+                    Quantity = c.SoLuong,
+                    Price = c.GiaBan
+                }).ToList();
+                
+                viewModel.SubTotal = cartItems.Sum(c => c.GiaBan * c.SoLuong);
+                viewModel.Total = viewModel.SubTotal; // Tính tổng tiền (phí ship có thể cộng thêm sau)
+            }
 
-            return View(new CheckoutViewModel()); 
+            return View(viewModel); 
         }
 
+        // ========================================================
+        // HÀM XỬ LÝ ĐẶT HÀNG (Đổi tên thành ProcessPayment cho khớp HTML)
+        // ========================================================
         [HttpPost]
-        public async Task<IActionResult> ThanhToan(CheckoutViewModel model)
+        public async Task<IActionResult> ProcessPayment(CheckoutViewModel model)
         {
             string? cartJson = HttpContext.Session.GetString("GioHang");
             if (string.IsNullOrEmpty(cartJson)) return RedirectToAction("Index", "Cart");
@@ -52,16 +68,26 @@ namespace WebBanMoHinh.MVC.Controllers
                 GiaBan = x.GiaBan 
             }).ToList();
 
+            // 1. Dịch Phương thức thanh toán từ Id sang Chữ
+            string phuongThuc = model.SelectedPaymentMethodId switch
+            {
+                2 => "Chuyển khoản ngân hàng",
+                6 => "Thanh toán qua VNPay",
+                _ => "Thanh toán khi nhận hàng (COD)"
+            };
+
+            // 2. Gom dữ liệu đúng chuẩn gửi API
             var orderData = new {
-                TenDangNhap = HttpContext.Session.GetString("UserSession"),
-                model.DiaChiGiaoHang,
-                model.SoDienThoai,
-                model.PhuongThucThanhToan,
+                TenDangNhap = HttpContext.Session.GetString("UserSession") ?? "KhachHang",
+                DiaChiGiaoHang = model.CustomerInfo?.FullAddress ?? "",
+                SoDienThoai = model.CustomerInfo?.PhoneNumber ?? "",
+                PhuongThucThanhToan = phuongThuc,
                 Items = orderItems
             };
 
             try 
             {
+                // Gọi API tạo đơn hàng
                 var response = await _httpClient.PostAsJsonAsync("http://localhost:5298/api/Checkout/DatHang", orderData);
                 
                 string responseString = await response.Content.ReadAsStringAsync();
@@ -74,12 +100,13 @@ namespace WebBanMoHinh.MVC.Controllers
                     decimal totalAmount = cartItems.Sum(x => x.GiaBan * x.SoLuong);
                     string username = HttpContext.Session.GetString("UserSession") ?? "KhachHang";
                     
+                    // Xóa giỏ hàng sau khi đặt thành công
                     HttpContext.Session.Remove("GioHang"); 
 
-                    // LOGIC BẺ LÁI ĐIỀU HƯỚNG DỰA TRÊN PHƯƠNG THỨC THANH TOÁN
-                    string pttt = model.PhuongThucThanhToan?.ToUpper() ?? "";
+                    // 3. LOGIC BẺ LÁI ĐIỀU HƯỚNG DỰA TRÊN PHƯƠNG THỨC THANH TOÁN
+                    string pttt = phuongThuc.ToUpper();
                     
-                    if (pttt.Contains("ONLINE") || pttt.Contains("CHUYỂN KHOẢN") || pttt.Contains("CHUYEN KHOAN"))
+                    if (pttt.Contains("CHUYỂN KHOẢN") || pttt.Contains("VNPAY"))
                     {
                         return RedirectToAction("ThanhToanOnline", "Checkout", new { 
                             orderId = maDon, 
@@ -95,6 +122,11 @@ namespace WebBanMoHinh.MVC.Controllers
                     dynamic? errorResponse = JsonConvert.DeserializeObject<dynamic>(responseString);
                     string apiError = errorResponse?.message ?? "Lỗi không xác định từ Database.";
                     ModelState.AddModelError("", $"Lỗi từ hệ thống: {apiError}");
+                    
+                    // Nếu lỗi, nạp lại giỏ hàng vào view để hiển thị
+                    model.OrderItems = cartItems.Select(c => new OrderItemViewModel {
+                        Image = c.HinhAnhChinh ?? "fas fa-box", ProductName = c.TenSp, Quantity = c.SoLuong, Price = c.GiaBan
+                    }).ToList();
                     return View("Index", model);
                 }
             }
