@@ -59,7 +59,7 @@ namespace WebBanMoHinh.MVC.Controllers
                             TenSp = sp.TenSp,
                             HinhAnhChinh = sp.HinhAnhChinh,
                             
-                            // ĐÃ FIX: Ưu tiên lấy Giá Giảm (nếu có và lớn hơn 0), nếu không mới lấy Giá Bán gốc
+                            // Ưu tiên lấy Giá Giảm (nếu có và lớn hơn 0), nếu không mới lấy Giá Bán gốc
                             GiaBan = (sp.GiaGiam.HasValue && sp.GiaGiam > 0) ? sp.GiaGiam.Value : (sp.GiaBan ?? 0),
                             
                             SoLuong = soLuong
@@ -82,6 +82,23 @@ namespace WebBanMoHinh.MVC.Controllers
                 SaveCart(cart);
             }
             return RedirectToAction("Index");
+        }
+
+        // HÀM AJAX: CẬP NHẬT SỐ LƯỢNG KHI BẤM NÚT +/- Ở GIỎ HÀNG
+        [HttpPost]
+        public IActionResult UpdateQuantity(int id, int quantity)
+        {
+            var cart = GetCartItems();
+            var item = cart.FirstOrDefault(x => x.MaSp == id);
+            
+            if (item != null)
+            {
+                // Chốt số lượng mới (tối thiểu là 1)
+                item.SoLuong = quantity > 0 ? quantity : 1; 
+                SaveCart(cart);
+                return Ok();
+            }
+            return BadRequest();
         }
     }
 }

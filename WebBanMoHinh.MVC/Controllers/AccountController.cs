@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Json;
+using System.Text.Json; // ĐÃ THÊM: Thư viện xử lý JSON
 using WebBanMoHinh.MVC.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using System.Security.Claims;
+
 namespace WebBanMoHinh.MVC.Controllers
 {
     public class AccountController : Controller
@@ -26,7 +28,7 @@ namespace WebBanMoHinh.MVC.Controllers
             return View(model);
         }
 
-        // 2. POST: /Account/Login (XỬ LÝ ĐĂNG NHẬP & PHỤC HỒI GIỎ HÀNG CŨ)
+        // 2. POST: /Account/Login (XỬ LÝ ĐĂNG NHẬP & GỘP GIỎ HÀNG)
         [HttpPost]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
@@ -45,34 +47,54 @@ namespace WebBanMoHinh.MVC.Controllers
                     // 1. Lưu Session Đăng nhập của Pilot trên MVC
                     HttpContext.Session.SetString("UserSession", model.TenDangNhap);
 
-                    // ========================================================
                     // LƯU AVATAR VÀO SESSION KHI ĐĂNG NHẬP THƯỜNG
-                    // ========================================================
                     if (apiResult != null && apiResult.ContainsKey("avatar") && apiResult["avatar"] != null)
                     {
                         HttpContext.Session.SetString("UserAvatar", apiResult["avatar"].ToString()!);
                     }
 
-                    // 2. GỌI SANG API CART CONTROLLER ĐỂ LẤY LẠI GIỎ HÀNG CŨ CỦA USER NÀY
+                    // 2. ĐỒNG BỘ VÀ GỘP (MERGE) GIỎ HÀNG VÃNG LAI VÀO TÀI KHOẢN=
                     try
                     {
+                        string? guestCartJson = HttpContext.Session.GetString("GioHang");
+                        var guestCart = string.IsNullOrEmpty(guestCartJson) 
+                            ? new List<CartItemViewModel>() 
+                            : JsonSerializer.Deserialize<List<CartItemViewModel>>(guestCartJson);
+
                         var cartResponse = await _httpClient.GetAsync($"http://localhost:5298/api/Cart/GetCart/{model.TenDangNhap}");
                         if (cartResponse.IsSuccessStatusCode)
                         {
                             var cartData = await cartResponse.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+                            
+                            // NẾU DATABASE ĐÃ CÓ GIỎ HÀNG CŨ -> GỘP CHÚNG LẠI
                             if (cartData != null && cartData.ContainsKey("cartJson") && !string.IsNullOrEmpty(cartData["cartJson"]))
                             {
-                                // Đổ chuỗi JSON giỏ hàng cũ vào lại Session "GioHang" của trình duyệt
-                                HttpContext.Session.SetString("GioHang", cartData["cartJson"]);
+                                var dbCart = JsonSerializer.Deserialize<List<CartItemViewModel>>(cartData["cartJson"]) ?? new List<CartItemViewModel>();
+
+                                if (guestCart != null && guestCart.Any())
+                                {
+                                    foreach (var item in guestCart)
+                                    {
+                                        var existItem = dbCart.FirstOrDefault(x => x.MaSp == item.MaSp);
+                                        if (existItem != null) existItem.SoLuong += item.SoLuong;
+                                        else dbCart.Add(item);
+                                    }
+                                }
+                                
+                                string mergedCartJson = JsonSerializer.Serialize(dbCart);
+                                HttpContext.Session.SetString("GioHang", mergedCartJson);
+                                await _httpClient.PostAsJsonAsync("http://localhost:5298/api/Cart/SaveCart", new { Username = model.TenDangNhap, CartJson = mergedCartJson });
+                            }
+                            // NẾU DATABASE RỖNG NHƯNG KHÁCH VÃNG LAI CÓ HÀNG -> LƯU THẲNG LÊN DB
+                            else if (guestCart != null && guestCart.Any())
+                            {
+                                await _httpClient.PostAsJsonAsync("http://localhost:5298/api/Cart/SaveCart", new { Username = model.TenDangNhap, CartJson = guestCartJson });
                             }
                         }
                     }
-                    catch 
-                    { 
-                        // Tạm thời bỏ qua nếu kết nối API Giỏ hàng gặp trục trặc để user vẫn login được
-                    }
+                    catch { }
 
-                    // Điều hướng sau khi login thành công
+                    // Điều hướng sau khi login thành công (Đá ngược về trang Thanh toán nếu có)
                     if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
                     {
                         return Redirect(model.ReturnUrl);
@@ -110,19 +132,12 @@ namespace WebBanMoHinh.MVC.Controllers
                 try
                 {
                     var saveBody = new { Username = username, CartJson = currentCartJson };
-                    // Gọi sang CartController bên API để lưu trữ vào cột DiaChi của bảng TaiKhoan
                     await _httpClient.PostAsJsonAsync("http://localhost:5298/api/Cart/SaveCart", saveBody);
                 }
-                catch 
-                {
-                    // Phòng trường hợp API mất kết nối thì luồng Logout vẫn chạy tiếp, không bị treo trang
-                }
+                catch { }
             }
 
-            // LỆNH THẦN THÁNH - QUÉT SẠCH MỌI TRẠNG THÁI TRÊN TRÌNH DUYỆT
-            // Giỏ hàng, tài khoản và AVATAR lập tức bốc hơi trên giao diện (trống trơn 100%)
             HttpContext.Session.Clear(); 
-
             return RedirectToAction("Index", "Home");
         }
 
@@ -179,9 +194,7 @@ namespace WebBanMoHinh.MVC.Controllers
         [HttpGet]
         public IActionResult GoogleLogin(string? returnUrl)
         {
-            // Lưu lại URL hiện tại của khách vào TempData để sau khi login xong quay về
             TempData["ReturnUrl"] = returnUrl ?? "/Home/Index";
-            
             var properties = new AuthenticationProperties { RedirectUri = Url.Action("GoogleResponse") };
             return Challenge(properties, GoogleDefaults.AuthenticationScheme);
         }
@@ -190,11 +203,9 @@ namespace WebBanMoHinh.MVC.Controllers
         [HttpGet]
         public async Task<IActionResult> GoogleResponse()
         {
-            // Đọc thông tin mã hóa từ Cookie Google trả về cho MVC
             var result = await HttpContext.AuthenticateAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             if (!result.Succeeded) return RedirectToAction("Login");
 
-            // Bốc tách Email và Họ tên của khách hàng
             var claims = result.Principal.Identities.FirstOrDefault()?.Claims;
             var email = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
             var name = claims?.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
@@ -207,7 +218,6 @@ namespace WebBanMoHinh.MVC.Controllers
 
             try
             {
-                // BẮN THÔNG TIN SANG API ĐỂ SQL SERVER KIỂM TRA/KHỞI TẠO TÀI KHOẢN
                 var googleRequestBody = new { Email = email, HoTen = name ?? "Google User" };
                 var response = await _httpClient.PostAsJsonAsync(_apiUrl + "GoogleLogin", googleRequestBody);
 
@@ -219,31 +229,54 @@ namespace WebBanMoHinh.MVC.Controllers
                     {
                         string systemUsername = apiResult["username"].ToString()!;
 
-                        // 1. Cấp Session danh tính cho người dùng chạy xuyên suốt Website MVC
                         HttpContext.Session.SetString("UserSession", systemUsername);
 
-                        // ========================================================
-                        // LƯU AVATAR VÀO SESSION KHI ĐĂNG NHẬP BẰNG GOOGLE
-                        // ========================================================
                         if (apiResult.ContainsKey("avatar") && apiResult["avatar"] != null)
                         {
                             HttpContext.Session.SetString("UserAvatar", apiResult["avatar"].ToString()!);
                         }
 
-                        // 2. PHỤC HỒI GIỎ HÀNG THẦN TỐC: Đổ lại dữ liệu cũ vào Session "GioHang" của bạn
-                        if (apiResult.ContainsKey("dataCart") && apiResult["dataCart"] != null)
+                        // GỘP GIỎ HÀNG CHO GOOGLE LOGIN
+                        try
                         {
-                            string oldCartJson = apiResult["dataCart"].ToString()!;
-                            if (!string.IsNullOrEmpty(oldCartJson) && oldCartJson.StartsWith("["))
+                            string? guestCartJson = HttpContext.Session.GetString("GioHang");
+                            var guestCart = string.IsNullOrEmpty(guestCartJson) 
+                                ? new List<CartItemViewModel>() 
+                                : JsonSerializer.Deserialize<List<CartItemViewModel>>(guestCartJson);
+
+                            var cartResponse = await _httpClient.GetAsync($"http://localhost:5298/api/Cart/GetCart/{systemUsername}");
+                            if (cartResponse.IsSuccessStatusCode)
                             {
-                                HttpContext.Session.SetString("GioHang", oldCartJson);
+                                var cartData = await cartResponse.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+                                
+                                if (cartData != null && cartData.ContainsKey("cartJson") && !string.IsNullOrEmpty(cartData["cartJson"]))
+                                {
+                                    var dbCart = JsonSerializer.Deserialize<List<CartItemViewModel>>(cartData["cartJson"]) ?? new List<CartItemViewModel>();
+
+                                    if (guestCart != null && guestCart.Any())
+                                    {
+                                        foreach (var item in guestCart)
+                                        {
+                                            var existItem = dbCart.FirstOrDefault(x => x.MaSp == item.MaSp);
+                                            if (existItem != null) existItem.SoLuong += item.SoLuong;
+                                            else dbCart.Add(item);
+                                        }
+                                    }
+                                    
+                                    string mergedCartJson = JsonSerializer.Serialize(dbCart);
+                                    HttpContext.Session.SetString("GioHang", mergedCartJson);
+                                    await _httpClient.PostAsJsonAsync("http://localhost:5298/api/Cart/SaveCart", new { Username = systemUsername, CartJson = mergedCartJson });
+                                }
+                                else if (guestCart != null && guestCart.Any())
+                                {
+                                    await _httpClient.PostAsJsonAsync("http://localhost:5298/api/Cart/SaveCart", new { Username = systemUsername, CartJson = guestCartJson });
+                                }
                             }
                         }
+                        catch { }
                     }
-                    // Đọc URL, dùng ?? để đảm bảo nếu TempData bị mất (do Timeout hoặc lỗi) thì luôn về trang chủ
+
                     string returnUrl = TempData["ReturnUrl"]?.ToString() ?? "/Home/Index";
-                    
-                    // Xóa cookie đệm nếu cần
                     await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
 
                     return Redirect(returnUrl);

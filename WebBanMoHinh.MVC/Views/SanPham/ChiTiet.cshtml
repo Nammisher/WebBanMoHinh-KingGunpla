@@ -80,51 +80,27 @@
                 </div>
 
                 <div class="border-top border-secondary border-opacity-10 pt-4">
-
-                    @if (Context.Session.GetString("UserSession") == null)
-                    {
+                    <form action="/Cart/AddToCart" method="post">
+                        <input type="hidden" name="maSp" value="@Model.MaSp" />
+                        
                         <div class="d-flex align-items-center gap-3 mb-4">
                             <span class="spec-label fw-bold text-uppercase" style="width: auto;">Số lượng mua:</span>
-                            <input type="number" class="form-control text-center" value="1" min="1" max="@(Model.SoLuongTon ?? 1)" style="width: 90px; background: var(--bg-card); color: var(--text-main);">
+                            <input type="number" name="soLuong" class="form-control text-center" value="1" min="1" max="@(Model.SoLuongTon ?? 1)" style="width: 90px; background: var(--bg-card); color: var(--text-main);">
                         </div>
-                        
+
                         <div class="row g-2">
                             <div class="col-6">
-                                <a href="/Account/Login?returnUrl=@Context.Request.Path" class="btn btn-outline-primary w-100 py-2.5 rounded-pill fw-bold btn-sm text-uppercase d-block text-center">
+                                <button type="submit" class="btn btn-outline-primary w-100 py-2.5 rounded-pill fw-bold btn-sm text-uppercase">
                                     <i class="bi bi-cart-plus me-2"></i>Thêm Vào Giỏ
-                                </a>
+                                </button>
                             </div>
                             <div class="col-6">
-                                <a href="/Account/Login?returnUrl=@Context.Request.Path" class="btn btn-primary w-100 py-2.5 rounded-pill fw-bold btn-sm text-uppercase d-block text-center">
+                                <button type="submit" class="btn btn-primary w-100 py-2.5 rounded-pill fw-bold btn-sm text-uppercase">
                                     <i class="bi bi-lightning-fill me-1"></i>Mua Ngay
-                                </a>
+                                </button>
                             </div>
                         </div>
-                    }
-                    else
-                    {
-                        <form action="/Cart/AddToCart" method="post">
-                            <input type="hidden" name="maSp" value="@Model.MaSp" />
-                            
-                            <div class="d-flex align-items-center gap-3 mb-4">
-                                <span class="spec-label fw-bold text-uppercase" style="width: auto;">Số lượng mua:</span>
-                                <input type="number" name="soLuong" class="form-control text-center" value="1" min="1" max="@(Model.SoLuongTon ?? 1)" style="width: 90px; background: var(--bg-card); color: var(--text-main);">
-                            </div>
-
-                            <div class="row g-2">
-                                <div class="col-6">
-                                    <button type="submit" class="btn btn-outline-primary w-100 py-2.5 rounded-pill fw-bold btn-sm text-uppercase">
-                                        <i class="bi bi-cart-plus me-2"></i>Thêm Vào Giỏ
-                                    </button>
-                                </div>
-                                <div class="col-6">
-                                    <button type="submit" class="btn btn-primary w-100 py-2.5 rounded-pill fw-bold btn-sm text-uppercase">
-                                        <i class="bi bi-lightning-fill me-1"></i>Mua Ngay
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    }
+                    </form>
                 </div>
             </div>
         </div>

@@ -45,15 +45,17 @@
         .shipping-option.selected, .payment-option.selected { border-color: var(--text-nav-hover); background: rgba(0, 198, 255, 0.08); box-shadow: 0 0 20px rgba(0, 198, 255, 0.15); transform: translateY(-2px); }
         .payment-option.selected i { color: var(--text-nav-hover); transform: scale(1.1); filter: drop-shadow(0 0 8px rgba(0,198,255,0.5));}
 
-        .shipping-info { display: flex; justify-content: space-between; align-items: center; }
+        /* ĐÃ FIX: Cho Tên và Mô tả xếp chồng lên nhau, đẩy Giá/Badge sang phải, chống đè chữ */
+        .shipping-info { display: block; padding-right: 100px; }
         .shipping-name { font-weight: 800; color: var(--text-footer-h5); letter-spacing: 0.5px;}
-        .shipping-desc { font-size: 0.85rem; color: var(--text-nav); margin-top: 6px; }
-        .badge-free { background: linear-gradient(135deg, #2ecc71, #27ae60); color: #fff; padding: 5px 12px; border-radius: 30px; font-size: 0.75rem; font-weight: 800; position: absolute; top: 15px; right: 15px; box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3); }
-        .shipping-price { font-weight: 800; color: var(--text-nav-hover); font-size: 1.1rem;}
+        .shipping-desc { font-size: 0.85rem; color: var(--text-nav); margin-top: 6px; line-height: 1.4; }
+        .badge-free { background: linear-gradient(135deg, #2ecc71, #27ae60); color: #fff; padding: 5px 12px; border-radius: 30px; font-size: 0.75rem; font-weight: 800; position: absolute; top: 50%; right: 18px; transform: translateY(-50%); box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3); }
+        .shipping-price { font-weight: 800; color: var(--text-nav-hover); font-size: 1.1rem; position: absolute; top: 50%; right: 18px; transform: translateY(-50%); }
 
-        .bank-transfer-box { display: flex; gap: 25px; background: rgba(0,0,0,0.25); padding: 25px; border-radius: 12px; margin-top: 20px; border: 1px dashed rgba(0, 198, 255, 0.3); }
+        /* ĐÃ FIX: Đổi nền xám xỉn thành xanh cyber trong suốt, tự động đổi màu đường kẻ gạch dưới theo giao diện sáng/tối */
+        .bank-transfer-box { display: flex; gap: 25px; background: rgba(0, 198, 255, 0.05); padding: 25px; border-radius: 12px; margin-top: 20px; border: 1px dashed rgba(0, 198, 255, 0.4); }
         .qr-code img { border-radius: 10px; border: 3px solid var(--border-layout); padding: 5px; background: #fff;}
-        .bank-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.95rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 8px; align-items: center;}
+        .bank-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.95rem; border-bottom: 1px solid var(--border-layout); padding-bottom: 8px; align-items: center;}
         .bank-label { color: var(--text-nav); font-weight: 500;}
         .bank-value { font-weight: 800; color: var(--text-footer-h5); }
         .btn-copy { background: rgba(0, 198, 255, 0.1); border: 1px solid var(--text-nav-hover); color: var(--text-nav-hover); border-radius: 6px; font-size: 0.75rem; padding: 4px 10px; cursor: pointer; transition: 0.3s; font-weight: 700;}
@@ -67,7 +69,7 @@
         .product-item { display: flex; align-items: center; gap: 18px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px dashed var(--border-layout); }
         .product-image-wrap { position: relative; width: 60px; height: 60px; background: rgba(255,255,255,0.05); border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-layout);}
         .product-image-wrap img { width: 100%; height: 100%; object-fit: cover; border-radius: 10px; }
-        .product-qty { position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; border: 2px solid var(--bg-dropdown);}
+        .product-qty { position: absolute; top: -8px; right: -8px; background: #ef4444; color: white; width: 24px; height: 24px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; border: 2px solid var(--bg-dropdown); z-index: 5;}
         
         .product-info { flex: 1; }
         .product-name { font-weight: 700; font-size: 0.95rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; color: var(--text-footer-h5);}
@@ -116,7 +118,7 @@
                         <div class="form-group two-col">
                             <div>
                                 <label>EMAIL</label>
-                                @Html.TextBoxFor(m => m.CustomerInfo.Email, new { @class = "checkout-input", placeholder = "ban@email.com", required = "required", type = "email" })
+                                @Html.TextBoxFor(m => m.CustomerInfo.Email, new { @class = "checkout-input", placeholder = "ban@gmail.com", required = "required", type = "email" })
                             </div>
                             <div>
                                 <label>SỐ ĐIỆN THOẠI</label>
@@ -129,11 +131,11 @@
                             @Html.TextBoxFor(m => m.CustomerInfo.Address, new { @class = "checkout-input", placeholder = "VD: 123 Lê Lợi...", required = "required", id = "Address" })
                         </div>
 
-                        <div class="form-group three-col">
-                            <div>
-                                <label>TỈNH / THÀNH PHỐ</label>
-                                <select id="Province" class="checkout-input" required><option value="">Chọn Tỉnh/Thành...</option></select>
-                            </div>
+                        <div class="form-group mb-3">
+                            <label>TỈNH / THÀNH PHỐ</label>
+                            <select id="Province" class="checkout-input" required><option value="">Đang tải dữ liệu...</option></select>
+                        </div>
+                        <div class="form-group two-col mb-3">
                             <div>
                                 <label>QUẬN / HUYỆN</label>
                                 <select id="District" class="checkout-input" required disabled><option value="">Chọn Quận/Huyện...</option></select>
@@ -200,7 +202,6 @@
                         <div class="payment-details-container mt-3">
                             <div class="payment-details" id="payment-details-2">
                                 <div class="bank-transfer-box">
-                                    <!-- ĐÃ FIX: Ép khung 150x150, ẩn phần thừa (overflow) và Zoom ảnh (scale) vào đúng tâm QR -->
                                     <div class="qr-code" style="width: 150px; height: 150px; overflow: hidden; border-radius: 10px; border: 3px solid var(--border-layout); background: #fff; padding: 0;">
                                         <img src="~/images/qrbank/qr-techcombank.jpg" alt="Mã QR Techcombank" style="width: 100%; height: 100%; object-fit: cover; object-position: center 25%; transform: scale(1.8); border: none; padding: 0;" />
                                     </div>
@@ -245,14 +246,17 @@
                         Đơn hàng của bạn <span>@totalItems sản phẩm</span>
                     </div>
 
-                    <div class="summary-items" style="max-height: 350px; overflow-y: auto; padding-right: 10px;">
+                    <div class="summary-items" style="max-height: 350px; overflow-y: auto; padding-right: 10px; padding-top: 15px;">
                         @foreach (var item in cartItems)
                         {
                             <div class="product-item">
-                                <div class="product-image-wrap">
-                                    <img src="~/images/products/@item.HinhAnhChinh" onerror="this.src='https://placehold.co/60x60/1e293b/cbd5e1?text=SP'" alt="@item.TenSp" />
+                                <div class="position-relative me-3" style="width: 60px; height: 60px; flex-shrink: 0;">
+                                    <div style="width: 100%; height: 100%; border-radius: 10px; overflow: hidden; background-color: rgba(255,255,255,0.05); border: 1px solid var(--border-layout); display: flex; align-items: center; justify-content: center;">
+                                        <img src="~/images/products/@item.HinhAnhChinh" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.src='https://placehold.co/60x60/1e293b/cbd5e1?text=SP'" alt="@item.TenSp" />
+                                    </div>
                                     <div class="product-qty">@item.SoLuong</div>
                                 </div>
+
                                 <div class="product-info">
                                     <div class="product-name">@item.TenSp</div>
                                 </div>
@@ -290,13 +294,12 @@
 </div>
 
 @section scripts {
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/axios/0.21.1/axios.min.js"></script>
     <script>
         $(document).ready(function () {
-            // Lấy chính xác Tạm tính từ C# (Đảm bảo logic chạy mượt)
-            var rawSubTotal = @tamTinh;
+            // FIX LỖI CRASH JS DO ÉP KIỂU SỐ CỦA C#
+            var rawSubTotal = @((long)tamTinh);
 
-            // 1. CLICK CHỌN PHƯƠNG THỨC VẬN CHUYỂN
+            // 1. CHỌN PHƯƠNG THỨC VẬN CHUYỂN
             $('.shipping-option').click(function() {
                 $('.shipping-option').removeClass('selected');
                 $(this).addClass('selected');
@@ -315,12 +318,11 @@
                     $('#displayShippingFee').text('0₫'); 
                 }
 
-                // Cập nhật lại tổng tiền dưới đáy
                 var newTotal = rawSubTotal + shippingFee;
                 $('#displayTotalAmount').text(newTotal.toLocaleString('vi-VN') + '₫');
             });
 
-            // 2. CLICK CHỌN PHƯƠNG THỨC THANH TOÁN
+            // 2. CHỌN PHƯƠNG THỨC THANH TOÁN
             $('.payment-option').click(function() {
                 $('.payment-option').removeClass('selected');
                 $(this).addClass('selected');
@@ -333,7 +335,7 @@
                 $('#payment-details-' + methodId).fadeIn(200);
             });
 
-            // 3. COPY NỘI DUNG CHUYỂN KHOẢN (CÓ FALLBACK CHỐNG LỖI)
+            // 3. COPY NỘI DUNG CHUYỂN KHOẢN
             $('.btn-copy').click(function(e) {
                 e.preventDefault();
                 var textToCopy = $(this).closest('.bank-row').find('.bank-value').text();
@@ -341,7 +343,6 @@
                 var originalHtml = '<i class="fas fa-copy me-1"></i>Sao chép';
                 var successHtml = '<i class="fas fa-check me-1"></i>Đã chép';
 
-                // Hàm đổi giao diện nút bấm
                 function showSuccess() {
                     $btn.html(successHtml).css({'background-color': '#2ecc71', 'color': '#fff', 'border-color': '#2ecc71'});
                     setTimeout(function() {
@@ -349,11 +350,9 @@
                     }, 1500);
                 }
 
-                // Chạy lệnh copy
                 if (navigator.clipboard && window.isSecureContext) {
                     navigator.clipboard.writeText(textToCopy).then(showSuccess);
                 } else {
-                    // Dự phòng cho trình duyệt cũ hoặc localhost
                     var textArea = document.createElement("textarea");
                     textArea.value = textToCopy;
                     document.body.appendChild(textArea);
@@ -364,50 +363,77 @@
                 }
             });
 
-            // ===============================================
-            // LOGIC GỌI API ĐỊA CHỈ (GIỮ NGUYÊN HOẠT ĐỘNG TỐT)
-            const host = "https://provinces.open-api.vn/api/";
+            // =========================================================================================
+            // 4. LOGIC LẤY ĐỊA CHỈ BẰNG FETCH GỐC (ĐÃ FIX LỖI CHẶN AXIOS)
+            // =========================================================================================
             
-            var callAPI = (api) => {
-                return axios.get(api).then((response) => {
-                    renderData(response.data, "Province");
+            fetch('/Location/GetProvinces')
+                .then(response => {
+                    if(!response.ok) throw new Error("HTTP Status " + response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    if (data && data.error === 0) {
+                        let row = '<option value="">Chọn Tỉnh/Thành...</option>';
+                        data.data.forEach(element => {
+                            row += `<option data-code="${element.id}" value="${element.full_name}">${element.full_name}</option>`;
+                        });
+                        $("#Province").html(row);
+                    } else {
+                        $("#Province").html('<option value="">Lỗi định dạng dữ liệu</option>');
+                    }
+                })
+                .catch(error => {
+                    console.error("Fetch lỗi:", error);
+                    $("#Province").html('<option value="">Lỗi API. Bấm F12 xem Console!</option>');
                 });
-            }
-            callAPI('https://provinces.open-api.vn/api/?depth=1');
 
-            var callApiDistrict = (api) => {
-                return axios.get(api).then((response) => {
-                    renderData(response.data.districts, "District");
-                    $('#District').prop('disabled', false);
-                });
-            }
-
-            var callApiWard = (api) => {
-                return axios.get(api).then((response) => {
-                    renderData(response.data.wards, "Ward");
-                    $('#Ward').prop('disabled', false);
-                });
-            }
-
-            var renderData = (array, select) => {
-                let row = ' <option value="">Chọn</option>';
-                array.forEach(element => {
-                    row += `<option data-code="${element.code}" value="${element.name}">${element.name}</option>`
-                });
-                document.querySelector("#" + select).innerHTML = row;
-            }
-
-            $("#Province").change(() => {
-                let code = $("#Province").find(':selected').data('code');
+            $("#Province").change(function() {
+                let code = $(this).find(':selected').data('code');
                 $('#Ward').html('<option value="">Chọn Phường/Xã...</option>').prop('disabled', true);
-                if(code) callApiDistrict(host + "p/" + code + "?depth=2");
+                
+                if(code) {
+                    $('#District').html('<option value="">Đang tải...</option>').prop('disabled', true);
+                    
+                    fetch("/Location/GetDistricts/" + code)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data && data.error === 0) {
+                                let row = '<option value="">Chọn Quận/Huyện...</option>';
+                                data.data.forEach(element => {
+                                    row += `<option data-code="${element.id}" value="${element.full_name}">${element.full_name}</option>`;
+                                });
+                                $("#District").html(row).prop('disabled', false);
+                            }
+                        });
+                } else {
+                    $('#District').html('<option value="">Chọn Quận/Huyện...</option>').prop('disabled', true);
+                }
             });
 
-            $("#District").change(() => {
-                let code = $("#District").find(':selected').data('code');
-                if(code) callApiWard(host + "d/" + code + "?depth=2");
+            $("#District").change(function() {
+                let code = $(this).find(':selected').data('code');
+                
+                if(code) {
+                    $('#Ward').html('<option value="">Đang tải...</option>').prop('disabled', true);
+                    
+                    fetch("/Location/GetWards/" + code)
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data && data.error === 0) {
+                                let row = '<option value="">Chọn Phường/Xã...</option>';
+                                data.data.forEach(element => {
+                                    row += `<option data-code="${element.id}" value="${element.full_name}">${element.full_name}</option>`;
+                                });
+                                $("#Ward").html(row).prop('disabled', false);
+                            }
+                        });
+                } else {
+                    $('#Ward').html('<option value="">Chọn Phường/Xã...</option>').prop('disabled', true);
+                }
             });
 
+            // 5. BẮT LỖI FORM SUBMIT
             $('#checkoutForm').submit(function (e) {
                 var phone = $('#PhoneNumber').val().trim();
                 
