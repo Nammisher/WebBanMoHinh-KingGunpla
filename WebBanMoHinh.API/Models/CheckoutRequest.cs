@@ -6,6 +6,7 @@ namespace WebBanMoHinh.API.Models
         public string DiaChiGiaoHang { get; set; } = null!;
         public string SoDienThoai { get; set; } = null!;
         public string PhuongThucThanhToan { get; set; } = "Thanh toán khi nhận hàng";
+        public decimal TongTien { get; set; } // THÊM DÒNG NÀY ĐỂ HỨNG TỔNG TIỀN TỪ MVC
         public List<CartItemDTO> Items { get; set; } = new();
     }
 

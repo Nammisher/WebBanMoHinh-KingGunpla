@@ -1,12 +1,18 @@
-# Bỏ qua các thư mục rác khi build C#
-[Bb]in/
-[Oo]bj/
+# Thư mục build và log
+bin/
+obj/
 .vs/
 .vscode/
+*.log
 
-# Bỏ qua file cấu hình chứa mật khẩu Database
+# Cấu hình bảo mật - Không được phép push lên GitHub
 appsettings.json
 appsettings.Development.json
-client_secret_*.json
+appsettings.Production.json
+*.user
+*.userosscache
+*.sln.docstates
 # Bỏ qua thư mục chứa ảnh do người dùng upload (nếu có)
 wwwroot/images/avatars/
+# Thêm dòng này vào cuối file .gitignore
+client_secret_*.json

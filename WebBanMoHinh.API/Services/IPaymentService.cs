@@ -29,14 +29,23 @@ namespace WebBanMoHinh.API.Services
         }
     }
 
-    // ========================================================
     // ĐÃ THÊM: Strategy xử lý thanh toán Chuyển khoản Online
-    // ========================================================
     public class ChuyenKhoanOnlinePaymentService : IPaymentService
     {
         public async Task<bool> ProcessPaymentAsync(decimal amount)
         {
             // Do phần tạo mã QR đã được xử lý bên MVC, API chỉ cần lưu Database thành công là được!
+            await Task.Delay(100); 
+            return true; 
+        }
+    }
+    // ĐÃ THÊM: Strategy xử lý thanh toán VNPay
+    public class VnPayPaymentService : IPaymentService
+    {
+        public async Task<bool> ProcessPaymentAsync(decimal amount)
+        {
+            // Do MVC đã lo phần bảo mật chuyển hướng VNPay, 
+            // API chỉ cần trả về true để Facade Pattern duyệt lưu Database!
             await Task.Delay(100); 
             return true; 
         }

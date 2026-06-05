@@ -33,12 +33,11 @@ namespace WebBanMoHinh.API.Controllers
                     DiaChiGiaoHang = request.DiaChiGiaoHang,
                     SoDienThoai = request.SoDienThoai,
                     PhuongThucThanhToan = request.PhuongThucThanhToan,
-                    
                     // ĐÃ FIX LỖI DB: Cấp ngày đặt và trạng thái mặc định cho SQL Server
                     NgayDat = DateTime.Now,
                     TrangThaiDonHang = "Chờ xác nhận",
-
-                    TongTien = request.Items.Sum(x => x.SoLuong * x.GiaBan),
+                    // SỬA Ở ĐÂY: Lấy trực tiếp từ request để đảm bảo khớp với số tiền đã tính ở MVC
+                    TongTien = request.TongTien,
                     
                     ChiTietDonHang = request.Items.Select(item => new ChiTietDonHang
                     {

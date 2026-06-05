@@ -23,6 +23,10 @@ namespace WebBanMoHinh.API.Services
             if (normalized.Contains("CHUYỂN KHOẢN") || normalized.Contains("ONLINE") || normalized.Contains("CHUYEN KHOAN"))
                 return new ChuyenKhoanOnlinePaymentService();
 
+            // ĐÃ THÊM: Bắt từ khóa VNPAY
+            if (normalized.Contains("VNPAY"))
+                return new VnPayPaymentService();
+
             // NẾU VẪN LỖI, IN THẲNG CÁI CHỮ ĐÓ RA MÀN HÌNH ĐỂ BẮT TẬN TAY!
             throw new ArgumentException($"Không hỗ trợ phương thức: '{method}'");
         }

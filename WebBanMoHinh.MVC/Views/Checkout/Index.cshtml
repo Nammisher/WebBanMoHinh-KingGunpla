@@ -2,7 +2,6 @@
 
 @{
     ViewBag.Title = "Thanh toán - KingGunpla";
-    // Kéo dữ liệu từ Giỏ hàng để tính toán chính xác
     var cartItems = ViewBag.Cart as List<WebBanMoHinh.MVC.Models.CartItemViewModel> ?? new List<WebBanMoHinh.MVC.Models.CartItemViewModel>();
     decimal tamTinh = cartItems.Sum(x => x.GiaBan * x.SoLuong);
     int totalItems = cartItems.Sum(x => x.SoLuong);
@@ -45,14 +44,12 @@
         .shipping-option.selected, .payment-option.selected { border-color: var(--text-nav-hover); background: rgba(0, 198, 255, 0.08); box-shadow: 0 0 20px rgba(0, 198, 255, 0.15); transform: translateY(-2px); }
         .payment-option.selected i { color: var(--text-nav-hover); transform: scale(1.1); filter: drop-shadow(0 0 8px rgba(0,198,255,0.5));}
 
-        /* ĐÃ FIX: Cho Tên và Mô tả xếp chồng lên nhau, đẩy Giá/Badge sang phải, chống đè chữ */
         .shipping-info { display: block; padding-right: 100px; }
         .shipping-name { font-weight: 800; color: var(--text-footer-h5); letter-spacing: 0.5px;}
         .shipping-desc { font-size: 0.85rem; color: var(--text-nav); margin-top: 6px; line-height: 1.4; }
         .badge-free { background: linear-gradient(135deg, #2ecc71, #27ae60); color: #fff; padding: 5px 12px; border-radius: 30px; font-size: 0.75rem; font-weight: 800; position: absolute; top: 50%; right: 18px; transform: translateY(-50%); box-shadow: 0 4px 10px rgba(46, 204, 113, 0.3); }
         .shipping-price { font-weight: 800; color: var(--text-nav-hover); font-size: 1.1rem; position: absolute; top: 50%; right: 18px; transform: translateY(-50%); }
 
-        /* ĐÃ FIX: Đổi nền xám xỉn thành xanh cyber trong suốt, tự động đổi màu đường kẻ gạch dưới theo giao diện sáng/tối */
         .bank-transfer-box { display: flex; gap: 25px; background: rgba(0, 198, 255, 0.05); padding: 25px; border-radius: 12px; margin-top: 20px; border: 1px dashed rgba(0, 198, 255, 0.4); }
         .qr-code img { border-radius: 10px; border: 3px solid var(--border-layout); padding: 5px; background: #fff;}
         .bank-row { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 0.95rem; border-bottom: 1px solid var(--border-layout); padding-bottom: 8px; align-items: center;}
@@ -97,6 +94,15 @@
             <h1>Thanh toán</h1>
         </div>
 
+        @if (!ViewData.ModelState.IsValid || TempData["Error"] != null)
+        {
+            <div class="alert alert-danger fw-bold rounded-4 shadow-sm border-0 mb-4 p-4" style="background-color: #ffe5e5; color: #d63031; border-left: 5px solid #d63031 !important;">
+                <h5 class="fw-bold mb-2"><i class="fas fa-exclamation-triangle me-2"></i> Giao dịch bị gián đoạn</h5>
+                @if(TempData["Error"] != null) { <p class="mb-1">@TempData["Error"]</p> }
+                @Html.ValidationSummary(false, "", new { @class = "mb-0" })
+            </div>
+        }
+
         <form method="post" id="checkoutForm" action="@Url.Action("ProcessPayment", "Checkout")">
             <div class="checkout-content">
                 
@@ -118,7 +124,7 @@
                         <div class="form-group two-col">
                             <div>
                                 <label>EMAIL</label>
-                                @Html.TextBoxFor(m => m.CustomerInfo.Email, new { @class = "checkout-input", placeholder = "ban@gmail.com", required = "required", type = "email" })
+                                @Html.TextBoxFor(m => m.CustomerInfo.Email, new { @class = "checkout-input", placeholder = "ban@email.com", required = "required", type = "email" })
                             </div>
                             <div>
                                 <label>SỐ ĐIỆN THOẠI</label>
@@ -163,7 +169,7 @@
                                     <div class="shipping-name">Giao hàng tận nơi</div>
                                     <div class="shipping-desc">Giao hàng tiêu chuẩn 3-5 ngày làm việc</div>
                                 </div>
-                                <div class="shipping-price">30.000₫</div>
+                                <div class="shipping-price">25.000₫</div>
                             </div>
 
                             <div class="shipping-option" data-value="2">
@@ -272,12 +278,12 @@
                     
                     <div class="summary-row">
                         <span class="summary-row-label">Phí vận chuyển</span>
-                        <span class="summary-row-value" id="displayShippingFee">30.000₫</span>
+                        <span class="summary-row-value" id="displayShippingFee">25.000₫</span>
                     </div>
 
                     <div class="summary-total">
                         <span class="summary-total-label">Tổng cộng</span>
-                        <span class="summary-total-amount" id="displayTotalAmount">@((tamTinh + 30000).ToString("N0"))₫</span>
+                        <span class="summary-total-amount" id="displayTotalAmount">@((tamTinh + 25000).ToString("N0"))₫</span>
                     </div>
 
                     <button type="submit" class="btn-checkout">
@@ -296,7 +302,6 @@
 @section scripts {
     <script>
         $(document).ready(function () {
-            // FIX LỖI CRASH JS DO ÉP KIỂU SỐ CỦA C#
             var rawSubTotal = @((long)tamTinh);
 
             // 1. CHỌN PHƯƠNG THỨC VẬN CHUYỂN
@@ -311,8 +316,8 @@
                 var shippingFee = 0;
 
                 if (methodId === "1") {
-                    shippingFee = 30000;
-                    $('#displayShippingFee').text('30.000₫');
+                    shippingFee = 25000;
+                    $('#displayShippingFee').text('25.000₫');
                 } else {
                     shippingFee = 0;
                     $('#displayShippingFee').text('0₫'); 
@@ -363,10 +368,7 @@
                 }
             });
 
-            // =========================================================================================
-            // 4. LOGIC LẤY ĐỊA CHỈ BẰNG FETCH GỐC (ĐÃ FIX LỖI CHẶN AXIOS)
-            // =========================================================================================
-            
+            // 4. LẤY ĐỊA CHỈ TỪ BACKEND
             fetch('/Location/GetProvinces')
                 .then(response => {
                     if(!response.ok) throw new Error("HTTP Status " + response.status);
