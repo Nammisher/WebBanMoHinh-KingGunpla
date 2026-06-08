@@ -19,13 +19,15 @@
         .checkout-header i { font-size: 2.2rem; color: var(--text-nav-hover); filter: drop-shadow(0 0 8px rgba(0, 198, 255, 0.5)); }
 
         .checkout-content { display: grid; grid-template-columns: 1.8fr 1.2fr; gap: 30px; align-items: start; }
-        .customer-section, .shipping-section, .payment-section { background: var(--bg-dropdown); padding: 30px; border-radius: 16px; border: 1px solid var(--border-layout); margin-bottom: 25px; box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15); }
+        .customer-section, .shipping-section, .payment-section { background: var(--bg-dropdown); padding: 30px; border-radius: 16px; border: 1px solid var(--border-layout); margin-bottom: 25px; box-shadow: 0 8px 32px rgba(255, 255, 255, 0.02); }
         
         .section-title { font-size: 1.15rem; font-weight: 800; margin-bottom: 25px; display: flex; align-items: center; gap: 10px; color: var(--text-nav-hover); text-transform: uppercase; letter-spacing: 1px;}
         
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; font-size: 0.85rem; font-weight: 700; margin-bottom: 8px; color: var(--text-nav); text-transform: uppercase; letter-spacing: 0.5px;}
-        .checkout-input { width: 100%; padding: 14px 18px; background: var(--bg-search); border: 1px solid var(--border-layout); color: var(--text-search); border-radius: 10px; transition: all 0.3s; font-size: 0.95rem; color-scheme: dark; }
+        
+        /* ĐÃ XÓA color-scheme: dark; Ở ĐÂY */
+        .checkout-input { width: 100%; padding: 14px 18px; background: var(--bg-search); border: 1px solid var(--border-layout); color: var(--text-search); border-radius: 10px; transition: all 0.3s; font-size: 0.95rem; }
         select.checkout-input option { background-color: var(--bg-dropdown); color: var(--text-dropdown); }
         .checkout-input:focus { border-color: var(--text-nav-hover); outline: none; box-shadow: 0 0 0 4px rgba(0, 198, 255, 0.15); }
         .checkout-input:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -84,6 +86,20 @@
         .btn-back:hover { color: var(--text-nav-hover) !important; text-shadow: 0 0 8px rgba(0, 198, 255, 0.4);}
 
         @@media (max-width: 992px) { .checkout-content { grid-template-columns: 1fr; gap: 20px;} .order-summary { position: static; margin-top: 10px; } .three-col, .two-col, .payment-grid { grid-template-columns: 1fr; } .bank-transfer-box { flex-direction: column; align-items: center; text-align: center;} }
+
+        /* =========================================
+           FIX LỖI AUTOFILL - ĐỒNG BỘ 100% VỚI SELECT
+           ========================================= */
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus, 
+        input:-webkit-autofill:active {
+            /* Kỹ thuật "đóng băng" thời gian đổi màu của trình duyệt */
+            transition: background-color 5000s ease-in-out 0s !important;
+            
+            /* Ép màu chữ đi theo theme hiện tại */
+            -webkit-text-fill-color: var(--text-search) !important;
+        }
     </style>
 }
 

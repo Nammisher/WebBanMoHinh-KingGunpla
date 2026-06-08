@@ -4,17 +4,107 @@
     ViewData["Title"] = "Lịch sử đơn hàng của Pilot";
 }
 
+@section styles {
+    <style>
+        /* =========================================
+           CUSTOM LỊCH SỬ ĐƠN HÀNG - SỬ DỤNG NATIVE VARS
+           ========================================= */
+        .history-card {
+            background: var(--bg-dropdown); /* Tự động đổi nền chuẩn theo theme */
+            border: 1px solid var(--border-layout);
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            margin-bottom: 25px;
+            transition: all 0.3s ease;
+        }
+        
+        .history-header {
+            background: rgba(0, 198, 255, 0.03); /* Phủ nhẹ một lớp màu cyan cực nhạt */
+            border-bottom: 1px solid var(--border-layout);
+            padding: 18px 25px;
+        }
+        
+        .history-body {
+            padding: 25px;
+            background: transparent;
+        }
+
+        .history-label {
+            color: var(--text-nav);
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+            display: block;
+        }
+
+        .history-val {
+            color: var(--text-footer-h5);
+            font-weight: 700;
+        }
+        
+        .history-val.highlight {
+            color: var(--text-nav-hover); /* Màu Cyan sáng */
+            text-shadow: 0 0 8px rgba(0, 198, 255, 0.3);
+        }
+
+        /* KHỬ SẠCH MÀU NỀN CỦA BOOTSTRAP TABLE */
+        .table-history, 
+        .table-history > :not(caption) > * > * {
+            background-color: transparent !important;
+            color: var(--text-body) !important;
+        }
+
+        .table-history thead th {
+            color: var(--text-nav) !important;
+            border-bottom: 1px solid var(--border-layout) !important;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 0.5px;
+        }
+
+        .table-history tbody td {
+            border-bottom: 1px dashed var(--border-layout) !important;
+            vertical-align: middle;
+            color: var(--text-footer-h5) !important;
+            transition: all 0.2s ease;
+        }
+
+        /* Hiệu ứng trỏ chuột phát sáng Cyberpunk */
+        .table-history tbody tr:hover td {
+            background: rgba(0, 198, 255, 0.05) !important;
+            box-shadow: inset 3px 0 0 var(--text-nav-hover) !important;
+        }
+
+        .img-history-wrapper {
+            width: 70px; height: 70px;
+            background: var(--bg-search);
+            border: 1px solid var(--border-layout);
+            border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        
+        .img-history-wrapper img {
+            width: 100%; height: 100%; object-fit: cover;
+        }
+    </style>
+}
+
 <div class="container my-5">
-    <h3 class="mb-4 text-uppercase fw-bold" style="color: var(--text-nav-hover); text-shadow: var(--glow-brand);">
+    <h3 class="mb-4 text-uppercase fw-bold" style="color: var(--text-nav-hover); text-shadow: 0 0 10px rgba(0,198,255,0.4);">
         <i class="bi bi-clock-history me-2"></i> Lịch sử đơn hàng của Pilot
     </h3>
 
     @if (Model == null || !Model.Any())
     {
-        <div class="alert border border-secondary p-5 text-center rounded-4 shadow" style="background-color: var(--bg-card); color: var(--text-main);">
+        <div class="history-card p-5 text-center">
             <div class="display-1 text-warning mb-3"><i class="bi bi-exclamation-triangle-fill"></i></div>
-            <h4 class="fw-bold">Chưa ghi nhận dữ liệu chuyến bay!</h4>
-            <p style="color: var(--text-muted);">Hệ thống chưa tìm thấy bất kỳ đơn đặt hàng nào từ tài khoản Pilot của bạn.</p>
+            <h4 class="fw-bold history-val">Chưa ghi nhận dữ liệu chuyến bay!</h4>
+            <p style="color: var(--text-nav);">Hệ thống chưa tìm thấy bất kỳ đơn đặt hàng nào từ tài khoản Pilot của bạn.</p>
             <a href="/Home/Index" class="btn btn-outline-info mt-3 rounded-pill px-4">Khám phá tổng kho Gunpla</a>
         </div>
     }
@@ -24,23 +114,24 @@
             @foreach (var donHang in Model)
             {
                 <div class="col-12">
-                    <div class="card border-0 shadow rounded-4 overflow-hidden mb-3" style="background-color: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-layout) !important;">
-                        
-                        <div class="card-header p-3 d-flex flex-wrap justify-content-between align-items-center gap-3" style="background-color: rgba(128, 128, 128, 0.05); border-bottom: 1px solid var(--border-layout);">
+                    <div class="history-card">
+                        <div class="history-header d-flex flex-wrap justify-content-between align-items-center gap-3">
                             <div>
-                                <span class="small text-uppercase d-block" style="color: var(--text-muted);">Mã Đơn Hàng</span>
-                                <span class="fw-bold text-info fs-5">#@donHang.MaDonHang</span>
+                                <span class="history-label">Mã Đơn Hàng</span>
+                                <span class="history-val highlight fs-5">#@donHang.MaDonHang</span>
                             </div>
                             <div>
-                                <span class="small text-uppercase d-block" style="color: var(--text-muted);">Thời Gian Đặt</span>
-                                <span class="fw-semibold">@(donHang.NgayDat?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")</span>
+                                <span class="history-label">Thời Gian Đặt</span>
+                                <span class="history-val">@(donHang.NgayDat?.ToString("dd/MM/yyyy HH:mm") ?? "N/A")</span>
                             </div>
                             <div>
-                                <span class="small text-uppercase d-block" style="color: var(--text-muted);">Giao Dịch</span>
-                                <span class="badge bg-secondary px-3 py-2">@donHang.PhuongThucThanhToan</span>
+                                <span class="history-label">Giao Dịch</span>
+                                <span class="badge bg-secondary px-3 py-2" style="background-color: var(--bg-search) !important; border: 1px solid var(--border-layout); color: var(--text-footer-h5);">
+                                    @donHang.PhuongThucThanhToan
+                                </span>
                             </div>
                             <div>
-                                <span class="small text-uppercase d-block" style="color: var(--text-muted);">Trạng Thái Hệ Thống</span>
+                                <span class="history-label">Trạng Thái Hệ Thống</span>
                                 @if (donHang.TrangThaiDonHang == "Chờ xác nhận")
                                 {
                                     <span class="badge bg-warning text-dark fw-bold px-3 py-2"><i class="bi bi-hourglass-split me-1"></i>Chờ xác nhận</span>
@@ -59,21 +150,21 @@
                                 }
                             </div>
                             <div class="text-lg-end">
-                                <span class="small text-uppercase d-block" style="color: var(--text-muted);">Tổng Chi Phí</span>
-                                <span class="fw-bold text-warning fs-5">@(donHang.TongTien?.ToString("N0") ?? "0") đ</span>
+                                <span class="history-label">Tổng Chi Phí</span>
+                                <span class="history-val fs-5" style="color: #f43f5e;">@(donHang.TongTien?.ToString("N0") ?? "0") đ</span>
                             </div>
                         </div>
 
-                        <div class="card-body p-4">
-                            <div class="mb-3 pb-3 border-bottom border-secondary border-opacity-25 ps-3">
-                                 <span class="small d-block mb-1" style="color: var(--text-muted);"><i class="bi bi-geo-alt-fill text-danger me-1"></i>Địa chỉ nhận hàng tòa cứ điểm:</span>
-                                <span class="small fw-medium fs-6" style="color: var(--text-main);">@donHang.DiaChiGiaoHang</span>
+                        <div class="history-body">
+                            <div class="mb-3 pb-3" style="border-bottom: 1px dashed var(--border-layout);">
+                                <span class="history-label mb-1"><i class="bi bi-geo-alt-fill text-danger me-1"></i>Địa chỉ nhận hàng tòa cứ điểm:</span>
+                                <span class="history-val fs-6">@donHang.DiaChiGiaoHang</span>
                             </div>
 
                             <div class="table-responsive mt-2">
-                                <table class="table table-hover table-borderless align-middle mb-0" style="color: var(--text-main);">
-                                    <thead class="small" style="border-bottom: 1px solid var(--border-layout);">
-                                        <tr class="text-nowrap" style="color: var(--text-muted);">
+                                <table class="table table-hover table-history">
+                                    <thead>
+                                        <tr>
                                             <th scope="col" class="text-center" style="width: 100px;">Hình Ảnh</th>
                                             <th scope="col" style="min-width: 250px;">Mô Hình</th>
                                             <th scope="col" class="text-end" style="width: 15%">Đơn Giá</th>
@@ -88,20 +179,16 @@
                                             var hinhAnh = chiTiet.MaSpNavigation?.HinhAnhChinh ?? "no-image.jpg";
                                             var thanhTien = (chiTiet.SoLuong ?? 0) * (chiTiet.DonGia ?? 0);
 
-                                            <tr style="border-bottom: 1px solid rgba(128,128,128,0.1);">
+                                            <tr>
                                                 <td class="text-center">
-                                                    <div style="width: 70px; height: 70px; margin: 0 auto; background-color: rgba(128,128,128,0.1); border-radius: 8px; overflow: hidden; display: flex; align-items: center; justify-content: center;">
-                                                        <img src="~/images/@hinhAnh" 
-                                                             onerror="this.src='https://placehold.co/70x70/1e293b/cbd5e1?text=No+Img'" 
-                                                             style="width: 100%; height: 100%; object-fit: cover;" 
-                                                             alt="Gunpla" />
+                                                    <div class="img-history-wrapper mx-auto">
+                                                        <img src="~/images/@hinhAnh" onerror="this.src='https://placehold.co/70x70/1e293b/cbd5e1?text=No+Img'" alt="Gunpla" />
                                                     </div>
                                                 </td>
-                                                <td class="fw-semibold text-info pe-3">@tenSp</td>
-                                                
-                                                <td class="text-end text-nowrap" style="color: var(--text-main);">@(chiTiet.DonGia?.ToString("N0") ?? "0") đ</td>
-                                                <td class="text-center fw-bold text-warning text-nowrap">x @chiTiet.SoLuong</td>
-                                                <td class="text-end fw-bold text-success fs-6 text-nowrap">@thanhTien.ToString("N0") đ</td>
+                                                <td class="history-val highlight pe-3">@tenSp</td>
+                                                <td class="text-end text-nowrap">@(chiTiet.DonGia?.ToString("N0") ?? "0") đ</td>
+                                                <td class="text-center text-warning text-nowrap" style="font-weight: 800;">x @chiTiet.SoLuong</td>
+                                                <td class="text-end text-success fs-6 text-nowrap" style="font-weight: 800;">@thanhTien.ToString("N0") đ</td>
                                             </tr>
                                         }
                                     </tbody>

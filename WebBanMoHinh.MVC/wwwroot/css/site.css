@@ -8,8 +8,14 @@ html {
   }
 }
 
-.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
-  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+.btn:focus,
+.btn:active:focus,
+.btn-link.nav-link:focus,
+.form-control:focus,
+.form-check-input:focus {
+  box-shadow:
+    0 0 0 0.1rem white,
+    0 0 0 0.25rem #258cfb;
 }
 
 html {
@@ -21,11 +27,117 @@ body {
   margin-bottom: 60px;
 }
 
-.form-floating > .form-control-plaintext::placeholder, .form-floating > .form-control::placeholder {
+.form-floating > .form-control-plaintext::placeholder,
+.form-floating > .form-control::placeholder {
   color: var(--bs-secondary-color);
   text-align: end;
 }
 
-.form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
+.form-floating > .form-control-plaintext:focus::placeholder,
+.form-floating > .form-control:focus::placeholder {
   text-align: start;
+}
+
+/* 1. LIGHT MODE (Mặc định) */
+.success-card {
+  background-color: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+  border-radius: 1.5rem;
+}
+.success-icon {
+  font-size: 5rem;
+  color: #198754;
+}
+.success-title {
+  color: #212529;
+}
+.success-text {
+  color: #6c757d;
+}
+.text-brand {
+  color: #000000;
+}
+
+.success-alert {
+  background-color: rgba(13, 110, 253, 0.05);
+  color: #0d6efd;
+  border: 1px solid rgba(13, 110, 253, 0.15);
+  border-radius: 0.75rem;
+}
+
+.custom-btn-outline {
+  background-color: transparent;
+  color: #495057;
+  border: 1px solid #ced4da;
+  border-radius: 0.5rem;
+}
+.custom-btn-outline:hover {
+  background-color: #f8f9fa;
+  color: #212529;
+}
+
+/* 2. DARK MODE (Đã bao vây mọi trường hợp Selector) */
+[data-theme="dark"] .success-card,
+[data-bs-theme="dark"] .success-card,
+.dark-mode .success-card,
+body.dark .success-card {
+  background-color: #05012d !important; /* Xám đen sâu, tệp với nền */
+  box-shadow: 0 15px 35px rgba(11, 42, 217, 0.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+[data-theme="dark"] .success-icon,
+[data-bs-theme="dark"] .success-icon,
+.dark-mode .success-icon,
+body.dark .success-icon {
+  color: #2ea043 !important;
+  text-shadow: 0 0 25px rgba(46, 160, 67, 0.5) !important;
+}
+
+[data-theme="dark"] .success-title,
+[data-bs-theme="dark"] .success-title,
+.dark-mode .success-title,
+body.dark .success-title {
+  color: #f0f6fc !important;
+}
+
+[data-theme="dark"] .success-text,
+[data-bs-theme="dark"] .success-text,
+.dark-mode .success-text,
+body.dark .success-text {
+  color: #8b949e !important;
+}
+
+[data-theme="dark"] .text-brand,
+[data-bs-theme="dark"] .text-brand,
+.dark-mode .text-brand,
+body.dark .text-brand {
+  color: #ffffff !important;
+}
+
+[data-theme="dark"] .success-alert,
+[data-bs-theme="dark"] .success-alert,
+.dark-mode .success-alert,
+body.dark .success-alert {
+  background-color: rgba(56, 139, 253, 0.1) !important;
+  color: #79c0ff !important;
+  border: 1px solid rgba(56, 139, 253, 0.2) !important;
+}
+
+[data-theme="dark"] .custom-btn-outline,
+[data-bs-theme="dark"] .custom-btn-outline,
+.dark-mode .custom-btn-outline,
+body.dark .custom-btn-outline {
+  background-color: transparent !important;
+  color: #c9d1d9 !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+}
+
+[data-theme="dark"] .custom-btn-outline:hover,
+[data-bs-theme="dark"] .custom-btn-outline:hover,
+.dark-mode .custom-btn-outline:hover,
+body.dark .custom-btn-outline:hover {
+  background-color: rgba(255, 255, 255, 0.1) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
 }
