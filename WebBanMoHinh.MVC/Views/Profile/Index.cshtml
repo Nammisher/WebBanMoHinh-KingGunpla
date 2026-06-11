@@ -45,7 +45,7 @@
 
         <div class="col-lg-8">
             <div class="card border-0 shadow rounded-4 p-4" style="background-color: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-layout) !important;">
-                <form asp-action="UpdateInfo" asp-controller="Profile" method="post" autocomplete="off">
+                <form id="updateInfoForm" asp-action="UpdateInfo" asp-controller="Profile" method="post" autocomplete="off">
                     <h5 class="fw-bold text-uppercase border-bottom border-secondary border-opacity-25 pb-2 mb-4">
                         <i class="bi bi-sliders me-2 text-warning"></i>Cấu hình hệ thống cá nhân
                     </h5>
@@ -118,7 +118,7 @@
     <script>
         const toastTimeouts = {};
 
-        // 1. Xử lý AJAX Form
+        // 1. AJAX Đổi mật khẩu
         document.getElementById("changePasswordForm").addEventListener("submit", function(e) {
             e.preventDefault();
             const formData = new FormData(this);
@@ -130,7 +130,18 @@
             });
         });
 
-        // 2. Hàm hiển thị Toast
+        // 2. AJAX Cập nhật thông tin (Dùng ID updateInfoForm)
+        document.getElementById("updateInfoForm").addEventListener("submit", function(e) {
+            e.preventDefault(); 
+            const formData = new FormData(this);
+            fetch('/Profile/UpdateInfo', { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(data => {
+                showToast(data.message, data.success);
+            });
+        });
+
+        // 3. Hàm hiển thị Toast (Đã bỏ nút X)
         function showToast(message, isSuccess) {
             const toastBox = document.getElementById('toastBox');
             const toastId = 'toast-' + Date.now();
@@ -151,7 +162,7 @@
             toastTimeouts[toastId] = setTimeout(() => { removeToast(toastId); }, 3000);
         }
 
-        // 3. Hàm xóa Toast tự động
+        // 4. Hàm xóa Toast
         function removeToast(toastId) {
             if (toastTimeouts[toastId]) {
                 clearTimeout(toastTimeouts[toastId]);
@@ -164,7 +175,6 @@
             }
         }
 
-        // Các hàm hỗ trợ
         function previewAvatar(event) {
             var input = event.target;
             if (input.files && input.files[0]) {
