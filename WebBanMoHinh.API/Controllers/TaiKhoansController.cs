@@ -40,16 +40,43 @@ namespace WebBanMoHinh.API.Controllers
             return Ok(new { message = "Đăng ký tài khoản thành công!" });
         }
 
-        // 2. POST: api/TaiKhoans/DangNhap (Đăng nhập đơn giản)
+        // 2. POST: api/TaiKhoans/DangNhap (HỖ TRỢ NÂNG CẤP MẬT KHẨU CŨ)
         [HttpPost("DangNhap")]
         public async Task<IActionResult> DangNhap([FromBody] LoginRequest request)
         {
-            // Tìm user chỉ bằng Username
             var taiKhoan = await _context.TaiKhoan
                 .FirstOrDefaultAsync(t => t.TenDangNhap == request.Username);
 
-            // Xác thực mật khẩu bằng hàm Verify của BCrypt
-            if (taiKhoan == null || !BCrypt.Net.BCrypt.Verify(request.Password, taiKhoan.MatKhau))
+            if (taiKhoan == null)
+            {
+                return Unauthorized(new { message = "Tài khoản hoặc mật khẩu không chính xác!" });
+            }
+
+            bool isPasswordValid = false;
+
+            // Kiểm tra xem mật khẩu hiện tại có phải là chuỗi đã băm (hash) không
+            // Các mật khẩu băm bởi BCrypt thường bắt đầu bằng "$2a$" hoặc "$2b$"
+            bool isHashed = taiKhoan.MatKhau.StartsWith("$2a$") || taiKhoan.MatKhau.StartsWith("$2b$");
+
+            if (isHashed)
+            {
+                // Nếu đã băm: dùng Verify
+                isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, taiKhoan.MatKhau);
+            }
+            else
+            {
+                // Nếu chưa băm (tài khoản cũ): So sánh chuỗi thô
+                if (request.Password == taiKhoan.MatKhau)
+                {
+                    isPasswordValid = true;
+                    // TỰ ĐỘNG NÂNG CẤP: Băm mật khẩu này ngay lập tức 
+                    // để lần đăng nhập sau sẽ dùng BCrypt
+                    taiKhoan.MatKhau = BCrypt.Net.BCrypt.HashPassword(request.Password);
+                    await _context.SaveChangesAsync();
+                }
+            }
+
+            if (!isPasswordValid)
             {
                 return Unauthorized(new { message = "Tài khoản hoặc mật khẩu không chính xác!" });
             }
@@ -130,7 +157,6 @@ namespace WebBanMoHinh.API.Controllers
                 taiKhoan = new TaiKhoan
                 {
                     TenDangNhap = tempUsername,
-                    // Băm mật khẩu ngẫu nhiên
                     MatKhau = BCrypt.Net.BCrypt.HashPassword(Guid.NewGuid().ToString().Substring(0, 8)),
                     HoTen = request.HoTen,
                     Email = request.Email,
@@ -174,14 +200,10 @@ namespace WebBanMoHinh.API.Controllers
                 return NotFound(new { message = "Email này chưa được liên kết với bất kỳ tài khoản Pilot nào!" });
             }
 
-            // Tạo mật khẩu thô để gửi mail
             string newPassword = Guid.NewGuid().ToString().Substring(0, 8);
-
-            // Băm mật khẩu trước khi cập nhật vào DB
             taiKhoan.MatKhau = BCrypt.Net.BCrypt.HashPassword(newPassword);
             await _context.SaveChangesAsync();
 
-            // Gửi mật khẩu thô qua email
             bool sendMailSuccess = await SendEmailAsync(taiKhoan.Email!, taiKhoan.HoTen ?? "Pilot", newPassword);
 
             if (sendMailSuccess)
@@ -194,7 +216,6 @@ namespace WebBanMoHinh.API.Controllers
             }
         }
 
-        // ================= HÀM HỖ TRỢ GỬI EMAIL (SMTP) =================
         private async Task<bool> SendEmailAsync(string toEmail, string userName, string newPassword)
         {
             try
@@ -241,7 +262,6 @@ namespace WebBanMoHinh.API.Controllers
         }
     }
     
-    // ================= CÁC CLASS (DTO) NHẬN DỮ LIỆU TỪ MVC =================
     public class UpdateProfileRequest
     {
         public string TenDangNhap { get; set; } = null!;

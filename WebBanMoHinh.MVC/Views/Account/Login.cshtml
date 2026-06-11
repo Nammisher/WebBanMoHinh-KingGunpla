@@ -66,7 +66,7 @@
                 <i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]
             </div>
         }
-        
+        <div asp-validation-summary="ModelOnly" class="text-danger text-center fw-bold mb-3"></div>
         <form asp-action="Login" asp-controller="Account" method="post">
             <input type="hidden" asp-for="ReturnUrl" />
 
