@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 
 namespace WebBanMoHinh.API.Models;
 
@@ -39,6 +40,9 @@ public partial class SanPham
 
     public string? LoaiHinhHienThi { get; set; }
 
+    [Timestamp] // Đây chính là ConcurrencyToken chống âm số lượng tồn kho cho SQL Server
+    public required byte[] Version { get; set; }
+    
     public virtual ICollection<BinhLuanDanhGia> BinhLuanDanhGia { get; set; } = new List<BinhLuanDanhGia>();
 
     public virtual ICollection<ChiTietDonHang> ChiTietDonHang { get; set; } = new List<ChiTietDonHang>();
