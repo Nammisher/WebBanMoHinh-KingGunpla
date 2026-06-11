@@ -72,14 +72,15 @@
             transition: all 0.2s ease;
         }
 
-        /* Hiệu ứng trỏ chuột phát sáng Cyberpunk */
-        .table-history tbody tr:hover td {
-            background: rgba(0, 198, 255, 0.05) !important;
-            box-shadow: inset 3px 0 0 var(--text-nav-hover) !important;
+        
+        /* Chỉ hiện vạch sáng ở cột đầu tiên để không bị lặp đường kẻ */
+        .table-history tbody tr:hover td:first-child {
+            box-shadow: inset 4px 0 0 var(--text-nav-hover) !important;
         }
 
         .img-history-wrapper {
-            width: 70px; height: 70px;
+            width: 70px;
+            height: 70px;
             background: var(--bg-search);
             border: 1px solid var(--border-layout);
             border-radius: 10px;
@@ -89,7 +90,8 @@
         }
         
         .img-history-wrapper img {
-            width: 100%; height: 100%; object-fit: cover;
+            width: 100%;
+            height: 100%; object-fit: cover;
         }
     </style>
 }

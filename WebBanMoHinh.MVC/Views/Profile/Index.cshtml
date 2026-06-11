@@ -9,10 +9,10 @@
         <i class="bi bi-person-badge-fill me-2"></i> Thông Tin Pilot
     </h3>
 
-    <form asp-action="Index" asp-controller="Profile" method="post" enctype="multipart/form-data" autocomplete="off">
-        <div class="row g-4">
-            
-            <div class="col-lg-4">
+    <div class="row g-4">
+        
+        <div class="col-lg-4">
+            <form asp-action="UpdateAvatar" asp-controller="Profile" method="post" enctype="multipart/form-data" class="h-100">
                 <div class="card border-0 shadow rounded-4 p-4 text-center h-100" style="background-color: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-layout) !important;">
                     
                     <div class="position-relative mx-auto mb-3" style="width: 130px; height: 130px; cursor: pointer;" onclick="document.getElementById('avatarInput').click()" title="Bấm để thay đổi Avatar">
@@ -52,27 +52,31 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </form>
+        </div>
 
-            <div class="col-lg-8">
-                <div class="card border-0 shadow rounded-4 p-4" style="background-color: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-layout) !important;">
-                    
-                    @if (TempData["Success"] != null)
-                    {
-                        <div class="alert alert-success alert-dismissible fade show rounded-3 small fw-semibold" role="alert">
-                            <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    }
-                    @if (TempData["Error"] != null)
-                    {
-                        <div class="alert alert-danger alert-dismissible fade show rounded-3 small fw-semibold" role="alert">
-                            <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    }
+        <div class="col-lg-8">
+            <div class="card border-0 shadow rounded-4 p-4" style="background-color: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-layout) !important;">
+                
+                @if (TempData["Success"] != null)
+                {
+                    <div class="alert alert-success alert-dismissible fade show rounded-3 small fw-semibold" role="alert">
+                        <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
+                @if (TempData["Error"] != null)
+                {
+                    <div class="alert alert-danger alert-dismissible fade show rounded-3 small fw-semibold" role="alert">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                }
 
-                    <h5 class="fw-bold text-uppercase border-bottom border-secondary border-opacity-25 pb-2 mb-4"><i class="bi bi-sliders me-2 text-warning"></i>Cấu hình hệ thống cá nhân</h5>
+                <form asp-action="UpdateInfo" asp-controller="Profile" method="post" autocomplete="off">
+                    <h5 class="fw-bold text-uppercase border-bottom border-secondary border-opacity-25 pb-2 mb-4">
+                        <i class="bi bi-sliders me-2 text-warning"></i>Cấu hình hệ thống cá nhân
+                    </h5>
                     
                     <div class="row g-3">
                         <div class="col-md-6">
@@ -89,7 +93,17 @@
                         </div>
                     </div>
 
-                    <h5 class="fw-bold text-uppercase border-bottom border-secondary border-opacity-25 pb-2 mt-5 mb-4"><i class="bi bi-shield-lock-fill me-2 text-danger"></i>Thiết lập mật mã bảo mật</h5>
+                    <div class="mt-4 pt-2 text-end">
+                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold text-uppercase btn-sm shadow">
+                            <i class="bi bi-person-check-fill me-2"></i>Cập nhật thông tin
+                        </button>
+                    </div>
+                </form>
+
+                <form asp-action="ChangePassword" asp-controller="Account" method="post" autocomplete="off" class="mt-5">
+                    <h5 class="fw-bold text-uppercase border-bottom border-secondary border-opacity-25 pb-2 mb-4">
+                        <i class="bi bi-shield-lock-fill me-2 text-danger"></i>Thiết lập mật mã bảo mật
+                    </h5>
                     
                     <div class="row g-3">
                         <div class="col-12">
@@ -97,7 +111,7 @@
                         </div>
                         <div class="col-12">
                             <label class="form-label small fw-bold">Mật khẩu hiện tại</label>
-                            <input type="password" asp-for="MatKhauCu" class="form-control rounded-3" style="background-color: rgba(128,128,128,0.05); color: var(--text-main); border: 1px solid var(--border-layout);" placeholder="Nhập mật khẩu cũ nếu muốn đổi" />
+                            <input type="password" asp-for="MatKhauCu" class="form-control rounded-3" style="background-color: rgba(128,128,128,0.05); color: var(--text-main); border: 1px solid var(--border-layout);" placeholder="Nhập mật khẩu cũ để xác thực" />
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Mật khẩu mới</label>
@@ -110,15 +124,15 @@
                     </div>
 
                     <div class="mt-4 pt-2 text-end">
-                        <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold text-uppercase btn-sm shadow">
-                            <i class="bi bi-save2 me-2"></i>Lưu cấu hình hồ sơ
+                        <button type="submit" class="btn btn-outline-danger rounded-pill px-4 fw-bold text-uppercase btn-sm shadow">
+                            <i class="bi bi-key-fill me-2"></i>Đổi mật khẩu
                         </button>
                     </div>
+                </form>
 
-                </div>
             </div>
         </div>
-    </form>
+    </div>
 </div>
 
 @section Scripts {

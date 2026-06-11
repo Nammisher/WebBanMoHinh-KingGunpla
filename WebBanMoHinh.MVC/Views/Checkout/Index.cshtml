@@ -88,17 +88,19 @@
         @@media (max-width: 992px) { .checkout-content { grid-template-columns: 1fr; gap: 20px;} .order-summary { position: static; margin-top: 10px; } .three-col, .two-col, .payment-grid { grid-template-columns: 1fr; } .bank-transfer-box { flex-direction: column; align-items: center; text-align: center;} }
 
         /* =========================================
-           FIX LỖI AUTOFILL - ĐỒNG BỘ 100% VỚI SELECT
+           FIX LỖI AUTOFILL - TỰ ĐỘNG ĐỔI MÀU THEO MODE
            ========================================= */
         input:-webkit-autofill,
         input:-webkit-autofill:hover, 
         input:-webkit-autofill:focus, 
         input:-webkit-autofill:active {
-            /* Kỹ thuật "đóng băng" thời gian đổi màu của trình duyệt */
-            transition: background-color 5000s ease-in-out 0s !important;
+            /* Dùng bóng đổ (box-shadow) chèn vào trong, ép nhận biến màu nền của hệ thống */
+            -webkit-box-shadow: 0 0 0 50px var(--bg-search) inset !important;
             
-            /* Ép màu chữ đi theo theme hiện tại */
+            /* Ép màu chữ theo biến hệ thống */
             -webkit-text-fill-color: var(--text-search) !important;
+            
+            /* BỎ DÒNG TRANSITION 5000s ĐI ĐỂ TRÌNH DUYỆT KHÔNG BỊ ĐÓNG BĂNG NỮA */
         }
     </style>
 }

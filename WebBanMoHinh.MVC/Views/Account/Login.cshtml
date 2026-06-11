@@ -59,12 +59,14 @@
     <div class="login-card text-center">
         <h3 class="fw-bold mb-2 text-uppercase tracking-wider"><i class="bi bi-shield-lock text-info me-2"></i>Pilot Login</h3>
         <p class="text-muted small mb-4">Vui lòng đăng nhập để truy cập tổng kho KingGunpla</p>
+        
         @if (TempData["SuccessMessage"] != null)
         {
             <div class="alert alert-success border-0 small py-2 rounded-3 text-center fw-semibold mb-3">
                 <i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]
             </div>
         }
+        
         <form asp-action="Login" asp-controller="Account" method="post">
             <input type="hidden" asp-for="ReturnUrl" />
 
@@ -75,9 +77,13 @@
             </div>
 
             <div class="text-start mb-4">
-                <label class="form-label small fw-bold">Mật khẩu</label>
+                <label class="form-label small fw-bold mb-2">Mật khẩu</label>
                 <input asp-for="MatKhau" class="form-control form-control-cyber" placeholder="Nhập mật khẩu..." />
                 <span asp-validation-for="MatKhau" class="text-danger small"></span>
+                
+                <div class="text-start mt-2">
+                    <a href="/Account/ForgotPassword" class="text-info small text-decoration-none fw-semibold">Quên mật khẩu?</a>
+                </div>
             </div>
 
             <button type="submit" class="btn btn-cyber w-100 text-uppercase mb-3">Đăng Nhập Hệ Thống</button>
@@ -87,27 +93,27 @@
             </div>
 
             <div class="mt-4 mb-3">
-            <div class="d-flex align-items-center mb-3">
-                <hr class="flex-grow-1 border-secondary m-0" style="opacity: 0.3;">
-                <span class="mx-3 text-uppercase" style="font-size: 12px; color: #8a93a2; font-weight: 500; letter-spacing: 0.5px;">
-                    Hoặc đăng nhập bằng
-                </span>
-                <hr class="flex-grow-1 border-secondary m-0" style="opacity: 0.3;">
+                <div class="d-flex align-items-center mb-3">
+                    <hr class="flex-grow-1 border-secondary m-0" style="opacity: 0.3;">
+                    <span class="mx-3 text-uppercase" style="font-size: 12px; color: #8a93a2; font-weight: 500; letter-spacing: 0.5px;">
+                        Hoặc đăng nhập bằng
+                    </span>
+                    <hr class="flex-grow-1 border-secondary m-0" style="opacity: 0.3;">
+                </div>
+        
+                <a href="/Account/GoogleLogin?returnUrl=@Context.Request.Query["returnUrl"]" 
+                    class="btn btn-outline-light w-100 mb-3" 
+                    style="border-radius: 12px; padding: 10px 0; border: 1px solid #444;">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48" class="me-2">
+                            <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.354,43.611,20.083z"/>
+                            <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
+                            <path fill="#4CAF50" d="M24,44c5.166,0,9.898-1.965,13.507-5.185l-6.23-5.275C29.15,35.347,26.732,36,24,36c-5.223,0-9.654-3.343-11.303-8H4v5.303C7.458,40.163,15.116,44,24,44z"/>
+                            <path fill="#1976D2" d="M43.611,20.083L43.611,20.083L43.611,20.083z"/>
+                            <path fill="#1976D2" d="M43.611,20.083H44v-8.083h-3.389C40.75,15.054,42.062,17.785,43.611,20.083z"/>
+                        </svg>
+                        Tiếp tục với Google
+                </a>
             </div>
-    
-            <a href="/Account/GoogleLogin?returnUrl=@Context.Request.Query["returnUrl"]" 
-                class="btn btn-outline-light w-100 mb-3" 
-                style="border-radius: 12px; padding: 10px 0; border: 1px solid #444;">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48" class="me-2">
-                        <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.354,43.611,20.083z"/>
-                        <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z"/>
-                        <path fill="#4CAF50" d="M24,44c5.166,0,9.898-1.965,13.507-5.185l-6.23-5.275C29.15,35.347,26.732,36,24,36c-5.223,0-9.654-3.343-11.303-8H4v5.303C7.458,40.163,15.116,44,24,44z"/>
-                        <path fill="#1976D2" d="M43.611,20.083L43.611,20.083L43.611,20.083z"/>
-                        <path fill="#1976D2" d="M43.611,20.083H44v-8.083h-3.389C40.75,15.054,42.062,17.785,43.611,20.083z"/>
-                    </svg>
-                    Tiếp tục với Google
-            </a>
-        </div>
         </form>
     </div>
 </body>

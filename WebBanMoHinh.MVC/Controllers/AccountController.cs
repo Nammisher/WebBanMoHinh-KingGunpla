@@ -293,5 +293,94 @@ namespace WebBanMoHinh.MVC.Controllers
 
             return RedirectToAction("Login");
         }
+
+        // 8. GET: /Account/ForgotPassword (MỞ GIAO DIỆN QUÊN MẬT KHẨU)
+        [HttpGet]
+        public IActionResult ForgotPassword()
+        {
+            return View();
+        }
+
+        // 9. POST: /Account/ForgotPassword (GỬI EMAIL SANG API ĐỂ XỬ LÝ)
+        [HttpPost]
+        public async Task<IActionResult> ForgotPassword(ForgotPasswordViewModel model)
+        {
+            if (!ModelState.IsValid) return View(model);
+
+            try
+            {
+                // Đóng gói Email gửi sang Endpoint "QuenMatKhau" của API
+                var requestBody = new { Email = model.Email };
+                var response = await _httpClient.PostAsJsonAsync(_apiUrl + "QuenMatKhau", requestBody);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    // Nếu API báo thành công, hiện thông báo xanh và đá về trang Đăng nhập
+                    TempData["SuccessMessage"] = "Hệ thống đã gửi mã khôi phục! Vui lòng kiểm tra hộp thư Email của bạn.";
+                    return RedirectToAction("Login");
+                }
+                else
+                {
+                    // Nếu API báo lỗi (VD: Email không tồn tại), hiện thông báo đỏ
+                    var errorResult = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+                    string errorMsg = errorResult != null && errorResult.ContainsKey("message") 
+                        ? errorResult["message"] 
+                        : "Email này chưa được liên kết với bất kỳ tài khoản Pilot nào trên hệ thống!";
+
+                    TempData["ErrorMessage"] = errorMsg;
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["ErrorMessage"] = $"Lỗi kết nối đến Tổng kho API: {ex.Message}";
+            }
+
+            return View(model);
+        }
+        [HttpPost]
+        public async Task<IActionResult> ChangePassword(UserProfileViewModel model)
+        {
+            // 1. Kiểm tra khớp mật khẩu ngay tại MVC trước cho nhanh
+            if (model.MatKhauMoi != model.NhapLaiMatKhauMoi)
+            {
+                TempData["Error"] = "Mật khẩu xác nhận không trùng khớp!";
+                return RedirectToAction("Index");
+            }
+
+            // 2. Lấy Tên đăng nhập từ Session để biết ai đang đổi mật khẩu
+            string? username = HttpContext.Session.GetString("UserSession");
+            if (string.IsNullOrEmpty(username)) return RedirectToAction("Login", "Account");
+
+            try
+            {
+                // 3. Đóng gói dữ liệu gửi sang API
+                var requestData = new
+                {
+                    TenDangNhap = username,
+                    MatKhauCu = model.MatKhauCu,
+                    MatKhauMoi = model.MatKhauMoi
+                };
+
+                // Gọi API Cập nhật hồ sơ (API này đã có sẵn logic đổi pass)
+                var response = await _httpClient.PutAsJsonAsync("http://localhost:5298/api/TaiKhoans/CapNhatProfile", requestData);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    TempData["Success"] = "Thay đổi mật khẩu thành công!";
+                }
+                else
+                {
+                    // Bắt lỗi nếu mật khẩu cũ sai
+                    var errorResult = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
+                    TempData["Error"] = errorResult?.GetValueOrDefault("message") ?? "Đổi mật khẩu thất bại!";
+                }
+            }
+            catch (Exception ex)
+            {
+                TempData["Error"] = "Lỗi kết nối đến Server: " + ex.Message;
+            }
+
+            return RedirectToAction("Index");
+        }
     }
 }
