@@ -36,6 +36,7 @@ public partial class WebBanMoHinhContext : DbContext
     public virtual DbSet<SanPham> SanPham { get; set; }
 
     public virtual DbSet<TaiKhoan> TaiKhoan { get; set; }
+    public virtual DbSet<GioHang> GioHang { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
@@ -259,6 +260,19 @@ public partial class WebBanMoHinhContext : DbContext
             entity.Property(e => e.VaiTro)
                 .HasMaxLength(20)
                 .HasDefaultValue("Customer");
+        });
+        modelBuilder.Entity<GioHang>(entity =>
+        {
+            entity.HasKey(e => e.TenDangNhap);
+            
+            entity.Property(e => e.TenDangNhap)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+
+            entity.HasOne(d => d.TenDangNhapNavigation)
+                .WithOne()
+                .HasForeignKey<GioHang>(d => d.TenDangNhap)
+                .HasConstraintName("FK_GioHang_TaiKhoan");
         });
 
         OnModelCreatingPartial(modelBuilder);

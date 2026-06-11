@@ -15,36 +15,51 @@ namespace WebBanMoHinh.API.Controllers
             _context = context;
         }
 
-        // 1. API LẤY GIỎ HÀNG CŨ TỪ SQL SERVER: GET /api/Cart/GetCart/admin
+        // 1. API LẤY GIỎ HÀNG TỪ BẢNG GIOHANG: GET /api/Cart/GetCart/admin
         [HttpGet("GetCart/{username}")]
         public async Task<IActionResult> GetCart(string username)
         {
-            // Duy quét bảng lưu chi tiết giỏ hàng của bạn dưới DB (ví dụ mình đặt là ChiTietGioHangs)
-            // Nếu Duy chưa tạo bảng riêng, Duy có thể mượn cột DiaChi của bảng TaiKhoan để cất chuỗi JSON tại đây
-            var taiKhoan = await _context.TaiKhoan.FirstOrDefaultAsync(t => t.TenDangNhap == username);
-            if (taiKhoan == null) return NotFound(new { message = "Không tìm thấy user" });
+            // Quét thẳng vào bảng GioHang
+            var gioHang = await _context.GioHang.FirstOrDefaultAsync(g => g.TenDangNhap == username);
+            
+            // Nếu chưa từng có giỏ hàng, trả về chuỗi rỗng để MVC tự gộp, KHÔNG trả lỗi NotFound
+            if (gioHang == null) return Ok(new { cartJson = "" });
 
-            return Ok(new { cartJson = taiKhoan.DiaChi });
+            return Ok(new { cartJson = gioHang.CartJson });
         }
 
-        // 2. API LƯU GIỎ HÀNG VÀO SQL SERVER: POST /api/Cart/SaveCart
+        // 2. API LƯU GIỎ HÀNG VÀO BẢNG GIOHANG: POST /api/Cart/SaveCart
         [HttpPost("SaveCart")]
         public async Task<IActionResult> SaveCart([FromBody] SaveCartDTO request)
         {
-            var taiKhoan = await _context.TaiKhoan.FirstOrDefaultAsync(t => t.TenDangNhap == request.Username);
-            if (taiKhoan == null) return NotFound(new { message = "Không tìm thấy user" });
+            var gioHang = await _context.GioHang.FirstOrDefaultAsync(g => g.TenDangNhap == request.Username);
 
-            // Lưu chuỗi giỏ hàng vào DB
-            taiKhoan.DiaChi = request.CartJson;
+            if (gioHang == null)
+            {
+                // Khách này chưa có record giỏ hàng -> Tạo mới trong bảng GioHang
+                gioHang = new GioHang 
+                { 
+                    TenDangNhap = request.Username, 
+                    CartJson = request.CartJson 
+                };
+                _context.GioHang.Add(gioHang);
+            }
+            else
+            {
+                // Đã có rồi -> Ghi đè chuỗi JSON mới
+                gioHang.CartJson = request.CartJson;
+            }
+
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Đã lưu giỏ hàng thành công!" });
+            return Ok(new { message = "Lưu giỏ hàng thành công!" });
         }
     }
 
+    // DTO hứng dữ liệu từ MVC gửi lên
     public class SaveCartDTO
     {
         public string Username { get; set; } = null!;
-        public string? CartJson { get; set; }
+        public string CartJson { get; set; } = null!;
     }
 }
