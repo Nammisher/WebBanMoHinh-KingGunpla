@@ -1,8 +1,8 @@
 @model WebBanMoHinh.MVC.Models.UserProfileViewModel
 
-@{
-    ViewData["Title"] = "Hồ sơ cá nhân Pilot";
-}
+@{ ViewData["Title"] = "Hồ sơ cá nhân Pilot"; }
+
+<div class="toast-container" id="toastBox"></div>
 
 <div class="container my-5">
     <h3 class="mb-4 text-uppercase fw-bold" style="color: var(--text-nav-hover); text-shadow: var(--glow-brand);">
@@ -10,46 +10,33 @@
     </h3>
 
     <div class="row g-4">
-        
         <div class="col-lg-4">
             <form asp-action="UpdateAvatar" asp-controller="Profile" method="post" enctype="multipart/form-data" class="h-100">
                 <div class="card border-0 shadow rounded-4 p-4 text-center h-100" style="background-color: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-layout) !important;">
-                    
-                    <div class="position-relative mx-auto mb-3" style="width: 130px; height: 130px; cursor: pointer;"
-                        onclick="document.getElementById('avatarInput').click()" title="Bấm để thay đổi Avatar">
-                        <img id="avatarPreview" 
-                             src="@(string.IsNullOrEmpty(Model.Avatar) ? "https://placehold.co/130x130/1e293b/cbd5e1?text=Pilot" : "/images/" + Model.Avatar)" 
-                             class="rounded-circle object-fit-cover w-100 h-100 shadow" 
-                             style="border: 3px solid var(--text-nav-hover);"
-                             onerror="this.src='https://placehold.co/130x130/1e293b/cbd5e1?text=Pilot'" alt="Avatar" />
-                        
+                    <div class="position-relative mx-auto mb-3" style="width: 130px; height: 130px; cursor: pointer;" onclick="document.getElementById('avatarInput').click()" title="Bấm để thay đổi Avatar">
+                        <img id="avatarPreview" src="@(string.IsNullOrEmpty(Model.Avatar) ? "https://placehold.co/130x130/1e293b/cbd5e1?text=Pilot" : "/images/" + Model.Avatar)" class="rounded-circle object-fit-cover w-100 h-100 shadow" style="border: 3px solid var(--text-nav-hover);" onerror="this.src='https://placehold.co/130x130/1e293b/cbd5e1?text=Pilot'" alt="Avatar" />
                         <div class="position-absolute bottom-0 end-0 bg-primary rounded-circle shadow d-flex align-items-center justify-content-center" style="width: 35px; height: 35px; transform: translate(-5px, -5px);">
                             <i class="bi bi-camera-fill text-white small"></i>
                         </div>
                     </div>
-                    
                     <input type="file" id="avatarInput" asp-for="AvatarUpload" accept="image/*" class="d-none" onchange="previewAvatar(event)" />
                     <input type="hidden" asp-for="Avatar" />
-
                     <div id="btnSaveAvatarWrapper" class="d-none mb-3">
                         <button type="submit" class="btn btn-sm btn-success rounded-pill px-4 shadow fw-bold text-uppercase">
                             <i class="bi bi-cloud-arrow-up-fill me-1"></i> Lưu Ảnh Đại Diện
                         </button>
                     </div>
-
-                    <h4 class="fw-bold mb-1">@Model.HoTen</h4>
-                    <p class="badge bg-primary px-3 py-1.5 rounded-pill mb-3 small">@Model.VaiTro</p>
-                    
+                    <h4 class="fw-bold mb-1">@(Model?.HoTen ?? "") </h4>
+                    <p class="badge bg-primary px-3 py-1.5 rounded-pill mb-3 small">@(Model?.VaiTro ?? "")</p>
                     <hr class="w-100 opacity-25" style="color: var(--text-muted);">
-                    
                     <div class="text-start w-100 small">
                         <div class="mb-2 d-flex justify-content-between">
                             <span style="color: var(--text-muted);">Mật danh đăng nhập:</span>
-                            <span class="fw-bold text-info">@Model.TenDangNhap</span>
+                            <span class="fw-bold text-info">@(Model?.TenDangNhap ?? "")</span>
                         </div>
                         <div class="d-flex justify-content-between">
                             <span style="color: var(--text-muted);">Ngày gia nhập:</span>
-                            <span class="fw-medium">@(Model.NgayTao?.ToString("dd/MM/yyyy") ?? "N/A")</span>
+                            <span class="fw-medium">@(Model?.NgayTao?.ToString("dd/MM/yyyy") ?? "N/A")</span>
                         </div>
                     </div>
                 </div>
@@ -58,27 +45,10 @@
 
         <div class="col-lg-8">
             <div class="card border-0 shadow rounded-4 p-4" style="background-color: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-layout) !important;">
-                
-                @if (TempData["Success"] != null)
-                {
-                    <div class="alert alert-success alert-dismissible fade show rounded-3 small fw-semibold" role="alert">
-                        <i class="bi bi-check-circle-fill me-2"></i> @TempData["Success"]
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                }
-                @if (TempData["Error"] != null)
-                {
-                    <div class="alert alert-danger alert-dismissible fade show rounded-3 small fw-semibold" role="alert">
-                        <i class="bi bi-exclamation-triangle-fill me-2"></i> @TempData["Error"]
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                }
-
                 <form asp-action="UpdateInfo" asp-controller="Profile" method="post" autocomplete="off">
                     <h5 class="fw-bold text-uppercase border-bottom border-secondary border-opacity-25 pb-2 mb-4">
                         <i class="bi bi-sliders me-2 text-warning"></i>Cấu hình hệ thống cá nhân
                     </h5>
-                    
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Họ và tên hiển thị</label>
@@ -93,7 +63,6 @@
                             <input type="email" asp-for="Email" class="form-control rounded-3" style="background-color: rgba(128,128,128,0.05); color: var(--text-main); border: 1px solid var(--border-layout);" required />
                         </div>
                     </div>
-
                     <div class="mt-4 pt-2 text-end">
                         <button type="submit" class="btn btn-primary rounded-pill px-4 fw-bold text-uppercase btn-sm shadow">
                             <i class="bi bi-person-check-fill me-2"></i>Cập nhật thông tin
@@ -101,19 +70,15 @@
                     </div>
                 </form>
 
-                <form asp-action="ChangePassword" asp-controller="Account" method="post" autocomplete="off" class="mt-5">
+                <form id="changePasswordForm" method="post" autocomplete="off" class="mt-5">
                     <h5 class="fw-bold text-uppercase border-bottom border-secondary border-opacity-25 pb-2 mb-4">
                         <i class="bi bi-shield-lock-fill me-2 text-danger"></i>Thiết lập mật mã bảo mật
                     </h5>
-                    
                     <div class="row g-3">
-                        <div class="col-12">
-                            <label class="form-label small text-muted">Nếu không có nhu cầu thay đổi mật mã đăng nhập, vui lòng bỏ trống các ô bên dưới.</label>
-                        </div>
                         <div class="col-12">
                             <label class="form-label small fw-bold">Mật khẩu hiện tại</label>
                             <div class="input-group">
-                                <input type="password" id="curPass" asp-for="MatKhauCu" class="form-control rounded-3 border-end-0" style="background-color: rgba(128,128,128,0.05); color: var(--text-main); border: 1px solid var(--border-layout);" placeholder="Nhập mật khẩu cũ để xác thực" />
+                                <input type="password" id="curPass" name="MatKhauCu" class="form-control rounded-3 border-end-0" style="background-color: rgba(128,128,128,0.05); color: var(--text-main); border: 1px solid var(--border-layout);" placeholder="Nhập mật khẩu cũ..." />
                                 <span class="input-group-text border-start-0" style="background-color: rgba(128,128,128,0.05); border: 1px solid var(--border-layout); cursor:pointer;" onclick="togglePassword('curPass', this)">
                                     <i class="bi bi-eye-slash"></i>
                                 </span>
@@ -122,7 +87,7 @@
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Mật khẩu mới</label>
                             <div class="input-group">
-                                <input type="password" id="newPass" asp-for="MatKhauMoi" class="form-control rounded-3 border-end-0" style="background-color: rgba(128,128,128,0.05); color: var(--text-main); border: 1px solid var(--border-layout);" placeholder="Tối thiểu 6 ký tự" />
+                                <input type="password" id="newPass" name="MatKhauMoi" class="form-control rounded-3 border-end-0" style="background-color: rgba(128,128,128,0.05); color: var(--text-main); border: 1px solid var(--border-layout);" placeholder="Tối thiểu 6 ký tự" />
                                 <span class="input-group-text border-start-0" style="background-color: rgba(128,128,128,0.05); border: 1px solid var(--border-layout); cursor:pointer;" onclick="togglePassword('newPass', this)">
                                     <i class="bi bi-eye-slash"></i>
                                 </span>
@@ -131,21 +96,19 @@
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Xác nhận mật khẩu mới</label>
                             <div class="input-group">
-                                <input type="password" id="confPass" asp-for="NhapLaiMatKhauMoi" class="form-control rounded-3 border-end-0" style="background-color: rgba(128,128,128,0.05); color: var(--text-main); border: 1px solid var(--border-layout);" placeholder="Nhập lại mật khẩu mới" />
+                                <input type="password" id="confPass" name="NhapLaiMatKhauMoi" class="form-control rounded-3 border-end-0" style="background-color: rgba(128,128,128,0.05); color: var(--text-main); border: 1px solid var(--border-layout);" placeholder="Nhập lại mật khẩu mới" />
                                 <span class="input-group-text border-start-0" style="background-color: rgba(128,128,128,0.05); border: 1px solid var(--border-layout); cursor:pointer;" onclick="togglePassword('confPass', this)">
                                     <i class="bi bi-eye-slash"></i>
                                 </span>
                             </div>
                         </div>
                     </div>
-
                     <div class="mt-4 pt-2 text-end">
                         <button type="submit" class="btn btn-outline-danger rounded-pill px-4 fw-bold text-uppercase btn-sm shadow">
                             <i class="bi bi-key-fill me-2"></i>Đổi mật khẩu
                         </button>
                     </div>
                 </form>
-
             </div>
         </div>
     </div>
@@ -153,6 +116,55 @@
 
 @section Scripts {
     <script>
+        const toastTimeouts = {};
+
+        // 1. Xử lý AJAX Form
+        document.getElementById("changePasswordForm").addEventListener("submit", function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            fetch('/Account/ChangePassword', { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(data => {
+                showToast(data.message, data.success);
+                if(data.success) document.getElementById("changePasswordForm").reset();
+            });
+        });
+
+        // 2. Hàm hiển thị Toast
+        function showToast(message, isSuccess) {
+            const toastBox = document.getElementById('toastBox');
+            const toastId = 'toast-' + Date.now();
+            const toast = document.createElement('div');
+            toast.className = 'toast-custom';
+            toast.id = toastId;
+            toast.style.backgroundColor = isSuccess ? '#198754' : '#dc3545';
+            
+            toast.innerHTML = `
+                <div class="toast-content">
+                    <span>${message}</span>
+                </div>
+                <div class="progress-bar-bottom"><div class="progress-active" style="transition: width 3000ms linear;"></div></div>
+            `;
+            toastBox.appendChild(toast);
+            
+            setTimeout(() => { toast.querySelector('.progress-active').style.width = '0%'; }, 50);
+            toastTimeouts[toastId] = setTimeout(() => { removeToast(toastId); }, 3000);
+        }
+
+        // 3. Hàm xóa Toast tự động
+        function removeToast(toastId) {
+            if (toastTimeouts[toastId]) {
+                clearTimeout(toastTimeouts[toastId]);
+                delete toastTimeouts[toastId];
+            }
+            const toast = document.getElementById(toastId);
+            if (toast) {
+                toast.classList.add('toast-fade-out'); 
+                setTimeout(() => { toast.remove(); }, 300);
+            }
+        }
+
+        // Các hàm hỗ trợ
         function previewAvatar(event) {
             var input = event.target;
             if (input.files && input.files[0]) {

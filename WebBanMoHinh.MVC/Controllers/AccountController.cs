@@ -342,47 +342,33 @@ namespace WebBanMoHinh.MVC.Controllers
         [HttpPost]
         public async Task<IActionResult> ChangePassword(UserProfileViewModel model)
         {
-            // 1. Kiểm tra khớp mật khẩu ngay tại MVC trước cho nhanh
+            // Kiểm tra dữ liệu cơ bản
             if (model.MatKhauMoi != model.NhapLaiMatKhauMoi)
-            {
-                TempData["Error"] = "Mật khẩu xác nhận không trùng khớp!";
-                return RedirectToAction("Index");
-            }
+                return Json(new { success = false, message = "Mật khẩu mới không trùng khớp!" });
 
-            // 2. Lấy Tên đăng nhập từ Session để biết ai đang đổi mật khẩu
             string? username = HttpContext.Session.GetString("UserSession");
-            if (string.IsNullOrEmpty(username)) return RedirectToAction("Login", "Account");
+            if (string.IsNullOrEmpty(username)) 
+                return Json(new { success = false, message = "Phiên đăng nhập đã hết hạn!" });
 
             try
             {
-                // 3. Đóng gói dữ liệu gửi sang API
-                var requestData = new
-                {
-                    TenDangNhap = username,
-                    MatKhauCu = model.MatKhauCu,
-                    MatKhauMoi = model.MatKhauMoi
-                };
-
-                // Gọi API Cập nhật hồ sơ (API này đã có sẵn logic đổi pass)
+                var requestData = new { TenDangNhap = username, MatKhauCu = model.MatKhauCu, MatKhauMoi = model.MatKhauMoi };
                 var response = await _httpClient.PutAsJsonAsync($"{_apiUrl}TaiKhoans/CapNhatProfile", requestData);
 
                 if (response.IsSuccessStatusCode)
                 {
-                    TempData["Success"] = "Thay đổi mật khẩu thành công!";
+                    return Json(new { success = true, message = "Thay đổi mật khẩu thành công!" });
                 }
                 else
                 {
-                    // Bắt lỗi nếu mật khẩu cũ sai
                     var errorResult = await response.Content.ReadFromJsonAsync<Dictionary<string, string>>();
-                    TempData["Error"] = errorResult?.GetValueOrDefault("message") ?? "Đổi mật khẩu thất bại!";
+                    return Json(new { success = false, message = errorResult?.GetValueOrDefault("message") ?? "Đổi mật khẩu thất bại!" });
                 }
             }
             catch (Exception ex)
             {
-                TempData["Error"] = "Lỗi kết nối đến Server: " + ex.Message;
+                return Json(new { success = false, message = "Lỗi kết nối: " + ex.Message });
             }
-
-            return RedirectToAction("Index");
         }
     }
 }

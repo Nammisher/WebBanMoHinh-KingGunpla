@@ -141,3 +141,56 @@ body.dark .custom-btn-outline:hover {
   color: #ffffff !important;
   border: 1px solid rgba(255, 255, 255, 0.4) !important;
 }
+
+/* CSS cho Toast thông báo */
+.toast-container {
+  position: fixed;
+  top: 80px;
+  right: 20px;
+  z-index: 9999;
+}
+.toast-custom {
+  background-color: #198754;
+  color: white;
+  width: 350px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  overflow: hidden;
+  animation: slideInRight 0.3s ease-out;
+  transition: all 0.3s ease; /* Tạo hiệu ứng mượt khi xóa */
+}
+.toast-content {
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.btn-close-toast:hover {
+  opacity: 1;
+  transform: scale(1.2); /* Hiệu ứng phình to nhẹ khi di chuột vào */
+}
+.progress-bar-bottom {
+  height: 4px;
+  background-color: rgba(0, 0, 0, 0.2);
+  width: 100%;
+}
+.progress-active {
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.4);
+  width: 100%;
+  transition: width linear;
+}
+.toast-fade-out {
+  transform: scale(0.9);
+  opacity: 0;
+} /* Hiệu ứng thu nhỏ */
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
