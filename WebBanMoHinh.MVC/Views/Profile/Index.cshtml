@@ -15,7 +15,8 @@
             <form asp-action="UpdateAvatar" asp-controller="Profile" method="post" enctype="multipart/form-data" class="h-100">
                 <div class="card border-0 shadow rounded-4 p-4 text-center h-100" style="background-color: var(--bg-card); color: var(--text-main); border: 1px solid var(--border-layout) !important;">
                     
-                    <div class="position-relative mx-auto mb-3" style="width: 130px; height: 130px; cursor: pointer;" onclick="document.getElementById('avatarInput').click()" title="Bấm để thay đổi Avatar">
+                    <div class="position-relative mx-auto mb-3" style="width: 130px; height: 130px; cursor: pointer;"
+                        onclick="document.getElementById('avatarInput').click()" title="Bấm để thay đổi Avatar">
                         <img id="avatarPreview" 
                              src="@(string.IsNullOrEmpty(Model.Avatar) ? "https://placehold.co/130x130/1e293b/cbd5e1?text=Pilot" : "/images/" + Model.Avatar)" 
                              class="rounded-circle object-fit-cover w-100 h-100 shadow" 
@@ -111,15 +112,30 @@
                         </div>
                         <div class="col-12">
                             <label class="form-label small fw-bold">Mật khẩu hiện tại</label>
-                            <input type="password" asp-for="MatKhauCu" class="form-control rounded-3" style="background-color: rgba(128,128,128,0.05); color: var(--text-main); border: 1px solid var(--border-layout);" placeholder="Nhập mật khẩu cũ để xác thực" />
+                            <div class="input-group">
+                                <input type="password" id="curPass" asp-for="MatKhauCu" class="form-control rounded-3 border-end-0" style="background-color: rgba(128,128,128,0.05); color: var(--text-main); border: 1px solid var(--border-layout);" placeholder="Nhập mật khẩu cũ để xác thực" />
+                                <span class="input-group-text border-start-0" style="background-color: rgba(128,128,128,0.05); border: 1px solid var(--border-layout); cursor:pointer;" onclick="togglePassword('curPass', this)">
+                                    <i class="bi bi-eye-slash"></i>
+                                </span>
+                            </div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Mật khẩu mới</label>
-                            <input type="password" asp-for="MatKhauMoi" class="form-control rounded-3" style="background-color: rgba(128,128,128,0.05); color: var(--text-main); border: 1px solid var(--border-layout);" placeholder="Tối thiểu 6 ký tự" />
+                            <div class="input-group">
+                                <input type="password" id="newPass" asp-for="MatKhauMoi" class="form-control rounded-3 border-end-0" style="background-color: rgba(128,128,128,0.05); color: var(--text-main); border: 1px solid var(--border-layout);" placeholder="Tối thiểu 6 ký tự" />
+                                <span class="input-group-text border-start-0" style="background-color: rgba(128,128,128,0.05); border: 1px solid var(--border-layout); cursor:pointer;" onclick="togglePassword('newPass', this)">
+                                    <i class="bi bi-eye-slash"></i>
+                                </span>
+                            </div>
                         </div>
                         <div class="col-md-6">
                             <label class="form-label small fw-bold">Xác nhận mật khẩu mới</label>
-                            <input type="password" asp-for="NhapLaiMatKhauMoi" class="form-control rounded-3" style="background-color: rgba(128,128,128,0.05); color: var(--text-main); border: 1px solid var(--border-layout);" placeholder="Nhập lại mật khẩu mới" />
+                            <div class="input-group">
+                                <input type="password" id="confPass" asp-for="NhapLaiMatKhauMoi" class="form-control rounded-3 border-end-0" style="background-color: rgba(128,128,128,0.05); color: var(--text-main); border: 1px solid var(--border-layout);" placeholder="Nhập lại mật khẩu mới" />
+                                <span class="input-group-text border-start-0" style="background-color: rgba(128,128,128,0.05); border: 1px solid var(--border-layout); cursor:pointer;" onclick="togglePassword('confPass', this)">
+                                    <i class="bi bi-eye-slash"></i>
+                                </span>
+                            </div>
                         </div>
                     </div>
 
@@ -139,17 +155,28 @@
     <script>
         function previewAvatar(event) {
             var input = event.target;
-            
             if (input.files && input.files[0]) {
                 var reader = new FileReader();
                 reader.onload = function(e){
                     var output = document.getElementById('avatarPreview');
                     output.src = e.target.result;
-                    
-                    // XÓA CLASS D-NONE ĐỂ HIỂN THỊ NÚT LƯU
                     document.getElementById('btnSaveAvatarWrapper').classList.remove('d-none');
                 };
                 reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        function togglePassword(inputId, toggleElement) {
+            const input = document.getElementById(inputId);
+            const icon = toggleElement.querySelector('i');
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("bi-eye-slash");
+                icon.classList.add("bi-eye");
+            } else {
+                input.type = "password";
+                icon.classList.remove("bi-eye");
+                icon.classList.add("bi-eye-slash");
             }
         }
     </script>

@@ -99,13 +99,23 @@
 
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size:0.75rem;">Mật Khẩu</label>
-                        <input asp-for="MatKhau" class="form-control form-control-cyber" placeholder="Tối thiểu 6 ký tự..." />
+                        <div class="input-group">
+                            <input asp-for="MatKhau" id="regPass" type="password" class="form-control form-control-cyber border-end-0" placeholder="Tối thiểu 6 ký tự..." />
+                            <span class="input-group-text form-control-cyber border-start-0" style="cursor:pointer;" onclick="togglePassword('regPass', this)">
+                                <i class="bi bi-eye-slash"></i>
+                            </span>
+                        </div>
                         <span asp-validation-for="MatKhau" class="text-danger small" style="font-size: 0.8rem;"></span>
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-secondary text-uppercase" style="font-size:0.75rem;">Xác Nhận Mật Khẩu</label>
-                        <input asp-for="NhapLaiMatKhau" class="form-control form-control-cyber" placeholder="Nhập lại mật khẩu..." />
+                        <div class="input-group">
+                            <input asp-for="NhapLaiMatKhau" id="regConfirm" type="password" class="form-control form-control-cyber border-end-0" placeholder="Nhập lại mật khẩu..." />
+                            <span class="input-group-text form-control-cyber border-start-0" style="cursor:pointer;" onclick="togglePassword('regConfirm', this)">
+                                <i class="bi bi-eye-slash"></i>
+                            </span>
+                        </div>
                         <span asp-validation-for="NhapLaiMatKhau" class="text-danger small" style="font-size: 0.8rem;"></span>
                     </div>
                 </div>
@@ -118,5 +128,21 @@
             </div>
         </form>
     </div>
+    
+    <script>
+        function togglePassword(inputId, toggleElement) {
+            const input = document.getElementById(inputId);
+            const icon = toggleElement.querySelector('i');
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove("bi-eye-slash");
+                icon.classList.add("bi-eye");
+            } else {
+                input.type = "password";
+                icon.classList.remove("bi-eye");
+                icon.classList.add("bi-eye-slash");
+            }
+        }
+    </script>
 </body>
 </html>
