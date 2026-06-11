@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Json;
-using System.Text.Json; // ĐÃ THÊM: Thư viện xử lý JSON
+using System.Text.Json;
 using WebBanMoHinh.MVC.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -12,12 +12,13 @@ namespace WebBanMoHinh.MVC.Controllers
     public class AccountController : Controller
     {
         private readonly HttpClient _httpClient;
-        // Đường dẫn gốc trỏ sang Controller TaiKhoans của API
-        private readonly string _apiUrl = "http://localhost:5298/api/TaiKhoans/"; 
+        private readonly string _apiUrl;
 
-        public AccountController(HttpClient httpClient)
+        public AccountController(HttpClient httpClient, IConfiguration configuration)
         {
             _httpClient = httpClient;
+            // Đọc URL từ appsettings.json, thiết lập fallback mặc định nếu không tìm thấy
+            _apiUrl = configuration.GetValue<string>("BackendApiUrl") ?? "http://localhost:5298/api/";
         }
 
         // 1. GET: /Account/Login
@@ -37,7 +38,7 @@ namespace WebBanMoHinh.MVC.Controllers
             try
             {
                 var requestBody = new { Username = model.TenDangNhap, Password = model.MatKhau };
-                var response = await _httpClient.PostAsJsonAsync(_apiUrl + "DangNhap", requestBody);
+                var response = await _httpClient.PostAsJsonAsync($"{_apiUrl}TaiKhoans/DangNhap", requestBody);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -53,7 +54,7 @@ namespace WebBanMoHinh.MVC.Controllers
                         HttpContext.Session.SetString("UserAvatar", apiResult["avatar"].ToString()!);
                     }
 
-                    // 2. ĐỒNG BỘ VÀ GỘP (MERGE) GIỎ HÀNG VÃNG LAI VÀO TÀI KHOẢN=
+                    // 2. ĐỒNG BỘ VÀ GỘP (MERGE) GIỎ HÀNG VÃNG LAI VÀO TÀI KHOẢN
                     try
                     {
                         string? guestCartJson = HttpContext.Session.GetString("GioHang");
@@ -61,7 +62,7 @@ namespace WebBanMoHinh.MVC.Controllers
                             ? new List<CartItemViewModel>() 
                             : JsonSerializer.Deserialize<List<CartItemViewModel>>(guestCartJson);
 
-                        var cartResponse = await _httpClient.GetAsync($"http://localhost:5298/api/Cart/GetCart/{model.TenDangNhap}");
+                        var cartResponse = await _httpClient.GetAsync($"{_apiUrl}Cart/GetCart/{model.TenDangNhap}");
                         if (cartResponse.IsSuccessStatusCode)
                         {
                             var cartData = await cartResponse.Content.ReadFromJsonAsync<Dictionary<string, string>>();
@@ -83,12 +84,12 @@ namespace WebBanMoHinh.MVC.Controllers
                                 
                                 string mergedCartJson = JsonSerializer.Serialize(dbCart);
                                 HttpContext.Session.SetString("GioHang", mergedCartJson);
-                                await _httpClient.PostAsJsonAsync("http://localhost:5298/api/Cart/SaveCart", new { Username = model.TenDangNhap, CartJson = mergedCartJson });
+                                await _httpClient.PostAsJsonAsync($"{_apiUrl}Cart/SaveCart", new { Username = model.TenDangNhap, CartJson = mergedCartJson });
                             }
                             // NẾU DATABASE RỖNG NHƯNG KHÁCH VÃNG LAI CÓ HÀNG -> LƯU THẲNG LÊN DB
                             else if (guestCart != null && guestCart.Any())
                             {
-                                await _httpClient.PostAsJsonAsync("http://localhost:5298/api/Cart/SaveCart", new { Username = model.TenDangNhap, CartJson = guestCartJson });
+                                await _httpClient.PostAsJsonAsync($"{_apiUrl}Cart/SaveCart", new { Username = model.TenDangNhap, CartJson = guestCartJson });
                             }
                         }
                     }
@@ -132,7 +133,7 @@ namespace WebBanMoHinh.MVC.Controllers
                 try
                 {
                     var saveBody = new { Username = username, CartJson = currentCartJson };
-                    await _httpClient.PostAsJsonAsync("http://localhost:5298/api/Cart/SaveCart", saveBody);
+                    await _httpClient.PostAsJsonAsync($"{_apiUrl}Cart/SaveCart", saveBody);
                 }
                 catch { }
             }
@@ -165,7 +166,7 @@ namespace WebBanMoHinh.MVC.Controllers
                     SoDienThoai = model.SoDienThoai 
                 };
 
-                var response = await _httpClient.PostAsJsonAsync(_apiUrl + "DangKy", requestBody);
+                var response = await _httpClient.PostAsJsonAsync($"{_apiUrl}TaiKhoans/DangKy", requestBody);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -219,7 +220,7 @@ namespace WebBanMoHinh.MVC.Controllers
             try
             {
                 var googleRequestBody = new { Email = email, HoTen = name ?? "Google User" };
-                var response = await _httpClient.PostAsJsonAsync(_apiUrl + "GoogleLogin", googleRequestBody);
+                var response = await _httpClient.PostAsJsonAsync($"{_apiUrl}TaiKhoans/GoogleLogin", googleRequestBody);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -244,7 +245,7 @@ namespace WebBanMoHinh.MVC.Controllers
                                 ? new List<CartItemViewModel>() 
                                 : JsonSerializer.Deserialize<List<CartItemViewModel>>(guestCartJson);
 
-                            var cartResponse = await _httpClient.GetAsync($"http://localhost:5298/api/Cart/GetCart/{systemUsername}");
+                            var cartResponse = await _httpClient.GetAsync($"{_apiUrl}Cart/GetCart/{systemUsername}");
                             if (cartResponse.IsSuccessStatusCode)
                             {
                                 var cartData = await cartResponse.Content.ReadFromJsonAsync<Dictionary<string, string>>();
@@ -265,11 +266,11 @@ namespace WebBanMoHinh.MVC.Controllers
                                     
                                     string mergedCartJson = JsonSerializer.Serialize(dbCart);
                                     HttpContext.Session.SetString("GioHang", mergedCartJson);
-                                    await _httpClient.PostAsJsonAsync("http://localhost:5298/api/Cart/SaveCart", new { Username = systemUsername, CartJson = mergedCartJson });
+                                    await _httpClient.PostAsJsonAsync($"{_apiUrl}Cart/SaveCart", new { Username = systemUsername, CartJson = mergedCartJson });
                                 }
                                 else if (guestCart != null && guestCart.Any())
                                 {
-                                    await _httpClient.PostAsJsonAsync("http://localhost:5298/api/Cart/SaveCart", new { Username = systemUsername, CartJson = guestCartJson });
+                                    await _httpClient.PostAsJsonAsync($"{_apiUrl}Cart/SaveCart", new { Username = systemUsername, CartJson = guestCartJson });
                                 }
                             }
                         }
@@ -311,7 +312,7 @@ namespace WebBanMoHinh.MVC.Controllers
             {
                 // Đóng gói Email gửi sang Endpoint "QuenMatKhau" của API
                 var requestBody = new { Email = model.Email };
-                var response = await _httpClient.PostAsJsonAsync(_apiUrl + "QuenMatKhau", requestBody);
+                var response = await _httpClient.PostAsJsonAsync($"{_apiUrl}TaiKhoans/QuenMatKhau", requestBody);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -337,6 +338,7 @@ namespace WebBanMoHinh.MVC.Controllers
 
             return View(model);
         }
+        
         [HttpPost]
         public async Task<IActionResult> ChangePassword(UserProfileViewModel model)
         {
@@ -362,7 +364,7 @@ namespace WebBanMoHinh.MVC.Controllers
                 };
 
                 // Gọi API Cập nhật hồ sơ (API này đã có sẵn logic đổi pass)
-                var response = await _httpClient.PutAsJsonAsync("http://localhost:5298/api/TaiKhoans/CapNhatProfile", requestData);
+                var response = await _httpClient.PutAsJsonAsync($"{_apiUrl}TaiKhoans/CapNhatProfile", requestData);
 
                 if (response.IsSuccessStatusCode)
                 {
