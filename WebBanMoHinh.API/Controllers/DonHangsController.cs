@@ -72,5 +72,16 @@ namespace WebBanMoHinh.API.Controllers
 
             return Ok(new { message = "Cập nhật trạng thái đơn hàng thành công!" });
         }
+        // Bổ sung API cho Admin: Lấy toàn bộ đơn hàng
+        [HttpGet("All")]
+        public async Task<ActionResult<IEnumerable<DonHang>>> GetAllDonHangs()
+        {
+            // Sắp xếp đơn đặt mới nhất lên đầu tiên
+            var donHangs = await _context.DonHang
+                .OrderByDescending(d => d.NgayDat)
+                .ToListAsync();
+                
+            return Ok(donHangs);
+        }
     }
 }

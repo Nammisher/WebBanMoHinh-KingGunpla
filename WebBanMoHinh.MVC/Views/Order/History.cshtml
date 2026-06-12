@@ -150,15 +150,8 @@
                                 }
                                 else if (donHang.TrangThaiDonHang == "Đã giao")
                                 {
-                                    <span class="badge bg-primary fw-bold px-3 py-2 me-2"><i class="bi bi-box-seam me-1"></i>Đã giao hàng</span>
-                                    
-                                    <button type="button" class="btn btn-sm btn-success rounded-pill fw-bold" onclick="xacNhanNhanHang(@donHang.MaDonHang)">
-                                        <i class="bi bi-box2-heart-fill me-1"></i> Đã nhận được hàng
-                                    </button>
-                                    
-                                    <button type="button" class="btn btn-sm btn-outline-danger rounded-pill fw-bold ms-1" onclick="yeuCauTraHang(@donHang.MaDonHang)">
-                                        <i class="bi bi-arrow-return-left me-1"></i> Trả hàng/Hoàn tiền
-                                    </button>
+                                    <span class="badge bg-primary fw-bold px-3 py-2"><i class="bi bi-box-seam me-1"></i>Đã giao hàng</span>
+                                    <!-- ĐÃ DỜI 2 NÚT XUỐNG DƯỚI BẢNG -->
                                 }
                                 else if (donHang.TrangThaiDonHang == "Hoàn thành" || donHang.TrangThaiDonHang == "Thành công")
                                 {
@@ -182,7 +175,7 @@
                             </div>
 
                             <div class="table-responsive mt-2">
-                                <table class="table table-hover table-history">
+                                <table class="table table-hover table-history mb-0">
                                     <thead>
                                         <tr>
                                             <th scope="col" class="text-center" style="width: 100px;">Hình Ảnh</th>
@@ -216,7 +209,6 @@
                                                         
                                                         @if (donHang.TrangThaiDonHang == "Hoàn thành" || donHang.TrangThaiDonHang == "Thành công")
                                                         {
-                                                            <!-- ĐÃ THÊM data-hinhanh ĐỂ TRUYỀN VÀO MODAL -->
                                                             <button type="button" class="btn btn-sm mt-2 rounded-pill fw-bold btn-open-review" 
                                                                     style="border: 1px solid #ee4d2d; color: #ee4d2d; background: transparent; transition: all 0.2s;"
                                                                     onmouseover="this.style.background='#ee4d2d'; this.style.color='#fff';"
@@ -242,6 +234,21 @@
                                     </tbody>
                                 </table>
                             </div>
+
+                            <!-- VỊ TRÍ MỚI CỦA NÚT HÀNH ĐỘNG -->
+                            @if (donHang.TrangThaiDonHang == "Đã giao")
+                            {
+                                <div class="d-flex justify-content-end align-items-center mt-3 pt-3" style="border-top: 1px dashed var(--border-layout);">
+                                    <button type="button" class="btn btn-success rounded-pill fw-bold px-4 py-2 me-3" onclick="xacNhanNhanHang(@donHang.MaDonHang)">
+                                        <i class="bi bi-box2-heart-fill me-1"></i> Đã nhận được hàng
+                                    </button>
+                                    
+                                    <button type="button" class="btn btn-outline-danger rounded-pill fw-bold px-4 py-2" onclick="yeuCauTraHang(@donHang.MaDonHang)">
+                                        <i class="bi bi-arrow-return-left me-1"></i> Trả hàng/Hoàn tiền
+                                    </button>
+                                </div>
+                            }
+
                         </div>
 
                     </div>
@@ -251,7 +258,7 @@
     }
 </div>
 
-     // MODAL HỎI ĐÁNH GIÁ NGAY SAU KHI NHẬN HÀNG
+<!-- MODAL HỎI ĐÁNH GIÁ NGAY SAU KHI NHẬN HÀNG -->
 <div class="modal fade" id="askReviewModal" tabindex="-1" data-bs-backdrop="static" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content text-center p-4" style="background-color: var(--bg-dropdown); border: 1px solid var(--text-nav-hover); border-radius: 16px;">
@@ -269,7 +276,7 @@
     </div>
 </div>
 
-     // MODAL ĐÁNH GIÁ SẢN PHẨM CHÍNH THỨC (CHUẨN SHOPEE)
+<!-- MODAL ĐÁNH GIÁ SẢN PHẨM CHÍNH THỨC (CHUẨN SHOPEE) -->
 <div class="modal fade" id="reviewModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content" style="background-color: var(--bg-dropdown); border: none; box-shadow: 0 0 20px rgba(0,0,0, 0.2); border-radius: 8px;">
@@ -284,13 +291,11 @@
                 <div class="modal-body p-4">
                     <input type="hidden" id="reviewMaSp" name="MaSp" />
                     
-                    <!-- THÔNG TIN SẢN PHẨM -->
                     <div class="d-flex align-items-start gap-3 mb-4 pb-3" style="border-bottom: 1px solid var(--border-layout);">
                         <img id="reviewImgSp" src="" alt="Sản phẩm" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-layout);" />
                         <h6 id="reviewTenSp" class="fw-bold mb-0" style="color: var(--text-main); font-size: 0.95rem; line-height: 1.4;">Tên SP</h6>
                     </div>
 
-                    <!-- STAR RATING -->
                     <div class="d-flex align-items-center mb-3">
                         <span class="me-4" style="color: var(--text-main); font-size: 0.95rem;">Chất lượng sản phẩm</span>
                         <div class="star-rating fs-3 text-warning d-flex align-items-center" style="cursor: pointer;">
@@ -299,13 +304,11 @@
                             <i class="bi bi-star star-item" data-value="3"></i>
                             <i class="bi bi-star star-item" data-value="4"></i>
                             <i class="bi bi-star star-item" data-value="5"></i>
-                            <!-- NHÃN TEXT HIỂN THỊ ĐỘ HÀI LÒNG -->
                             <span id="starTextLabel" class="fw-bold ms-3" style="font-size: 1rem; color: #ee4d2d;">Tuyệt vời</span>
                         </div>
                         <input type="hidden" id="reviewSoSao" name="SoSao" value="5" required />
                     </div>
 
-                    <!-- TEXTAREA BÌNH LUẬN -->
                     <div class="form-group mb-2">
                         <textarea id="reviewNoiDung" name="NoiDung" class="form-control p-3" rows="5" 
                                   placeholder="Hãy chia sẻ những điều bạn thích về sản phẩm này với những người mua khác nhé." 
@@ -326,11 +329,12 @@
 </div>
 
 @section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
         let reviewModal;
         let askReviewModal;
         
-        // BỘ TỪ ĐIỂN MAP SAO VÀO CHỮ
         const starLabels = {
             1: "Tệ",
             2: "Không hài lòng",
@@ -343,7 +347,6 @@
             reviewModal = new bootstrap.Modal(document.getElementById('reviewModal'));
             askReviewModal = new bootstrap.Modal(document.getElementById('askReviewModal'));
             
-            // Lắng nghe nút Đánh giá từng sản phẩm
             document.querySelectorAll('.btn-open-review').forEach(btn => {
                 btn.addEventListener('click', function() {
                     const maSp = this.getAttribute('data-masp');
@@ -363,20 +366,16 @@
         function openReviewModal(maSp, tenSp, hinhAnh) {
             document.getElementById('reviewMaSp').value = maSp;
             document.getElementById('reviewTenSp').innerText = tenSp;
-            
-            // Lấy ảnh gắn vào src
             document.getElementById('reviewImgSp').src = "/images/" + hinhAnh;
-            
             document.getElementById('reviewNoiDung').value = '';
-            document.getElementById('reviewSoSao').value = 5; // Mặc định 5 sao
+            document.getElementById('reviewSoSao').value = 5; 
             updateStars(5);
             
             if(reviewModal) reviewModal.show();
         }
 
-        // Logic UI Ngôi Sao
         const stars = document.querySelectorAll('.star-item');
-        let currentRating = 5; // Lưu trữ mức sao đang chọn
+        let currentRating = 5; 
 
         stars.forEach(star => {
             star.addEventListener('mouseover', function() { updateStars(this.getAttribute('data-value')); });
@@ -408,53 +407,94 @@
             });
         }
 
-        // Gửi Form Đánh Giá
+        // 1. LOGIC GỬI ĐÁNH GIÁ (ĐÃ ĐỔI SANG SWEET ALERT)
         document.getElementById('reviewForm').addEventListener('submit', function(e) {
             e.preventDefault();
             if(document.getElementById('reviewSoSao').value == 0) {
-                alert("Vui lòng chọn số sao để đánh giá!");
+                Swal.fire({ icon: 'warning', title: 'Oops...', text: 'Vui lòng chọn số sao để đánh giá!' });
                 return;
             }
             const formData = new FormData(this);
             fetch('/SanPham/GuiDanhGia', { method: 'POST', body: formData })
             .then(res => res.json())
             .then(data => {
-                if(reviewModal) reviewModal.hide();
+                if(reviewModal) reviewModal.hide(); // Ẩn hộp thoại đánh giá đi
+                
                 if(data.success) {
-                    alert("Cảm ơn Pilot! Đánh giá đã được ghi nhận thành công.");
-                    location.reload(); 
+                    // Hiện thông báo thành công đẹp mắt
+                    Swal.fire({
+                        title: 'Thành công!',
+                        text: 'Cảm ơn Pilot! Đánh giá đã được ghi nhận thành công.',
+                        icon: 'success',
+                        confirmButtonColor: '#00c6ff',
+                        confirmButtonText: 'Tuyệt vời'
+                    }).then(() => {
+                        location.reload(); // Bấm OK xong mới reload trang
+                    });
                 } else {
-                    alert("Lỗi: " + data.message);
+                    Swal.fire({ icon: 'error', title: 'Lỗi', text: data.message });
                 }
             })
-            .catch(err => { alert("Có lỗi kết nối máy chủ."); console.error(err); });
+            .catch(err => { 
+                Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Có lỗi kết nối máy chủ.' }); 
+                console.error(err); 
+            });
         });
 
-        // LOGIC YÊU CẦU TRẢ HÀNG
+        // 2. LOGIC YÊU CẦU TRẢ HÀNG (ĐÃ ĐỔI SANG SWEET ALERT)
         function yeuCauTraHang(maDonHang) {
-            if(confirm("Bạn có chắc chắn muốn yêu cầu trả hàng/hoàn tiền cho đơn #" + maDonHang + " không?")) {
-                alert("Hệ thống đã ghi nhận yêu cầu. Vui lòng giữ nguyên hiện trạng box/runner và liên hệ Zalo Hotline KingGunpla để được hỗ trợ xử lý nhé!");
-            }
+            Swal.fire({
+                title: 'Yêu cầu trả hàng?',
+                text: "Bạn có chắc chắn muốn yêu cầu trả hàng/hoàn tiền cho đơn #" + maDonHang + " không?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Đồng ý trả hàng',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        title: 'Đã ghi nhận!',
+                        text: 'Hệ thống đã ghi nhận yêu cầu. Vui lòng giữ nguyên hiện trạng box/runner và liên hệ Zalo Hotline KingGunpla để được hỗ trợ xử lý nhé!',
+                        icon: 'info',
+                        confirmButtonColor: '#00c6ff'
+                    });
+                }
+            });
         }
 
-        // LOGIC XÁC NHẬN "ĐÃ NHẬN ĐƯỢC HÀNG"
+        // 3. LOGIC XÁC NHẬN "ĐÃ NHẬN ĐƯỢC HÀNG" (ĐÃ ĐỔI SANG SWEET ALERT)
         function xacNhanNhanHang(maDonHang) {
-            if(confirm("Bạn xác nhận đã nhận được mô hình nguyên vẹn? (Sau khi xác nhận sẽ không thể Yêu cầu trả hàng/Hoàn tiền nữa)")) {
-                
-                const formData = new FormData();
-                formData.append('maDonHang', maDonHang);
+            Swal.fire({
+                title: 'Xác nhận nhận hàng',
+                text: "Bạn xác nhận đã nhận được mô hình nguyên vẹn? (Sau khi xác nhận sẽ không thể Yêu cầu trả hàng/Hoàn tiền nữa)",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#198754',
+                cancelButtonColor: '#dc3545',
+                confirmButtonText: 'Đã nhận được hàng',
+                cancelButtonText: 'Chưa nhận'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    const formData = new FormData();
+                    formData.append('maDonHang', maDonHang);
 
-                fetch('/Order/DaNhanHang', { method: 'POST', body: formData })
-                .then(res => res.json())
-                .then(data => {
-                    if(data.success) {
-                        askReviewModal.show();
-                    } else {
-                        alert("Lỗi: " + data.message);
-                    }
-                })
-                .catch(err => { alert("Lỗi kết nối."); console.error(err); });
-            }
+                    fetch('/Order/DaNhanHang', { method: 'POST', body: formData })
+                    .then(res => res.json())
+                    .then(data => {
+                        if(data.success) {
+                            askReviewModal.show(); // Bật popup hỏi đánh giá sau khi nhận hàng
+                        } else {
+                            Swal.fire({ icon: 'error', title: 'Lỗi', text: data.message });
+                        }
+                    })
+                    .catch(err => { 
+                        Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Lỗi kết nối.' }); 
+                        console.error(err); 
+                    });
+                }
+            });
         }
 
         function skipReviewAndReload() {

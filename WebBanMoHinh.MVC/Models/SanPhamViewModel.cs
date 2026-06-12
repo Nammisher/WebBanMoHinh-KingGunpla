@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization; // THÊM THƯ VIỆN NÀY ĐỂ DÙNG NHÃN JSON
 namespace WebBanMoHinh.MVC.Models
 {
     public class SanPhamViewModel
@@ -24,6 +25,7 @@ namespace WebBanMoHinh.MVC.Models
         public NhaSanXuatViewModel? MaNsxNavigation { get; set; }
 
         // Danh sách các đánh giá của sản phẩm này
+        [JsonPropertyName("binhLuanDanhGia")]
         public ICollection<BinhLuanDanhGiaViewModel>? BinhLuanDanhGias { get; set; }
     }
     // Lớp phụ dùng để hứng thông tin tên nhà sản xuất từ API Backend trả về

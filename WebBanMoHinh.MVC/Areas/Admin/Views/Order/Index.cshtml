@@ -1,0 +1,142 @@
+@model List<WebBanMoHinh.MVC.Models.OrderHistoryViewModel>
+
+@{
+    ViewData["Title"] = "Quản lý Đơn hàng";
+}
+
+<h2 class="mb-4" style="color: #00c6ff; font-weight: bold; text-shadow: 0 0 10px rgba(0,198,255,0.3);">
+    <i class="bi bi-box-seam me-2"></i> QUẢN LÝ ĐƠN HÀNG
+</h2>
+
+<div class="card shadow-lg" style="background-color: #252526; border: 1px solid #3e3e42; border-radius: 8px;">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover mb-0" style="background-color: transparent;">
+                <thead style="border-bottom: 2px solid #3e3e42;">
+                    <tr>
+                        <th class="p-3 text-uppercase" style="color: #cccccc; font-size: 0.85rem;">Mã ĐH</th>
+                        <th class="p-3 text-uppercase" style="color: #cccccc; font-size: 0.85rem;">Khách hàng</th>
+                        <th class="p-3 text-uppercase" style="color: #cccccc; font-size: 0.85rem;">Ngày đặt</th>
+                        <th class="p-3 text-uppercase" style="color: #cccccc; font-size: 0.85rem;">Tổng tiền</th>
+                        <th class="p-3 text-uppercase" style="color: #cccccc; font-size: 0.85rem;">Thanh toán</th>
+                        <th class="p-3 text-uppercase" style="color: #cccccc; font-size: 0.85rem;">Trạng thái</th>
+                        <th class="p-3 text-uppercase" style="color: #cccccc; font-size: 0.85rem;">Thao tác</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any())
+                    {
+                        foreach(var item in Model) 
+                        {
+                            <tr style="border-bottom: 1px solid #3e3e42;">
+                                <td class="p-3 align-middle fw-bold" style="color: #00c6ff;">#@item.MaDonHang</td>
+                                <td class="p-3 align-middle text-white">@item.TenDangNhap</td>
+                                <td class="p-3 align-middle text-white">@(item.NgayDat?.ToString("dd/MM/yyyy HH:mm"))</td>
+                                <td class="p-3 align-middle text-danger fw-bold">@(item.TongTien?.ToString("N0")) đ</td>
+                                <td class="p-3 align-middle text-white">@item.PhuongThucThanhToan</td>
+                                <td class="p-3 align-middle">
+                                    @if(item.TrangThaiDonHang == "Chờ xác nhận") { <span class="badge bg-warning text-dark px-2 py-1">Chờ xác nhận</span> }
+                                    else if(item.TrangThaiDonHang == "Đang giao") { <span class="badge bg-info text-dark px-2 py-1">Đang giao</span> }
+                                    else if(item.TrangThaiDonHang == "Đã giao") { <span class="badge bg-primary px-2 py-1">Đã giao</span> }
+                                    else if(item.TrangThaiDonHang == "Hoàn thành" || item.TrangThaiDonHang == "Thành công") { <span class="badge bg-success px-2 py-1">Hoàn thành</span> }
+                                    else { <span class="badge bg-danger px-2 py-1">@item.TrangThaiDonHang</span> }
+                                </td>
+                                <td class="p-3 align-middle">
+                                    @if(item.TrangThaiDonHang == "Chờ xác nhận") 
+                                    {
+                                        <button class="btn btn-sm fw-bold" style="background: #007acc; color: white; border: none;" onclick="doiTrangThai(@item.MaDonHang, 'Đang giao')">
+                                            <i class="bi bi-truck me-1"></i> Giao hàng
+                                        </button>
+                                    } 
+                                    else if (item.TrangThaiDonHang == "Đang giao") 
+                                    {
+                                        <button class="btn btn-sm fw-bold" style="background: #00c6ff; color: black; border: none;" onclick="doiTrangThai(@item.MaDonHang, 'Đã giao')">
+                                            <i class="bi bi-check-circle me-1"></i> Đã tới nơi
+                                        </button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="7" class="text-center p-4 text-muted">Chưa có dữ liệu đơn hàng nào trên hệ thống.</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        function doiTrangThai(maDonHang, trangThaiMoi) {
+            
+            // Hiện Popup hỏi xác nhận (Dùng SweetAlert2 thay cho confirm mặc định)
+            Swal.fire({
+                title: 'Xác nhận duyệt đơn?',
+                text: `Bạn có chắc chắn muốn chuyển đơn hàng #${maDonHang} sang trạng thái "${trangThaiMoi}" không?`,
+                icon: 'question',
+                showCancelButton: true,
+                background: '#252526', // Nền đen chuẩn VS Code
+                color: '#ffffff', // Chữ trắng
+                confirmButtonColor: '#007acc', // Nút đồng ý màu xanh VS Code
+                cancelButtonColor: '#3e3e42', // Nút hủy màu xám
+                confirmButtonText: '<i class="bi bi-check-lg"></i> Đồng ý',
+                cancelButtonText: 'Hủy'
+            }).then((result) => {
+                
+                // Nếu Admin bấm "Đồng ý"
+                if (result.isConfirmed) {
+                    const formData = new FormData();
+                    formData.append('maDonHang', maDonHang);
+                    formData.append('trangThaiMoi', trangThaiMoi);
+
+                    // Gọi API cập nhật
+                    fetch('/Admin/Order/CapNhatTrangThai', { 
+                        method: 'POST', 
+                        body: formData 
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if(data.success) {
+                            // Hiện thông báo thành công đẹp mắt
+                            Swal.fire({
+                                title: 'Thành công!',
+                                text: `Đơn hàng #${maDonHang} đã được cập nhật thành "${trangThaiMoi}".`,
+                                icon: 'success',
+                                background: '#252526',
+                                color: '#ffffff',
+                                confirmButtonColor: '#00c6ff' // Nút OK màu Cyan neon
+                            }).then(() => {
+                                location.reload(); // Bấm OK xong mới reload trang
+                            });
+                        } else {
+                            Swal.fire({ 
+                                icon: 'error', 
+                                title: 'Thất bại', 
+                                text: data.message,
+                                background: '#252526',
+                                color: '#ffffff'
+                            });
+                        }
+                    })
+                    .catch(err => {
+                        Swal.fire({ 
+                            icon: 'error', 
+                            title: 'Lỗi', 
+                            text: 'Mất kết nối đến trung tâm chỉ huy!',
+                            background: '#252526',
+                            color: '#ffffff'
+                        });
+                        console.error(err);
+                    });
+                }
+            });
+        }
+    </script>
+}

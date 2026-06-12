@@ -42,7 +42,7 @@ namespace WebBanMoHinh.MVC.Controllers
 
                 if (response.IsSuccessStatusCode)
                 {
-                    // Đọc phản hồi từ API để lấy thêm trường Avatar
+                    // Đọc phản hồi từ API để lấy thêm trường Avatar và VaiTro
                     var apiResult = await response.Content.ReadFromJsonAsync<Dictionary<string, object>>();
 
                     // 1. Lưu Session Đăng nhập của Pilot trên MVC
@@ -53,6 +53,30 @@ namespace WebBanMoHinh.MVC.Controllers
                     {
                         HttpContext.Session.SetString("UserAvatar", apiResult["avatar"].ToString()!);
                     }
+
+                    // CẤP THẺ ĐỊNH DANH (COOKIE CLAIMS VỚI ROLE)
+                    string vaiTro = "Customer"; // Mặc định là dân thường
+                    if (apiResult != null)
+                    {
+                        if (apiResult.ContainsKey("vaiTro") && apiResult["vaiTro"] != null)
+                            vaiTro = apiResult["vaiTro"].ToString()!;
+                        else if (apiResult.ContainsKey("VaiTro") && apiResult["VaiTro"] != null)
+                            vaiTro = apiResult["VaiTro"].ToString()!;
+                    }
+
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Name, model.TenDangNhap),
+                        new Claim(ClaimTypes.Role, vaiTro) // Gắn Role vào Cookie
+                    };
+
+                    var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                    
+                    // Kích hoạt Cookie Bảo mật
+                    await HttpContext.SignInAsync(
+                        CookieAuthenticationDefaults.AuthenticationScheme, 
+                        new ClaimsPrincipal(claimsIdentity)
+                    );
 
                     // 2. ĐỒNG BỘ VÀ GỘP (MERGE) GIỎ HÀNG VÃNG LAI VÀO TÀI KHOẢN
                     try
@@ -94,6 +118,13 @@ namespace WebBanMoHinh.MVC.Controllers
                         }
                     }
                     catch { }
+
+                    // ĐIỀU HƯỚNG TÙY THEO ROLE
+                    if (vaiTro == "Admin")
+                    {
+                        // Nếu là Admin -> Cho bay thẳng vào Căn cứ chỉ huy
+                        return Redirect("/Admin/Dashboard"); 
+                    }
 
                     // Điều hướng sau khi login thành công (Đá ngược về trang Thanh toán nếu có)
                     if (!string.IsNullOrEmpty(model.ReturnUrl) && Url.IsLocalUrl(model.ReturnUrl))
@@ -138,7 +169,12 @@ namespace WebBanMoHinh.MVC.Controllers
                 catch { }
             }
 
+            // XÓA SESSION GIỎ HÀNG CŨ
             HttpContext.Session.Clear(); 
+            
+            // XÓA COOKIE BẢO MẬT (Để hủy quyền Admin nếu có)
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
             return RedirectToAction("Index", "Home");
         }
 
@@ -226,6 +262,8 @@ namespace WebBanMoHinh.MVC.Controllers
                 {
                     var apiResult = await response.Content.ReadFromJsonAsync<Dictionary<string, object>>();
                     
+                    string vaiTro = "Customer";
+
                     if (apiResult != null && apiResult.ContainsKey("username"))
                     {
                         string systemUsername = apiResult["username"].ToString()!;
@@ -236,6 +274,24 @@ namespace WebBanMoHinh.MVC.Controllers
                         {
                             HttpContext.Session.SetString("UserAvatar", apiResult["avatar"].ToString()!);
                         }
+
+                        // LẤY ROLE TỪ API VÀ CẤP COOKIE
+                        if (apiResult.ContainsKey("vaiTro") && apiResult["vaiTro"] != null)
+                            vaiTro = apiResult["vaiTro"].ToString()!;
+                        else if (apiResult.ContainsKey("VaiTro") && apiResult["VaiTro"] != null)
+                            vaiTro = apiResult["VaiTro"].ToString()!;
+
+                        var userClaims = new List<Claim>
+                        {
+                            new Claim(ClaimTypes.Name, systemUsername),
+                            new Claim(ClaimTypes.Role, vaiTro)
+                        };
+
+                        var claimsIdentity = new ClaimsIdentity(userClaims, CookieAuthenticationDefaults.AuthenticationScheme);
+                        await HttpContext.SignInAsync(
+                            CookieAuthenticationDefaults.AuthenticationScheme, 
+                            new ClaimsPrincipal(claimsIdentity)
+                        );
 
                         // GỘP GIỎ HÀNG CHO GOOGLE LOGIN
                         try
@@ -278,7 +334,11 @@ namespace WebBanMoHinh.MVC.Controllers
                     }
 
                     string returnUrl = TempData["ReturnUrl"]?.ToString() ?? "/Home/Index";
-                    await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                    
+                    // QUAN TRỌNG: Không dùng await HttpContext.SignOutAsync(...) ở đây nữa
+                    // Vì nó sẽ xóa mất Cookie phân quyền vừa được tạo phía trên.
+
+                    if (vaiTro == "Admin") return Redirect("/Admin/Dashboard");
 
                     return Redirect(returnUrl);
                 }

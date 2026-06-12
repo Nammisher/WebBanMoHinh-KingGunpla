@@ -406,11 +406,11 @@
             transition: all 0.3s ease;
         }
         .king-footer .bi-facebook:hover { color: #1877f2 !important;
-        filter: drop-shadow(0 0 8px #1877f2); transform: scale(1.15); }
+            filter: drop-shadow(0 0 8px #1877f2); transform: scale(1.15); }
         .king-footer .bi-instagram:hover { color: #e1306c !important;
-        filter: drop-shadow(0 0 8px #e1306c); transform: scale(1.15); }
+            filter: drop-shadow(0 0 8px #e1306c); transform: scale(1.15); }
         .king-footer .bi-youtube:hover { color: #ff0000 !important;
-        filter: drop-shadow(0 0 8px #ff0000); transform: scale(1.15); }
+            filter: drop-shadow(0 0 8px #ff0000); transform: scale(1.15); }
     </style>
     
     @await RenderSectionAsync("styles", required: false)
@@ -441,6 +441,15 @@
                                 Sản Phẩm
                             </a>
                         </li>
+
+                        @if (User.Identity != null && User.Identity.IsAuthenticated && User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item d-flex align-items-center">
+                                <a class="nav-link fw-bold" href="/Admin/Dashboard" style="font-size: 1.2rem; letter-spacing: 0.5px; color: #00c6ff; text-shadow: 0 0 8px rgba(0,198,255,0.4);">
+                                    <i class="bi bi-shield-lock-fill me-1"></i> QUẢN TRỊ VIÊN
+                                </a>
+                            </li>
+                        }
                     </ul>
 
                     <div class="search-wrapper mx-lg-4 my-2 my-lg-0" id="searchWrapper">
@@ -613,12 +622,11 @@
                 
                 document.documentElement.setAttribute('data-bs-theme', targetTheme);
                 localStorage.setItem('theme', targetTheme);
+ 
                 updateThemeUI(targetTheme);
             });
 
-            // =========================================================================
             // 2. LOGIC ANIMATION THANH TÌM KIẾM (MỚI THÊM)
-            // =========================================================================
             const searchWrapper = document.getElementById('searchWrapper');
             const triggerSearchBtn = document.getElementById('triggerSearchBtn');
             const closeSearchBtn = document.getElementById('closeSearchBtn');

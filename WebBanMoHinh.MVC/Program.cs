@@ -65,6 +65,13 @@ app.UseAuthorization();
 
 app.MapStaticAssets();
 
+// ĐĂNG KÝ AREA ADMIN Ở ĐÂY
+app.MapAreaControllerRoute(
+    name: "admin_route",
+    areaName: "Admin",
+    pattern: "Admin/{controller=Dashboard}/{action=Index}/{id?}")
+    .WithStaticAssets();
+
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}")

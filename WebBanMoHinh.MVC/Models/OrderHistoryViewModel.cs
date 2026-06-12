@@ -9,6 +9,9 @@ namespace WebBanMoHinh.MVC.Models
         public string? PhuongThucThanhToan { get; set; }
         public string? TrangThaiDonHang { get; set; }
         public string? DiaChiGiaoHang { get; set; }
+        public string? TenDangNhap { get; set; }
+        public string? SoDienThoai { get; set; }
+        public string? GhiChu { get; set; }
         
         // Danh sách các món trong đơn này
         public List<OrderDetailViewModel> ChiTietDonHang { get; set; } = new();
