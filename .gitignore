@@ -16,3 +16,4 @@ appsettings.Production.json
 wwwroot/images/avatars/
 # Thêm dòng này vào cuối file .gitignore
 client_secret_*.json
+script.sql
