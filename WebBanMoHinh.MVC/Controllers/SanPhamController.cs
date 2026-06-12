@@ -1,7 +1,7 @@
 using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using WebBanMoHinh.MVC.Models;
-
+using System.Text;
 namespace WebBanMoHinh.MVC.Controllers
 {
     public class SanPhamController : Controller
@@ -104,6 +104,32 @@ namespace WebBanMoHinh.MVC.Controllers
             }
 
             return View(sanPham);
+        }
+        // POST: /SanPham/GuiDanhGia
+        [HttpPost]
+        public async Task<IActionResult> GuiDanhGia(int MaSp, int SoSao, string NoiDung)
+        {
+            string? username = HttpContext.Session.GetString("UserSession");
+            if (string.IsNullOrEmpty(username)) return Json(new { success = false, message = "Phiên đăng nhập hết hạn!" });
+
+            var danhGia = new BinhLuanDanhGiaViewModel
+            {
+                MaSp = MaSp,
+                TenDangNhap = username,
+                SoSao = SoSao,
+                NoiDung = NoiDung,
+                NgayBinhLuan = DateTime.Now
+            };
+
+            var jsonContent = new StringContent(JsonSerializer.Serialize(danhGia), Encoding.UTF8, "application/json");
+            
+            // ĐÃ SỬA DÒNG NÀY: Trỏ đúng vào Controller BinhLuanDanhGias của Web API
+            var response = await _httpClient.PostAsync($"{_apiUrl}BinhLuanDanhGias", jsonContent);
+
+            if (response.IsSuccessStatusCode)
+                return Json(new { success = true, message = "Cảm ơn Pilot đã đánh giá!" });
+            else
+                return Json(new { success = false, message = "Lỗi khi lưu đánh giá!" });
         }
     }
 }

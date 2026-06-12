@@ -22,8 +22,10 @@ namespace WebBanMoHinh.MVC.Models
 
         // Đối tượng điều hướng để lấy tên nhà sản xuất (Bandai, Motor Nuclear...)
         public NhaSanXuatViewModel? MaNsxNavigation { get; set; }
-    }
 
+        // Danh sách các đánh giá của sản phẩm này
+        public ICollection<BinhLuanDanhGiaViewModel>? BinhLuanDanhGias { get; set; }
+    }
     // Lớp phụ dùng để hứng thông tin tên nhà sản xuất từ API Backend trả về
     public class NhaSanXuatViewModel
     {

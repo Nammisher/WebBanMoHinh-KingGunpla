@@ -10,7 +10,7 @@
            CUSTOM LỊCH SỬ ĐƠN HÀNG - SỬ DỤNG NATIVE VARS
            ========================================= */
         .history-card {
-            background: var(--bg-dropdown); /* Tự động đổi nền chuẩn theo theme */
+            background: var(--bg-dropdown);
             border: 1px solid var(--border-layout);
             border-radius: 16px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
@@ -20,7 +20,7 @@
         }
         
         .history-header {
-            background: rgba(0, 198, 255, 0.03); /* Phủ nhẹ một lớp màu cyan cực nhạt */
+            background: rgba(0, 198, 255, 0.03);
             border-bottom: 1px solid var(--border-layout);
             padding: 18px 25px;
         }
@@ -45,11 +45,10 @@
         }
         
         .history-val.highlight {
-            color: var(--text-nav-hover); /* Màu Cyan sáng */
+            color: var(--text-nav-hover);
             text-shadow: 0 0 8px rgba(0, 198, 255, 0.3);
         }
 
-        /* KHỬ SẠCH MÀU NỀN CỦA BOOTSTRAP TABLE */
         .table-history, 
         .table-history > :not(caption) > * > * {
             background-color: transparent !important;
@@ -72,8 +71,6 @@
             transition: all 0.2s ease;
         }
 
-        
-        /* Chỉ hiện vạch sáng ở cột đầu tiên để không bị lặp đường kẻ */
         .table-history tbody tr:hover td:first-child {
             box-shadow: inset 4px 0 0 var(--text-nav-hover) !important;
         }
@@ -92,6 +89,15 @@
         .img-history-wrapper img {
             width: 100%;
             height: 100%; object-fit: cover;
+        }
+
+        /* Ẩn thanh scroll của textarea cho đẹp */
+        #reviewNoiDung::-webkit-scrollbar {
+            width: 6px;
+        }
+        #reviewNoiDung::-webkit-scrollbar-thumb {
+            background-color: var(--border-layout);
+            border-radius: 10px;
         }
     </style>
 }
@@ -142,7 +148,19 @@
                                 {
                                     <span class="badge bg-info text-dark fw-bold px-3 py-2"><i class="bi bi-truck me-1"></i>Đang vận chuyển</span>
                                 }
-                                else if (donHang.TrangThaiDonHang == "Đã giao" || donHang.TrangThaiDonHang == "Thành công")
+                                else if (donHang.TrangThaiDonHang == "Đã giao")
+                                {
+                                    <span class="badge bg-primary fw-bold px-3 py-2 me-2"><i class="bi bi-box-seam me-1"></i>Đã giao hàng</span>
+                                    
+                                    <button type="button" class="btn btn-sm btn-success rounded-pill fw-bold" onclick="xacNhanNhanHang(@donHang.MaDonHang)">
+                                        <i class="bi bi-box2-heart-fill me-1"></i> Đã nhận được hàng
+                                    </button>
+                                    
+                                    <button type="button" class="btn btn-sm btn-outline-danger rounded-pill fw-bold ms-1" onclick="yeuCauTraHang(@donHang.MaDonHang)">
+                                        <i class="bi bi-arrow-return-left me-1"></i> Trả hàng/Hoàn tiền
+                                    </button>
+                                }
+                                else if (donHang.TrangThaiDonHang == "Hoàn thành" || donHang.TrangThaiDonHang == "Thành công")
                                 {
                                     <span class="badge bg-success fw-bold px-3 py-2"><i class="bi bi-check-circle-fill me-1"></i>Hoàn thành</span>
                                 }
@@ -175,22 +193,50 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        @foreach (var chiTiet in donHang.ChiTietDonHang)
+                                        @if (donHang.ChiTietDonHang != null && donHang.ChiTietDonHang.Any())
                                         {
-                                            var tenSp = chiTiet.MaSpNavigation?.TenSp ?? "Mô hình Gunpla hệ thống";
-                                            var hinhAnh = chiTiet.MaSpNavigation?.HinhAnhChinh ?? "no-image.jpg";
-                                            var thanhTien = (chiTiet.SoLuong ?? 0) * (chiTiet.DonGia ?? 0);
+                                            foreach (var chiTiet in donHang.ChiTietDonHang)
+                                            {
+                                                var tenSp = chiTiet.MaSpNavigation?.TenSp ?? "Mô hình Gunpla hệ thống";
+                                                var hinhAnh = chiTiet.MaSpNavigation?.HinhAnhChinh ?? "no-image.jpg";
+                                                var thanhTien = (chiTiet.SoLuong ?? 0) * (chiTiet.DonGia ?? 0);
+                                                var maSp = chiTiet.MaSpNavigation?.MaSp ?? 0;
 
+                                                <tr>
+                                                    <td class="text-center">
+                                                        <div class="img-history-wrapper mx-auto">
+                                                            <img src="~/images/@hinhAnh" onerror="this.src='https://placehold.co/70x70/1e293b/cbd5e1?text=No+Img'" alt="Gunpla" />
+                                                        </div>
+                                                    </td>
+                                                    <td class="history-val highlight pe-3">@tenSp</td>
+                                                    <td class="text-end text-nowrap">@(chiTiet.DonGia?.ToString("N0") ?? "0") đ</td>
+                                                    <td class="text-center text-warning text-nowrap" style="font-weight: 800;">x @chiTiet.SoLuong</td>
+                                                    <td class="text-end text-nowrap">
+                                                        <div class="text-success fs-6" style="font-weight: 800;">@thanhTien.ToString("N0") đ</div>
+                                                        
+                                                        @if (donHang.TrangThaiDonHang == "Hoàn thành" || donHang.TrangThaiDonHang == "Thành công")
+                                                        {
+                                                            <!-- ĐÃ THÊM data-hinhanh ĐỂ TRUYỀN VÀO MODAL -->
+                                                            <button type="button" class="btn btn-sm mt-2 rounded-pill fw-bold btn-open-review" 
+                                                                    style="border: 1px solid #ee4d2d; color: #ee4d2d; background: transparent; transition: all 0.2s;"
+                                                                    onmouseover="this.style.background='#ee4d2d'; this.style.color='#fff';"
+                                                                    onmouseout="this.style.background='transparent'; this.style.color='#ee4d2d';"
+                                                                    data-masp="@maSp"
+                                                                    data-tensp="@tenSp"
+                                                                    data-hinhanh="@hinhAnh">
+                                                                Đánh Giá
+                                                            </button>
+                                                        }
+                                                    </td>
+                                                </tr>
+                                            }
+                                        }
+                                        else
+                                        {
                                             <tr>
-                                                <td class="text-center">
-                                                    <div class="img-history-wrapper mx-auto">
-                                                        <img src="~/images/@hinhAnh" onerror="this.src='https://placehold.co/70x70/1e293b/cbd5e1?text=No+Img'" alt="Gunpla" />
-                                                    </div>
+                                                <td colspan="5" class="text-center text-muted py-4">
+                                                    <i class="bi bi-box-seam fs-4 mb-2 d-block"></i> Đang tải thông tin... hoặc đơn hàng chưa cập nhật sản phẩm.
                                                 </td>
-                                                <td class="history-val highlight pe-3">@tenSp</td>
-                                                <td class="text-end text-nowrap">@(chiTiet.DonGia?.ToString("N0") ?? "0") đ</td>
-                                                <td class="text-center text-warning text-nowrap" style="font-weight: 800;">x @chiTiet.SoLuong</td>
-                                                <td class="text-end text-success fs-6 text-nowrap" style="font-weight: 800;">@thanhTien.ToString("N0") đ</td>
                                             </tr>
                                         }
                                     </tbody>
@@ -204,3 +250,221 @@
         </div>
     }
 </div>
+
+     // MODAL HỎI ĐÁNH GIÁ NGAY SAU KHI NHẬN HÀNG
+<div class="modal fade" id="askReviewModal" tabindex="-1" data-bs-backdrop="static" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content text-center p-4" style="background-color: var(--bg-dropdown); border: 1px solid var(--text-nav-hover); border-radius: 16px;">
+            <div class="text-success mb-3">
+                <i class="bi bi-check-circle-fill" style="font-size: 4rem;"></i>
+            </div>
+            <h4 class="fw-bold text-uppercase" style="color: var(--text-main);">Đơn Hàng Hoàn Thành!</h4>
+            <p class="text-muted mt-2">Cảm ơn Pilot đã mua sắm tại KingGunpla. Bạn có muốn đánh giá các sản phẩm trong đơn hàng này ngay bây giờ không?</p>
+            
+            <div class="d-flex justify-content-center gap-3 mt-4">
+                <button type="button" class="btn btn-outline-secondary rounded-pill px-4 fw-bold" onclick="skipReviewAndReload()">Bỏ qua</button>
+                <button type="button" class="btn btn-primary rounded-pill px-4 fw-bold" style="background: #ee4d2d; border:none;" onclick="reviewNowAndReload()">Đánh giá luôn</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+     // MODAL ĐÁNH GIÁ SẢN PHẨM CHÍNH THỨC (CHUẨN SHOPEE)
+<div class="modal fade" id="reviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content" style="background-color: var(--bg-dropdown); border: none; box-shadow: 0 0 20px rgba(0,0,0, 0.2); border-radius: 8px;">
+            <div class="modal-header border-bottom border-secondary border-opacity-10 py-3">
+                <h5 class="modal-title fw-bold" style="color: var(--text-main); font-size: 1.1rem;">
+                    Đánh Giá Sản Phẩm
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" style="filter: invert(1) grayscale(100%) brightness(200%);"></button>
+            </div>
+            
+            <form id="reviewForm">
+                <div class="modal-body p-4">
+                    <input type="hidden" id="reviewMaSp" name="MaSp" />
+                    
+                    <!-- THÔNG TIN SẢN PHẨM -->
+                    <div class="d-flex align-items-start gap-3 mb-4 pb-3" style="border-bottom: 1px solid var(--border-layout);">
+                        <img id="reviewImgSp" src="" alt="Sản phẩm" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-layout);" />
+                        <h6 id="reviewTenSp" class="fw-bold mb-0" style="color: var(--text-main); font-size: 0.95rem; line-height: 1.4;">Tên SP</h6>
+                    </div>
+
+                    <!-- STAR RATING -->
+                    <div class="d-flex align-items-center mb-3">
+                        <span class="me-4" style="color: var(--text-main); font-size: 0.95rem;">Chất lượng sản phẩm</span>
+                        <div class="star-rating fs-3 text-warning d-flex align-items-center" style="cursor: pointer;">
+                            <i class="bi bi-star star-item" data-value="1"></i>
+                            <i class="bi bi-star star-item" data-value="2"></i>
+                            <i class="bi bi-star star-item" data-value="3"></i>
+                            <i class="bi bi-star star-item" data-value="4"></i>
+                            <i class="bi bi-star star-item" data-value="5"></i>
+                            <!-- NHÃN TEXT HIỂN THỊ ĐỘ HÀI LÒNG -->
+                            <span id="starTextLabel" class="fw-bold ms-3" style="font-size: 1rem; color: #ee4d2d;">Tuyệt vời</span>
+                        </div>
+                        <input type="hidden" id="reviewSoSao" name="SoSao" value="5" required />
+                    </div>
+
+                    <!-- TEXTAREA BÌNH LUẬN -->
+                    <div class="form-group mb-2">
+                        <textarea id="reviewNoiDung" name="NoiDung" class="form-control p-3" rows="5" 
+                                  placeholder="Hãy chia sẻ những điều bạn thích về sản phẩm này với những người mua khác nhé." 
+                                  required 
+                                  style="background-color: var(--bg-search); color: var(--text-main); border: 1px solid var(--border-layout); border-radius: 4px; font-size: 0.95rem; box-shadow: none; resize: none;"></textarea>
+                    </div>
+                </div>
+                
+                <div class="modal-footer border-top-0 pt-0 pb-4 pe-4">
+                    <button type="button" class="btn btn-light fw-bold" data-bs-dismiss="modal" style="color: var(--text-main); background: transparent; border: none;">TRỞ LẠI</button>
+                    <button type="submit" class="btn text-white fw-bold px-4" style="background-color: #ee4d2d; border: none; border-radius: 4px;">
+                        HOÀN THÀNH
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        let reviewModal;
+        let askReviewModal;
+        
+        // BỘ TỪ ĐIỂN MAP SAO VÀO CHỮ
+        const starLabels = {
+            1: "Tệ",
+            2: "Không hài lòng",
+            3: "Bình thường",
+            4: "Hài lòng",
+            5: "Tuyệt vời"
+        };
+        
+        document.addEventListener("DOMContentLoaded", function() {
+            reviewModal = new bootstrap.Modal(document.getElementById('reviewModal'));
+            askReviewModal = new bootstrap.Modal(document.getElementById('askReviewModal'));
+            
+            // Lắng nghe nút Đánh giá từng sản phẩm
+            document.querySelectorAll('.btn-open-review').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const maSp = this.getAttribute('data-masp');
+                    const tenSp = this.getAttribute('data-tensp');
+                    const hinhAnh = this.getAttribute('data-hinhanh');
+                    openReviewModal(maSp, tenSp, hinhAnh);
+                });
+            });
+
+            if(sessionStorage.getItem('autoOpenReview') === 'true') {
+                sessionStorage.removeItem('autoOpenReview');
+                const firstReviewBtn = document.querySelector('.btn-open-review');
+                if(firstReviewBtn) firstReviewBtn.click();
+            }
+        });
+        
+        function openReviewModal(maSp, tenSp, hinhAnh) {
+            document.getElementById('reviewMaSp').value = maSp;
+            document.getElementById('reviewTenSp').innerText = tenSp;
+            
+            // Lấy ảnh gắn vào src
+            document.getElementById('reviewImgSp').src = "/images/" + hinhAnh;
+            
+            document.getElementById('reviewNoiDung').value = '';
+            document.getElementById('reviewSoSao').value = 5; // Mặc định 5 sao
+            updateStars(5);
+            
+            if(reviewModal) reviewModal.show();
+        }
+
+        // Logic UI Ngôi Sao
+        const stars = document.querySelectorAll('.star-item');
+        let currentRating = 5; // Lưu trữ mức sao đang chọn
+
+        stars.forEach(star => {
+            star.addEventListener('mouseover', function() { updateStars(this.getAttribute('data-value')); });
+            star.addEventListener('mouseout', function() { updateStars(currentRating); });
+            star.addEventListener('click', function() {
+                currentRating = this.getAttribute('data-value');
+                document.getElementById('reviewSoSao').value = currentRating;
+                updateStars(currentRating);
+            });
+        });
+
+        function updateStars(val) {
+            const labelEl = document.getElementById('starTextLabel');
+            if (val > 0) {
+                labelEl.innerText = starLabels[val];
+                labelEl.style.display = 'inline-block';
+            } else {
+                labelEl.style.display = 'none';
+            }
+
+            stars.forEach(s => {
+                if(s.getAttribute('data-value') <= val) {
+                    s.classList.remove('bi-star', 'text-muted');
+                    s.classList.add('bi-star-fill', 'text-warning');
+                } else {
+                    s.classList.remove('bi-star-fill', 'text-warning');
+                    s.classList.add('bi-star', 'text-muted');
+                }
+            });
+        }
+
+        // Gửi Form Đánh Giá
+        document.getElementById('reviewForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if(document.getElementById('reviewSoSao').value == 0) {
+                alert("Vui lòng chọn số sao để đánh giá!");
+                return;
+            }
+            const formData = new FormData(this);
+            fetch('/SanPham/GuiDanhGia', { method: 'POST', body: formData })
+            .then(res => res.json())
+            .then(data => {
+                if(reviewModal) reviewModal.hide();
+                if(data.success) {
+                    alert("Cảm ơn Pilot! Đánh giá đã được ghi nhận thành công.");
+                    location.reload(); 
+                } else {
+                    alert("Lỗi: " + data.message);
+                }
+            })
+            .catch(err => { alert("Có lỗi kết nối máy chủ."); console.error(err); });
+        });
+
+        // LOGIC YÊU CẦU TRẢ HÀNG
+        function yeuCauTraHang(maDonHang) {
+            if(confirm("Bạn có chắc chắn muốn yêu cầu trả hàng/hoàn tiền cho đơn #" + maDonHang + " không?")) {
+                alert("Hệ thống đã ghi nhận yêu cầu. Vui lòng giữ nguyên hiện trạng box/runner và liên hệ Zalo Hotline KingGunpla để được hỗ trợ xử lý nhé!");
+            }
+        }
+
+        // LOGIC XÁC NHẬN "ĐÃ NHẬN ĐƯỢC HÀNG"
+        function xacNhanNhanHang(maDonHang) {
+            if(confirm("Bạn xác nhận đã nhận được mô hình nguyên vẹn? (Sau khi xác nhận sẽ không thể Yêu cầu trả hàng/Hoàn tiền nữa)")) {
+                
+                const formData = new FormData();
+                formData.append('maDonHang', maDonHang);
+
+                fetch('/Order/DaNhanHang', { method: 'POST', body: formData })
+                .then(res => res.json())
+                .then(data => {
+                    if(data.success) {
+                        askReviewModal.show();
+                    } else {
+                        alert("Lỗi: " + data.message);
+                    }
+                })
+                .catch(err => { alert("Lỗi kết nối."); console.error(err); });
+            }
+        }
+
+        function skipReviewAndReload() {
+            sessionStorage.removeItem('autoOpenReview');
+            location.reload(); 
+        }
+
+        function reviewNowAndReload() {
+            sessionStorage.setItem('autoOpenReview', 'true');
+            location.reload();
+        }
+    </script>
+}

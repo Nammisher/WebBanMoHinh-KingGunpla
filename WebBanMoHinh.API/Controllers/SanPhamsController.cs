@@ -30,12 +30,17 @@ namespace WebBanMoHinh.API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<SanPham>> GetSanPham(int id)
         {
-            var sanPham = await _context.SanPham.FindAsync(id);
+            // DÙNG INCLUDE ĐỂ KÉO THEO DANH SÁCH BÌNH LUẬN TỪ DATABASE LÊN
+            var sanPham = await _context.SanPham
+                .Include(sp => sp.BinhLuanDanhGia) 
+                .FirstOrDefaultAsync(sp => sp.MaSp == id);
+
             if (sanPham == null || sanPham.DaXoa == true)
             {
                 return NotFound(new { message = "Không tìm thấy mô hình!" });
             }
-            return Ok(sanPham);
+
+            return sanPham;
         }
 
         // 3. POST: api/SanPhams (Thêm mới)
@@ -85,9 +90,7 @@ namespace WebBanMoHinh.API.Controllers
             return Ok(new { message = "Xóa sản phẩm thành công (Xóa mềm)!" });
         }
 
-        // ====================================================================
         // 6. CẬP NHẬT: API LỌC SẢN PHẨM (Hỗ trợ Search, Thương hiệu, Mã dòng, Mức giá, Sắp xếp)
-        // ====================================================================
         [HttpGet("LocSanPham")]
         public async Task<ActionResult<IEnumerable<SanPham>>> LocSanPham(
             [FromQuery] string? search,
