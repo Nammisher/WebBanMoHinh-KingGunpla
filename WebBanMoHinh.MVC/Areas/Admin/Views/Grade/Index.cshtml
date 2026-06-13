@@ -1,0 +1,132 @@
+@model List<WebBanMoHinh.MVC.Models.DongSanPhamViewModel>
+@{
+    ViewData["Title"] = "Quản lý Dòng Sản Phẩm";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 style="color: #00c6ff; font-weight: bold; text-shadow: 0 0 10px rgba(0,198,255,0.3);">
+        <i class="bi bi-collection me-2"></i> DANH MỤC LÕI: DÒNG SẢN PHẨM
+    </h2>
+    <button class="btn btn-primary fw-bold px-4 rounded-pill" style="background: linear-gradient(135deg, #00c6ff, #0072ff); border: none;" onclick="openModal()">
+        <i class="bi bi-plus-circle me-1"></i> Thêm Dòng Mới
+    </button>
+</div>
+
+<div class="card shadow-lg" style="background-color: #252526; border: 1px solid #3e3e42; border-radius: 8px;">
+    <div class="card-body p-0">
+        <table class="table table-dark table-hover mb-0">
+            <thead style="border-bottom: 2px solid #3e3e42;">
+                <tr>
+                    <th class="p-3 text-uppercase text-muted" style="width: 10%;">Mã</th>
+                    <th class="p-3 text-uppercase text-muted" style="width: 25%;">Tên Dòng</th>
+                    <th class="p-3 text-uppercase text-muted" style="width: 45%;">Mô Tả</th>
+                    <th class="p-3 text-uppercase text-muted text-center" style="width: 20%;">Thao Tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (Model != null && Model.Any())
+                {
+                    foreach (var item in Model)
+                    {
+                        <tr style="border-bottom: 1px solid #3e3e42;">
+                            <td class="p-3 align-middle fw-bold text-info">#@item.MaDong</td>
+                            <td class="p-3 align-middle text-white fw-bold fs-6">@item.TenDong</td>
+                            <td class="p-3 align-middle" style="color: #cccccc;">@(string.IsNullOrEmpty(item.MoTa) ? "Chưa có mô tả" : item.MoTa)</td>
+                            <td class="p-3 align-middle text-center">
+                                <button class="btn btn-sm btn-outline-info rounded-pill px-3 fw-bold me-2" onclick="openModal(@item.MaDong, '@item.TenDong', '@item.MoTa')">
+                                    <i class="bi bi-pencil-square"></i> Sửa
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold" onclick="deleteItem(@item.MaDong)">
+                                    <i class="bi bi-trash3"></i> Xóa
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+                else
+                {
+                    <tr><td colspan="4" class="text-center p-4 text-muted">Chưa có dữ liệu Dòng sản phẩm.</td></tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="modal fade" id="gradeModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="background-color: #252526; border: 1px solid #00c6ff; border-radius: 12px; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
+            <div class="modal-header border-bottom border-secondary border-opacity-25">
+                <h5 class="modal-title fw-bold text-white" id="modalTitle">Thêm Dòng Mới</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="gradeForm">
+                <div class="modal-body p-4">
+                    <input type="hidden" id="maDong" name="MaDong" value="0" />
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-white">Tên Dòng (Grade) <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control text-white" id="tenDong" required style="background-color: #1e1e1e; border: 1px solid #3e3e42;" placeholder="Ví dụ: MG, HG, SD..." />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold text-white">Mô tả chi tiết</label>
+                        <textarea class="form-control text-white" id="moTa" rows="3" style="background-color: #1e1e1e; border: 1px solid #3e3e42; resize: none;"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-top border-secondary border-opacity-25">
+                    <button type="button" class="btn btn-dark fw-bold px-4" data-bs-dismiss="modal">Hủy</button>
+                    <button type="submit" class="btn fw-bold px-4 text-dark" style="background: #00c6ff;">LƯU LẠI</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        const gradeModal = new bootstrap.Modal(document.getElementById('gradeModal'));
+
+        function openModal(id = 0, ten = '', mota = '') {
+            document.getElementById('modalTitle').innerText = id === 0 ? 'THÊM DÒNG SẢN PHẨM MỚI' : 'CẬP NHẬT DÒNG SẢN PHẨM';
+            document.getElementById('maDong').value = id;
+            document.getElementById('tenDong').value = ten;
+            document.getElementById('moTa').value = mota === 'null' ? '' : mota;
+            gradeModal.show();
+        }
+
+        document.getElementById('gradeForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const data = {
+                MaDong: parseInt(document.getElementById('maDong').value),
+                TenDong: document.getElementById('tenDong').value,
+                MoTa: document.getElementById('moTa').value
+            };
+
+            fetch('/Admin/Grade/CreateOrUpdate', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.success) {
+                    gradeModal.hide();
+                    Swal.fire({ icon: 'success', title: 'Hoàn tất!', text: 'Dữ liệu đã được lưu an toàn.', background: '#252526', color: '#fff', confirmButtonColor: '#00c6ff'}).then(() => location.reload());
+                } else Swal.fire({ icon: 'error', title: 'Lỗi', text: res.message, background: '#252526', color: '#fff' });
+            });
+        });
+
+        function deleteItem(id) {
+            Swal.fire({
+                title: 'Xác nhận xóa?', text: "Bạn không thể khôi phục sau khi xóa!", icon: 'warning', showCancelButton: true,
+                background: '#252526', color: '#fff', confirmButtonColor: '#d33', cancelButtonColor: '#6c757d', confirmButtonText: 'Đồng ý', cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('/Admin/Grade/Delete/' + id, { method: 'POST' })
+                    .then(res => res.json())
+                    .then(res => {
+                        if(res.success) Swal.fire({ icon: 'success', title: 'Đã xóa!', background: '#252526', color: '#fff', confirmButtonColor: '#00c6ff' }).then(() => location.reload());
+                        else Swal.fire({ icon: 'error', title: 'Không thể xóa', text: res.message, background: '#252526', color: '#fff' });
+                    });
+                }
+            });
+        }
+    </script>
+}

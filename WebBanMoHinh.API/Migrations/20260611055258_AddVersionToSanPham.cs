@@ -1,7 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
-
+//Sử dụng Entity Framework Core Code First và Migration để quản lý phiên bản cơ sở dữ liệu, 
+//tự động tạo và cập nhật schema SQL Server.
 namespace WebBanMoHinh.API.Migrations
 {
     /// <inheritdoc />

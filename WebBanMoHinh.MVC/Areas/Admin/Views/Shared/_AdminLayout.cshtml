@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - Admin KingGunpla</title>
 
-    <!-- Bootstrap 5 & Icons -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
 
-    <!-- CSS (Dùng chung bộ CSS gốc nếu bạn muốn) -->
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 
     <style>
@@ -67,7 +65,6 @@
             border-left: 4px solid transparent;
         }
 
-        /* Hiệu ứng khi Hover hoặc Đang ở trang đó */
         .nav-item-admin:hover, .nav-item-admin.active {
             background-color: #2d2d30;
             color: var(--vs-text-light);
@@ -88,7 +85,6 @@
             flex-direction: column;
         }
 
-        /* THANH ĐIỀU HƯỚNG TRÊN CÙNG */
         .admin-topbar {
             background-color: var(--vs-sidebar);
             border-bottom: 1px solid var(--vs-border);
@@ -108,12 +104,65 @@
         ::-webkit-scrollbar-track { background: var(--vs-bg-dark); }
         ::-webkit-scrollbar-thumb { background: #424242; border-radius: 5px; }
         ::-webkit-scrollbar-thumb:hover { background: #4f4f4f; }
+
+        /* HIỆU ỨNG MENU CON (SUB-MENU) */
+        a[aria-expanded="true"] .toggle-icon { transform: rotate(180deg); }
+        .nav-sub-item {
+            padding: 10px 20px 10px 48px;
+            color: #9e9e9e;
+            text-decoration: none;
+            display: block;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            border-left: 4px solid transparent;
+        }
+        .nav-sub-item:hover, .nav-sub-item.active {
+            color: var(--vs-cyan);
+            background-color: #2d2d30;
+            border-left: 4px solid var(--vs-cyan);
+        }
+        .nav-sub-item i { margin-right: 8px; font-size: 1rem; }
+
+        /* ========================================================================= */
+        /* FIX LỖI "BỊ ĐEN / CHÌM CHỮ" VÀ FIX LỖI AUTOFILL CỦA TRÌNH DUYỆT (MỚI THÊM)*/
+        /* ========================================================================= */
+        
+        /* 1. Ép tất cả các ô nhập liệu và Dropdown phải có nền đen và CHỮ TRẮNG */
+        .form-control, .form-select {
+            background-color: #1e1e1e !important;
+            border: 1px solid #3e3e42 !important;
+            color: #ffffff !important; 
+        }
+        
+        /* 2. Ép màu chữ trắng ngay cả khi đang Click (Focus) vào ô nhập */
+        .form-control:focus, .form-select:focus {
+            background-color: #2d2d30 !important;
+            border-color: #00c6ff !important;
+            color: #ffffff !important; 
+            box-shadow: 0 0 0 0.25rem rgba(0, 198, 255, 0.25) !important;
+        }
+
+        /* 3. Làm mờ chữ gợi ý (Placeholder) để dễ phân biệt với chữ thật */
+        .form-control::placeholder { color: #888888 !important; }
+
+        /* 4. Fix lỗi menu thả xuống bị trắng bệch */
+        option { background-color: #252526 !important; color: #ffffff !important; }
+
+        /* 5. KHẮC PHỤC TRIỆT ĐỂ LỖI AUTOFILL CỦA CHROME/EDGE LÀM ĐEN CHỮ */
+        input:-webkit-autofill, input:-webkit-autofill:hover, input:-webkit-autofill:focus, 
+        textarea:-webkit-autofill, textarea:-webkit-autofill:hover, textarea:-webkit-autofill:focus,
+        select:-webkit-autofill, select:-webkit-autofill:hover, select:-webkit-autofill:focus {
+            -webkit-text-fill-color: #ffffff !important;
+            -webkit-box-shadow: 0 0 0px 1000px #1e1e1e inset !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+        /* ========================================================================= */
+
     </style>
     @RenderSection("styles", required: false)
 </head>
 <body>
 
-    <!-- 1. SIDEBAR TRÁI -->
     <div id="sidebar">
         <a href="/Admin/Dashboard" class="sidebar-brand">
             <i class="bi bi-robot"></i> KING<span style="color: white;">GUNPLA</span>
@@ -129,18 +178,41 @@
             <a href="/Admin/Product" class="nav-item-admin @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Product" ? "active" : "")">
                 <i class="bi bi-boxes"></i> Kho Sản phẩm
             </a>
-            <a href="/Admin/Category" class="nav-item-admin @(ViewContext.RouteData.Values["Controller"]?.ToString() == "Category" ? "active" : "")">
-                <i class="bi bi-tags"></i> Danh mục (Loại/Dòng)
+
+            @{
+                var currentController = ViewContext.RouteData.Values["Controller"]?.ToString();
+                var isMasterDataOpen = currentController == "Category" || currentController == "Grade" || currentController == "Brand";
+            }
+            
+            <a href="#collapseMasterData" data-bs-toggle="collapse" role="button" aria-expanded="@(isMasterDataOpen ? "true" : "false")" aria-controls="collapseMasterData"
+               class="nav-item-admin d-flex justify-content-between align-items-center @(isMasterDataOpen ? "active" : "")">
+                <div>
+                    <i class="bi bi-tags"></i> Danh mục
+                </div>
+                <i class="bi bi-chevron-down toggle-icon" style="font-size: 0.8rem; transition: transform 0.3s;"></i>
             </a>
+
+            <div class="collapse @(isMasterDataOpen ? "show" : "")" id="collapseMasterData">
+                <div class="nav flex-column" style="background: rgba(0,0,0,0.2);">
+                    <a href="/Admin/Category" class="nav-sub-item @(currentController == "Category" ? "active" : "")">
+                        <i class="bi bi-dash"></i> Loại Sản Phẩm
+                    </a>
+                    <a href="/Admin/Grade" class="nav-sub-item @(currentController == "Grade" ? "active" : "")">
+                        <i class="bi bi-dash"></i> Dòng Sản Phẩm
+                    </a>
+                    <a href="/Admin/Brand" class="nav-sub-item @(currentController == "Brand" ? "active" : "")">
+                        <i class="bi bi-dash"></i> Nhà Sản Xuất
+                    </a>
+                </div>
+            </div>
+
             <a href="/Admin/User" class="nav-item-admin @(ViewContext.RouteData.Values["Controller"]?.ToString() == "User" ? "active" : "")">
                 <i class="bi bi-people"></i> Quản lý Pilot
             </a>
         </div>
     </div>
 
-    <!-- 2. KHU VỰC BÊN PHẢI -->
     <div id="main-content">
-        <!-- TOPBAR -->
         <div class="admin-topbar">
             <div class="dropdown">
                 <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle" id="dropdownUser" data-bs-toggle="dropdown" aria-expanded="false">
@@ -155,13 +227,11 @@
             </div>
         </div>
 
-        <!-- 3. NỘI DUNG ĐỘNG SẼ CHÈN VÀO ĐÂY -->
         <div class="admin-content-wrapper">
             @RenderBody()
         </div>
     </div>
 
-    <!-- Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     @RenderSection("Scripts", required: false)
 </body>

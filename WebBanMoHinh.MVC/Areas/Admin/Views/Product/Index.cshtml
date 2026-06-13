@@ -1,0 +1,307 @@
+@model List<WebBanMoHinh.MVC.Areas.Admin.Controllers.AdminProductDto>
+@{
+    ViewData["Title"] = "Quản lý Kho Sản Phẩm";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 style="color: #00c6ff; font-weight: bold; text-shadow: 0 0 10px rgba(0,198,255,0.3);">
+        <i class="bi bi-boxes me-2"></i> KHO SẢN PHẨM GUNPLA
+    </h2>
+    <button class="btn btn-primary fw-bold px-4 rounded-pill" style="background: linear-gradient(135deg, #00c6ff, #0072ff); border: none;" onclick="openModal()">
+        <i class="bi bi-plus-circle me-1"></i> Thêm Sản Phẩm Mới
+    </button>
+</div>
+
+<div class="card shadow-lg" style="background-color: #252526; border: 1px solid #3e3e42; border-radius: 8px;">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-dark table-hover mb-0 align-middle">
+                <thead style="border-bottom: 2px solid #3e3e42;">
+                    <tr>
+                        <th class="p-3 text-muted">ID</th>
+                        <th class="p-3 text-muted">HÌNH ẢNH</th>
+                        <th class="p-3 text-muted" style="min-width: 250px;">TÊN SẢN PHẨM</th>
+                        <th class="p-3 text-muted">GIÁ BÁN</th>
+                        <th class="p-3 text-muted">KHO</th>
+                        <th class="p-3 text-muted">THÔNG TIN LÕI</th>
+                        <th class="p-3 text-muted text-center">THAO TÁC</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model != null && Model.Any()) {
+                        foreach (var item in Model) {
+                            <tr style="border-bottom: 1px solid #3e3e42;">
+                                <td class="p-3 fw-bold text-info">#@item.MaSp</td>
+                                <td class="p-3">
+                                    <img src="~/images/ImageProduct/@(string.IsNullOrEmpty(item.HinhAnhChinh) ? "no-img.jpg" : item.HinhAnhChinh)" 
+                                         style="width: 55px; height: 55px; object-fit: cover; border-radius: 8px; border: 1px solid #3e3e42;" />
+                                </td>
+                                <td class="p-3 text-white fw-bold">
+                                    @item.TenSp 
+                                    @if(item.IsHot) { <span class="badge bg-danger ms-2" style="font-size:0.7rem;"><i class="bi bi-fire"></i> HOT</span> }
+                                </td>
+                                <td class="p-3 text-danger fw-bold fs-6">@item.GiaBan.ToString("N0") đ</td>
+                                <td class="p-3">
+                                    @if(item.SoLuongTon > 0) {
+                                        <span class="badge bg-success">@item.SoLuongTon (Còn)</span>
+                                    } else {
+                                        <span class="badge bg-secondary">Hết hàng</span>
+                                    }
+                                </td>
+                                <td class="p-3" style="color: #ccc; font-size: 0.85rem;">
+                                    <div><i class="bi bi-tag text-info"></i> L: @(item.TenLoai ?? "N/A")</div>
+                                    <div><i class="bi bi-collection text-warning"></i> D: @(item.TenDong ?? "N/A")</div>
+                                    <div><i class="bi bi-building text-success"></i> H: @(item.TenNsx ?? "N/A")</div>
+                                </td>
+                                <td class="p-3 text-center text-nowrap">
+                                    <button class="btn btn-sm btn-outline-info rounded-pill px-3 fw-bold me-1" 
+                                            onclick='editProduct(@Html.Raw(Json.Serialize(item)))'>
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger rounded-pill px-3 fw-bold" onclick="deleteProduct(@item.MaSp)">
+                                        <i class="bi bi-trash3"></i>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    } else {
+                        <tr><td colspan="7" class="text-center p-4 text-muted">Chưa có dữ liệu sản phẩm trong kho.</td></tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="productModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content" style="background-color: #252526; border: 1px solid #00c6ff; border-radius: 12px; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
+            <div class="modal-header border-bottom border-secondary border-opacity-25">
+                <h5 class="modal-title fw-bold text-white" id="modalTitle">THÊM SẢN PHẨM MỚI</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            
+            <form id="productForm" enctype="multipart/form-data">
+                <div class="modal-body p-4">
+                    <input type="hidden" id="maSp" name="MaSp" value="0" />
+                    <input type="hidden" id="hinhAnhCu" name="HinhAnhChinh" />
+
+                    <div class="row g-4">
+                        <div class="col-lg-8">
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-white">Tên Sản Phẩm <span class="text-danger">*</span></label>
+                                <input type="text" class="form-control text-white" id="tenSp" name="TenSp" required style="background-color: #1e1e1e; border: 1px solid #3e3e42;" />
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-white">Giá Bán (VNĐ) <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control text-white" id="giaBan" name="GiaBan" required style="background-color: #1e1e1e; border: 1px solid #3e3e42;" />
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label fw-bold text-white">Số Lượng Tồn <span class="text-danger">*</span></label>
+                                    <input type="number" class="form-control text-white" id="soLuongTon" name="SoLuongTon" required style="background-color: #1e1e1e; border: 1px solid #3e3e42;" />
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold text-info"><i class="bi bi-tag"></i> Loại Sản Phẩm</label>
+                                    <select class="form-select text-white" id="maLoai" name="MaLoai" style="background-color: #1e1e1e; border: 1px solid #3e3e42;">
+                                        <option value="">-- Chọn Loại --</option>
+                                        @if(ViewBag.LoaiSP != null) {
+                                            foreach(var item in (SelectList)ViewBag.LoaiSP) {
+                                                <option value="@item.Value">@item.Text</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold text-info"><i class="bi bi-collection"></i> Dòng Sản Phẩm</label>
+                                    <select class="form-select text-white" id="maDong" name="MaDong" style="background-color: #1e1e1e; border: 1px solid #3e3e42;">
+                                        <option value="">-- Chọn Dòng --</option>
+                                        @if(ViewBag.DongSP != null) {
+                                            foreach(var item in (SelectList)ViewBag.DongSP) {
+                                                <option value="@item.Value">@item.Text</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold text-info"><i class="bi bi-building"></i> Nhà Sản Xuất</label>
+                                    <select class="form-select text-white" id="maNsx" name="MaNsx" style="background-color: #1e1e1e; border: 1px solid #3e3e42;">
+                                        <option value="">-- Chọn Hãng --</option>
+                                        @if(ViewBag.NhaSX != null) {
+                                            foreach(var item in (SelectList)ViewBag.NhaSX) {
+                                                <option value="@item.Value">@item.Text</option>
+                                            }
+                                        }
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row mb-3">
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold text-white">Tỉ Lệ</label>
+                                    <input type="text" class="form-control text-white" id="tiLe" name="TiLe" placeholder="VD: 1/100" style="background-color: #1e1e1e; border: 1px solid #3e3e42;" />
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold text-white">Kích Thước</label>
+                                    <input type="text" class="form-control text-white" id="kichThuoc" name="KichThuoc" placeholder="VD: Cao 20cm" style="background-color: #1e1e1e; border: 1px solid #3e3e42;" />
+                                </div>
+                                <div class="col-md-4">
+                                    <label class="form-label fw-bold text-white">Chất Liệu</label>
+                                    <input type="text" class="form-control text-white" id="chatLieu" name="ChatLieu" placeholder="VD: Nhựa ABS" style="background-color: #1e1e1e; border: 1px solid #3e3e42;" />
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                <label class="form-label fw-bold text-white">Mô Tả Sản Phẩm</label>
+                                <textarea class="form-control text-white" id="moTa" name="MoTa" rows="4" style="background-color: #1e1e1e; border: 1px solid #3e3e42; resize: none;"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="col-lg-4 text-center border-start border-secondary border-opacity-25 ps-lg-4">
+                            <label class="form-label fw-bold text-white d-block text-start">Hình Ảnh Đại Diện</label>
+                            
+                            <div class="mb-3 p-2 rounded" style="background-color: #1e1e1e; border: 1px dashed #00c6ff;">
+                                <img id="imgPreview" src="https://placehold.co/400x400/1e1e1e/cccccc?text=Chưa+có+ảnh" 
+                                     class="img-fluid rounded" style="height: 250px; width: 100%; object-fit: contain;" />
+                            </div>
+                            
+                            <input type="file" class="form-control text-white mb-4" id="imageFile" name="ImageFile" accept="image/*" onchange="previewFile()" style="background-color: #252526; border: 1px solid #3e3e42;" />
+
+                            <div class="form-check form-switch text-start d-flex align-items-center gap-2">
+                                <input class="form-check-input" type="checkbox" role="switch" id="isHot" name="IsHot" value="true" style="width: 2.5em; height: 1.25em; cursor: pointer;">
+                                <label class="form-check-label fw-bold text-white" for="isHot" style="cursor: pointer; padding-top: 3px;">
+                                    <i class="bi bi-fire text-danger"></i> Đánh dấu Sản phẩm HOT
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer border-top border-secondary border-opacity-25">
+                    <button type="button" class="btn btn-dark fw-bold px-4" data-bs-dismiss="modal">Hủy Bỏ</button>
+                    <button type="submit" class="btn fw-bold px-4 text-dark" style="background: #00c6ff;">LƯU SẢN PHẨM</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        const productModal = new bootstrap.Modal(document.getElementById('productModal'));
+
+        // 1. LOGIC XEM TRƯỚC HÌNH ẢNH (PREVIEW)
+        function previewFile() {
+            const preview = document.getElementById('imgPreview');
+            const file = document.getElementById('imageFile').files[0];
+            const reader = new FileReader();
+
+            reader.onloadend = function () {
+                preview.src = reader.result;
+            }
+            if (file) {
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = "https://placehold.co/400x400/1e1e1e/cccccc?text=Chưa+có+ảnh";
+            }
+        }
+
+        // 2. MỞ FORM THÊM MỚI
+        function openModal() {
+            document.getElementById('modalTitle').innerText = 'THÊM SẢN PHẨM MỚI';
+            document.getElementById('productForm').reset();
+            document.getElementById('maSp').value = 0;
+            document.getElementById('hinhAnhCu').value = '';
+            document.getElementById('imgPreview').src = "https://placehold.co/400x400/1e1e1e/cccccc?text=Chưa+có+ảnh";
+            productModal.show();
+        }
+
+        // 3. MỞ FORM CẬP NHẬT (Đổ dữ liệu cũ vào Form)
+        function editProduct(item) {
+            document.getElementById('modalTitle').innerText = 'CẬP NHẬT SẢN PHẨM';
+            document.getElementById('productForm').reset();
+            
+            document.getElementById('maSp').value = item.maSp;
+            document.getElementById('tenSp').value = item.tenSp;
+            document.getElementById('giaBan').value = item.giaBan;
+            document.getElementById('soLuongTon').value = item.soLuongTon;
+            
+            // Đổ dữ liệu Dropdown
+            document.getElementById('maLoai').value = item.maLoai || '';
+            document.getElementById('maDong').value = item.maDong || '';
+            document.getElementById('maNsx').value = item.maNsx || '';
+            
+            document.getElementById('tiLe').value = item.tiLe || '';
+            document.getElementById('kichThuoc').value = item.kichThuoc || '';
+            document.getElementById('chatLieu').value = item.chatLieu || '';
+            document.getElementById('moTa').value = item.moTa || '';
+            document.getElementById('isHot').checked = item.isHot;
+
+            // Xử lý hình ảnh cũ
+            document.getElementById('hinhAnhCu').value = item.hinhAnhChinh || '';
+            if(item.hinhAnhChinh) {
+                // ĐÃ CẬP NHẬT ĐƯỜNG DẪN THƯ MỤC ImageProduct Ở ĐÂY
+                document.getElementById('imgPreview').src = '/images/ImageProduct/' + item.hinhAnhChinh;
+            } else {
+                document.getElementById('imgPreview').src = "https://placehold.co/400x400/1e1e1e/cccccc?text=Chưa+có+ảnh";
+            }
+
+            productModal.show();
+        }
+
+        // 4. LƯU DỮ LIỆU BẰNG AJAX FORM DATA (Hỗ trợ File)
+        document.getElementById('productForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const formData = new FormData(this);
+
+            // Bắt buộc đẩy giá trị False nếu Checkbox IsHot không được chọn
+            if(!document.getElementById('isHot').checked) {
+                formData.append('IsHot', 'false');
+            }
+
+            fetch('/Admin/Product/SaveData', {
+                method: 'POST',
+                body: formData 
+            })
+            .then(res => res.json())
+            .then(res => {
+                if(res.success) {
+                    productModal.hide();
+                    Swal.fire({ icon: 'success', title: 'Hoàn tất!', text: 'Lưu sản phẩm thành công.', background: '#252526', color: '#fff', confirmButtonColor: '#00c6ff'})
+                    .then(() => location.reload());
+                } else {
+                    Swal.fire({ icon: 'error', title: 'Lỗi', text: res.message, background: '#252526', color: '#fff' });
+                }
+            }).catch(err => {
+                Swal.fire({ icon: 'error', title: 'Lỗi', text: 'Mất kết nối máy chủ!', background: '#252526', color: '#fff' });
+            });
+        });
+
+        // 5. XÓA MỀM (SOFT DELETE)
+        function deleteProduct(id) {
+            Swal.fire({
+                title: 'Đưa vào thùng rác?', 
+                text: "Sản phẩm này sẽ bị ẩn khỏi cửa hàng thay vì xóa vĩnh viễn!", 
+                icon: 'warning', 
+                showCancelButton: true,
+                background: '#252526', color: '#fff', 
+                confirmButtonColor: '#d33', cancelButtonColor: '#6c757d', 
+                confirmButtonText: 'Đồng ý', cancelButtonText: 'Hủy'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    fetch('/Admin/Product/Delete/' + id, { method: 'POST' })
+                    .then(res => res.json())
+                    .then(res => {
+                        if(res.success) Swal.fire({ icon: 'success', title: 'Đã ẩn đi!', background: '#252526', color: '#fff', confirmButtonColor: '#00c6ff' }).then(() => location.reload());
+                        else Swal.fire({ icon: 'error', title: 'Lỗi', text: res.message, background: '#252526', color: '#fff' });
+                    });
+                }
+            });
+        }
+    </script>
+}
