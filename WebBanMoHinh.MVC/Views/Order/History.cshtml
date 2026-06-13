@@ -151,7 +151,6 @@
                                 else if (donHang.TrangThaiDonHang == "Đã giao")
                                 {
                                     <span class="badge bg-primary fw-bold px-3 py-2"><i class="bi bi-box-seam me-1"></i>Đã giao hàng</span>
-                                    <!-- ĐÃ DỜI 2 NÚT XUỐNG DƯỚI BẢNG -->
                                 }
                                 else if (donHang.TrangThaiDonHang == "Hoàn thành" || donHang.TrangThaiDonHang == "Thành công")
                                 {
@@ -198,7 +197,8 @@
                                                 <tr>
                                                     <td class="text-center">
                                                         <div class="img-history-wrapper mx-auto">
-                                                            <img src="~/images/@hinhAnh" onerror="this.src='https://placehold.co/70x70/1e293b/cbd5e1?text=No+Img'" alt="Gunpla" />
+                                                            <!-- ĐÃ FIX: THÊM ImageProduct/ VÀO ĐƯỜNG DẪN -->
+                                                            <img src="~/images/ImageProduct/@hinhAnh" onerror="this.src='https://placehold.co/70x70/1e293b/cbd5e1?text=No+Img'" alt="Gunpla" />
                                                         </div>
                                                     </td>
                                                     <td class="history-val highlight pe-3">@tenSp</td>
@@ -235,7 +235,6 @@
                                 </table>
                             </div>
 
-                            <!-- VỊ TRÍ MỚI CỦA NÚT HÀNH ĐỘNG -->
                             @if (donHang.TrangThaiDonHang == "Đã giao")
                             {
                                 <div class="d-flex justify-content-end align-items-center mt-3 pt-3" style="border-top: 1px dashed var(--border-layout);">
@@ -248,9 +247,7 @@
                                     </button>
                                 </div>
                             }
-
                         </div>
-
                     </div>
                 </div>
             }
@@ -258,7 +255,6 @@
     }
 </div>
 
-<!-- MODAL HỎI ĐÁNH GIÁ NGAY SAU KHI NHẬN HÀNG -->
 <div class="modal fade" id="askReviewModal" tabindex="-1" data-bs-backdrop="static" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content text-center p-4" style="background-color: var(--bg-dropdown); border: 1px solid var(--text-nav-hover); border-radius: 16px;">
@@ -276,7 +272,6 @@
     </div>
 </div>
 
-<!-- MODAL ĐÁNH GIÁ SẢN PHẨM CHÍNH THỨC (CHUẨN SHOPEE) -->
 <div class="modal fade" id="reviewModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content" style="background-color: var(--bg-dropdown); border: none; box-shadow: 0 0 20px rgba(0,0,0, 0.2); border-radius: 8px;">
@@ -366,7 +361,8 @@
         function openReviewModal(maSp, tenSp, hinhAnh) {
             document.getElementById('reviewMaSp').value = maSp;
             document.getElementById('reviewTenSp').innerText = tenSp;
-            document.getElementById('reviewImgSp').src = "/images/" + hinhAnh;
+            // ĐÃ FIX: THÊM ImageProduct/ VÀO ĐƯỜNG DẪN ẢNH TRONG JS
+            document.getElementById('reviewImgSp').src = "/images/ImageProduct/" + hinhAnh;
             document.getElementById('reviewNoiDung').value = '';
             document.getElementById('reviewSoSao').value = 5; 
             updateStars(5);
@@ -407,7 +403,6 @@
             });
         }
 
-        // 1. LOGIC GỬI ĐÁNH GIÁ (ĐÃ ĐỔI SANG SWEET ALERT)
         document.getElementById('reviewForm').addEventListener('submit', function(e) {
             e.preventDefault();
             if(document.getElementById('reviewSoSao').value == 0) {
@@ -418,10 +413,9 @@
             fetch('/SanPham/GuiDanhGia', { method: 'POST', body: formData })
             .then(res => res.json())
             .then(data => {
-                if(reviewModal) reviewModal.hide(); // Ẩn hộp thoại đánh giá đi
+                if(reviewModal) reviewModal.hide(); 
                 
                 if(data.success) {
-                    // Hiện thông báo thành công đẹp mắt
                     Swal.fire({
                         title: 'Thành công!',
                         text: 'Cảm ơn Pilot! Đánh giá đã được ghi nhận thành công.',
@@ -429,7 +423,7 @@
                         confirmButtonColor: '#00c6ff',
                         confirmButtonText: 'Tuyệt vời'
                     }).then(() => {
-                        location.reload(); // Bấm OK xong mới reload trang
+                        location.reload();
                     });
                 } else {
                     Swal.fire({ icon: 'error', title: 'Lỗi', text: data.message });
@@ -441,7 +435,6 @@
             });
         });
 
-        // 2. LOGIC YÊU CẦU TRẢ HÀNG (ĐÃ ĐỔI SANG SWEET ALERT)
         function yeuCauTraHang(maDonHang) {
             Swal.fire({
                 title: 'Yêu cầu trả hàng?',
@@ -464,7 +457,6 @@
             });
         }
 
-        // 3. LOGIC XÁC NHẬN "ĐÃ NHẬN ĐƯỢC HÀNG" (ĐÃ ĐỔI SANG SWEET ALERT)
         function xacNhanNhanHang(maDonHang) {
             Swal.fire({
                 title: 'Xác nhận nhận hàng',
@@ -484,7 +476,7 @@
                     .then(res => res.json())
                     .then(data => {
                         if(data.success) {
-                            askReviewModal.show(); // Bật popup hỏi đánh giá sau khi nhận hàng
+                            askReviewModal.show();
                         } else {
                             Swal.fire({ icon: 'error', title: 'Lỗi', text: data.message });
                         }
