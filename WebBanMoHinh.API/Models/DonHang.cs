@@ -10,7 +10,9 @@ public partial class DonHang
     public string? TenDangNhap { get; set; }
 
     public string? SoDienThoai { get; set; }
-    
+
+    public string? MaVanDon { get; set; }
+
     public DateTime? NgayDat { get; set; }
 
     public decimal? TongTien { get; set; }
@@ -22,7 +24,9 @@ public partial class DonHang
     public string? DiaChiGiaoHang { get; set; }
 
     public string? GhiChu { get; set; }
-
+    
+    public decimal? PhiVanChuyen { get; set; }
+    
     public virtual ICollection<ChiTietDonHang> ChiTietDonHang { get; set; } = new List<ChiTietDonHang>();
 
     public virtual TaiKhoan? TenDangNhapNavigation { get; set; }

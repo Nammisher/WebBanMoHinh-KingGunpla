@@ -42,15 +42,19 @@
                                     else { <span class="badge bg-danger px-2 py-1">@item.TrangThaiDonHang</span> }
                                 </td>
                                 <td class="p-3 align-middle">
+                                    <button class="btn btn-sm btn-outline-info rounded-pill px-3 fw-bold me-2 mb-1" onclick="viewDetail(@item.MaDonHang)">
+                                        <i class="bi bi-printer"></i> Chi tiết / In
+                                    </button>
+
                                     @if(item.TrangThaiDonHang == "Chờ xác nhận") 
                                     {
-                                        <button class="btn btn-sm fw-bold" style="background: #007acc; color: white; border: none;" onclick="doiTrangThai(@item.MaDonHang, 'Đang giao')">
+                                        <button class="btn btn-sm fw-bold mb-1" style="background: #007acc; color: white; border: none;" onclick="doiTrangThai(@item.MaDonHang, 'Đang giao')">
                                             <i class="bi bi-truck me-1"></i> Giao hàng
                                         </button>
                                     } 
                                     else if (item.TrangThaiDonHang == "Đang giao") 
                                     {
-                                        <button class="btn btn-sm fw-bold" style="background: #00c6ff; color: black; border: none;" onclick="doiTrangThai(@item.MaDonHang, 'Đã giao')">
+                                        <button class="btn btn-sm fw-bold mb-1" style="background: #00c6ff; color: black; border: none;" onclick="doiTrangThai(@item.MaDonHang, 'Đã giao')">
                                             <i class="bi bi-check-circle me-1"></i> Đã tới nơi
                                         </button>
                                     }
@@ -70,33 +74,158 @@
     </div>
 </div>
 
+<div class="modal fade" id="detailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content" style="background-color: #252526; border: 1px solid #00c6ff; border-radius: 12px; box-shadow: 0 0 20px rgba(0,0,0,0.5);">
+            <div class="modal-header border-bottom border-secondary border-opacity-25">
+                <h5 class="modal-title fw-bold text-white">
+                    <i class="bi bi-receipt me-2"></i> CHI TIẾT HÓA ĐƠN ĐIỆN TỬ
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body p-0">
+                <div id="printArea" style="background: white; padding: 20px;"></div>
+            </div>
+            <div class="modal-footer border-top border-secondary border-opacity-25">
+                <button type="button" class="btn btn-dark fw-bold px-4" data-bs-dismiss="modal">Đóng</button>
+                <button type="button" class="btn fw-bold px-4 text-dark" style="background: #00c6ff;" onclick="printBill()">
+                    <i class="bi bi-printer-fill me-1"></i> IN HÓA ĐƠN NÀY
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts {
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        function doiTrangThai(maDonHang, trangThaiMoi) {
+        // 1. TÍNH NĂNG LẤY DỮ LIỆU TỪ API & HIỂN THỊ HÓA ĐƠN
+        function viewDetail(id) {
+            // ĐÃ SỬA: Gọi vào hàm trung gian (Proxy) của MVC Controller
+            fetch('/Admin/Order/GetDetail/' + id)
+            .then(res => {
+                if(!res.ok) throw new Error('Network response was not ok');
+                return res.json();
+            })
+            .then(data => {
+                // Xây dựng danh sách sản phẩm
+                let itemsHtml = '';
+                let subTotal = 0; // ĐÃ THÊM: Tính Tạm tính tiền hàng
+
+                data.items.forEach(item => {
+                    subTotal += item.thanhTien; // ĐÃ THÊM: Cộng dồn tiền hàng
+                    itemsHtml += `
+                        <tr>
+                            <td style="border-bottom: 1px solid #ddd; padding: 10px 5px; color: #000;">${item.tenSp}</td>
+                            <td style="border-bottom: 1px solid #ddd; padding: 10px 5px; text-align: center; color: #000;">${item.soLuong}</td>
+                            <td style="border-bottom: 1px solid #ddd; padding: 10px 5px; text-align: right; color: #000;">${item.donGia.toLocaleString('vi-VN')} đ</td>
+                            <td style="border-bottom: 1px solid #ddd; padding: 10px 5px; text-align: right; font-weight: bold; color: #000;">${item.thanhTien.toLocaleString('vi-VN')} đ</td>
+                        </tr>
+                    `;
+                });
+
+                // ĐÃ SỬA: Lấy phí vận chuyển từ dữ liệu DB
+                let shippingFee = data.phiVanChuyen; 
+                let orderDate = new Date(data.ngayDat).toLocaleString('vi-VN');
+
+                // Code giao diện Bill chuẩn phong cách Shopee / Siêu thị (Chữ đen nền trắng tuyệt đối)
+                let html = `
+                    <div style="font-family: 'Courier New', Courier, monospace; color: #000; background: #fff; max-width: 800px; margin: 0 auto;">
+                        <div style="text-align: center; margin-bottom: 20px;">
+                            <h2 style="margin: 0; font-weight: bold; font-size: 26px; color: #000;">KING GUNPLA SHOP</h2>
+                            <p style="margin: 5px 0; font-size: 15px; color: #000;">65 Đồng Tâm, Trung Chánh, Hóc Môn, TP.HCM</p>
+                            <p style="margin: 5px 0; font-size: 15px; color: #000;">SĐT: 0981 260 096</p>
+                            <h3 style="margin-top: 15px; border-top: 2px dashed #000; padding-top: 15px; font-size: 20px; font-weight: bold; color: #000;">HÓA ĐƠN BÁN HÀNG</h3>
+                        </div>
+                        
+                        <div style="margin-bottom: 25px; font-size: 15px; line-height: 1.6; color: #000;">
+                            <p style="margin: 0;"><strong>Mã đơn hàng:</strong> #${data.maDonHang}</p>
+                            <p style="margin: 0;"><strong>Khách hàng :</strong> ${data.hoTenKhach}</p>
+                            <p style="margin: 0;"><strong>Điện thoại :</strong> ${data.soDienThoai ? data.soDienThoai : 'Không cung cấp'}</p>
+                            <p style="margin: 0;"><strong>Địa chỉ    :</strong> ${data.diaChiGiaoHang ? data.diaChiGiaoHang : 'Tại cửa hàng'}</p>
+                            <p style="margin: 0;"><strong>Ngày đặt   :</strong> ${orderDate}</p>
+                            <p style="margin: 0;"><strong>Mã vận đơn :</strong> ${data.maVanDon ? data.maVanDon : 'Chưa cập nhật'}</p>
+                        </div>
+
+                        <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px; font-size: 15px; color: #000;">
+                            <thead>
+                                <tr style="border-bottom: 2px solid #000;">
+                                    <th style="text-align: left; padding-bottom: 10px; color: #000;">Sản phẩm</th>
+                                    <th style="text-align: center; padding-bottom: 10px; color: #000;">SL</th>
+                                    <th style="text-align: right; padding-bottom: 10px; color: #000;">Đơn giá</th>
+                                    <th style="text-align: right; padding-bottom: 10px; color: #000;">Thành tiền</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${itemsHtml}
+                            </tbody>
+                        </table>
+
+                        <div style="text-align: right; font-size: 16px; margin-bottom: 30px; color: #000;">
+                            <p style="margin: 5px 0;">Tạm tính: ${subTotal.toLocaleString('vi-VN')} đ</p>
+                            <p style="margin: 5px 0;">Phí vận chuyển: ${shippingFee.toLocaleString('vi-VN')} đ</p>
+                            <p style="margin: 5px 0; font-size: 20px;"><strong>Tổng tiền: ${data.tongTien.toLocaleString('vi-VN')} đ</strong></p>
+                            <p style="margin: 5px 0; font-style: italic; font-size: 14px;">(Thanh toán: ${data.phuongThucThanhToan})</p>
+                        </div>
+
+                        <div style="text-align: center; border-top: 2px dashed #000; padding-top: 20px; font-size: 15px; color: #000;">
+                            <p style="margin: 5px 0; font-weight: bold;">Cảm ơn quý khách đã mua sắm tại King Gunpla!</p>
+                            <p style="margin: 5px 0;">Vui lòng giữ lại hóa đơn này để được hỗ trợ bảo hành.</p>
+                            <p style="margin: 5px 0; margin-top: 15px;"><img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=KINGGUNPLA-ORDER-${data.maDonHang}" alt="QR" /></p>
+                        </div>
+                    </div>
+                `;
+
+                // Đổ HTML vào vùng chờ và bật Modal
+                document.getElementById('printArea').innerHTML = html;
+                new bootstrap.Modal(document.getElementById('detailModal')).show();
+            })
+            .catch(err => {
+                Swal.fire({ 
+                    icon: 'error', 
+                    title: 'Lỗi lấy dữ liệu', 
+                    text: 'Không thể kết nối đến API lấy chi tiết đơn hàng (api/AdminOrders). Hãy đảm bảo project API đang chạy!',
+                    background: '#252526',
+                    color: '#ffffff'
+                });
+                console.error(err);
+            });
+        }
+
+        // 2. TÍNH NĂNG IN HÓA ĐƠN BẰNG JAVASCRIPT GỐC
+        function printBill() {
+            var printContents = document.getElementById('printArea').innerHTML;
+            var originalContents = document.body.innerHTML;
             
-            // Hiện Popup hỏi xác nhận (Dùng SweetAlert2 thay cho confirm mặc định)
+            // Ép trang web thay thế toàn bộ nội dung body bằng form Bill để in
+            document.body.innerHTML = printContents;
+            // Gọi hộp thoại in của Windows/Mac
+            window.print();
+            // Khôi phục lại giao diện Web Admin sau khi in xong
+            document.body.innerHTML = originalContents;
+            location.reload(); // Tải lại để phục hồi 100% sự kiện click của các nút
+        }
+
+        // 3. LOGIC CẬP NHẬT TRẠNG THÁI (CŨ - GIỮ NGUYÊN)
+        function doiTrangThai(maDonHang, trangThaiMoi) {
             Swal.fire({
                 title: 'Xác nhận duyệt đơn?',
                 text: `Bạn có chắc chắn muốn chuyển đơn hàng #${maDonHang} sang trạng thái "${trangThaiMoi}" không?`,
                 icon: 'question',
                 showCancelButton: true,
-                background: '#252526', // Nền đen chuẩn VS Code
-                color: '#ffffff', // Chữ trắng
-                confirmButtonColor: '#007acc', // Nút đồng ý màu xanh VS Code
-                cancelButtonColor: '#3e3e42', // Nút hủy màu xám
+                background: '#252526', 
+                color: '#ffffff', 
+                confirmButtonColor: '#007acc', 
+                cancelButtonColor: '#3e3e42', 
                 confirmButtonText: '<i class="bi bi-check-lg"></i> Đồng ý',
                 cancelButtonText: 'Hủy'
             }).then((result) => {
-                
-                // Nếu Admin bấm "Đồng ý"
                 if (result.isConfirmed) {
                     const formData = new FormData();
                     formData.append('maDonHang', maDonHang);
                     formData.append('trangThaiMoi', trangThaiMoi);
 
-                    // Gọi API cập nhật
                     fetch('/Admin/Order/CapNhatTrangThai', { 
                         method: 'POST', 
                         body: formData 
@@ -104,16 +233,15 @@
                     .then(res => res.json())
                     .then(data => {
                         if(data.success) {
-                            // Hiện thông báo thành công đẹp mắt
                             Swal.fire({
                                 title: 'Thành công!',
                                 text: `Đơn hàng #${maDonHang} đã được cập nhật thành "${trangThaiMoi}".`,
                                 icon: 'success',
                                 background: '#252526',
                                 color: '#ffffff',
-                                confirmButtonColor: '#00c6ff' // Nút OK màu Cyan neon
+                                confirmButtonColor: '#00c6ff' 
                             }).then(() => {
-                                location.reload(); // Bấm OK xong mới reload trang
+                                location.reload(); 
                             });
                         } else {
                             Swal.fire({ 

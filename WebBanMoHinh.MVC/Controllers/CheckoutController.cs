@@ -105,7 +105,8 @@ namespace WebBanMoHinh.MVC.Controllers
                 SoDienThoai = model.CustomerInfo?.PhoneNumber ?? "",
                 PhuongThucThanhToan = phuongThuc,
                 Items = orderItems,
-                TongTien = totalAmountWithShip // 2. Bổ sung trường này gửi xuống API
+                TongTien = totalAmountWithShip,
+                PhiVanChuyen = shippingFee // THÊM DÒNG NÀY ĐỂ BẮN XUỐNG API (DỮ LIỆU THẬT)
             };
 
             try 
@@ -117,7 +118,6 @@ namespace WebBanMoHinh.MVC.Controllers
                 {
                     dynamic? responseData = JsonConvert.DeserializeObject<dynamic>(responseString);
                     string maDon = responseData?.maDonHang?.ToString() ?? "UNKNOWN";
-                    decimal totalAmount = checkoutItems.Sum(x => x.GiaBan * x.SoLuong);
                     string username = HttpContext.Session.GetString("UserSession") ?? "KhachHang";
                     
                     allCartItems.RemoveAll(x => selectedIds.Contains(x.MaSp));
@@ -134,7 +134,8 @@ namespace WebBanMoHinh.MVC.Controllers
                     }
                     else if (pttt.Contains("CHUYỂN KHOẢN"))
                     {
-                        return RedirectToAction("ThanhToanOnline", "Checkout", new { orderId = maDon, amount = totalAmount, username = username });
+                        // FIX BUG: Đổi biến truyền vào thành totalAmountWithShip để sinh QR quét ra chuẩn số tiền có cước phí ship
+                        return RedirectToAction("ThanhToanOnline", "Checkout", new { orderId = maDon, amount = totalAmountWithShip, username = username });
                     }
                     
                     return RedirectToAction("Success", "Checkout");

@@ -19,11 +19,11 @@ namespace WebBanMoHinh.MVC.Areas.Admin.Controllers
             _apiUrl = configuration.GetValue<string>("BackendApiUrl") ?? "http://localhost:5298/api/";
         }
 
-        // Lấy danh sách đổ ra bảng
+        // 1. LẤY DANH SÁCH ĐỔ RA BẢNG (Đã sửa lại gọi đúng API AdminOrders)
         public async Task<IActionResult> Index()
         {
             var danhSach = new List<OrderHistoryViewModel>();
-            var response = await _httpClient.GetAsync($"{_apiUrl}DonHangs/All");
+            var response = await _httpClient.GetAsync($"{_apiUrl}AdminOrders");
             
             if (response.IsSuccessStatusCode)
             {
@@ -36,12 +36,31 @@ namespace WebBanMoHinh.MVC.Areas.Admin.Controllers
             return View(danhSach);
         }
 
-        // Admin bấm nút đổi trạng thái (Gọi hàm PUT của API đã có sẵn)
+        // 2. HÀM TRUNG GIAN LẤY CHI TIẾT BILL (MỚI THÊM)
+        [HttpGet]
+        public async Task<IActionResult> GetDetail(int id)
+        {
+            var response = await _httpClient.GetAsync($"{_apiUrl}AdminOrders/Detail/{id}");
+            
+            if (response.IsSuccessStatusCode)
+            {
+                var jsonData = await response.Content.ReadAsStringAsync();
+                return Content(jsonData, "application/json"); // Trả thẳng JSON về cho Javascript
+            }
+            
+            return NotFound(new { message = "Lỗi: Không tìm thấy chi tiết đơn hàng từ API!" });
+        }
+
+        // 3. CẬP NHẬT TRẠNG THÁI
         [HttpPost]
         public async Task<IActionResult> CapNhatTrangThai(int maDonHang, string trangThaiMoi)
         {
-            var jsonContent = new StringContent(JsonSerializer.Serialize(trangThaiMoi), Encoding.UTF8, "application/json");
-            var response = await _httpClient.PutAsync($"{_apiUrl}DonHangs/DoiTrangThai/{maDonHang}", jsonContent);
+            // Tạo đối tượng khớp với cấu trúc UpdateOrderDto bên API
+            var payload = new { TrangThai = trangThaiMoi, MaVanDon = (string?)null };
+            var jsonContent = new StringContent(JsonSerializer.Serialize(payload), Encoding.UTF8, "application/json");
+            
+            // Đã sửa lại đường dẫn gọi API UpdateStatus
+            var response = await _httpClient.PutAsync($"{_apiUrl}AdminOrders/UpdateStatus/{maDonHang}", jsonContent);
 
             if (response.IsSuccessStatusCode)
                 return Json(new { success = true });

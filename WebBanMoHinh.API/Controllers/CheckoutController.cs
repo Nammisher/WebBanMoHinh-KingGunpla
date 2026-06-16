@@ -33,11 +33,12 @@ namespace WebBanMoHinh.API.Controllers
                     DiaChiGiaoHang = request.DiaChiGiaoHang,
                     SoDienThoai = request.SoDienThoai,
                     PhuongThucThanhToan = request.PhuongThucThanhToan,
-                    // ĐÃ FIX LỖI DB: Cấp ngày đặt và trạng thái mặc định cho SQL Server
                     NgayDat = DateTime.Now,
                     TrangThaiDonHang = "Chờ xác nhận",
-                    // SỬA Ở ĐÂY: Lấy trực tiếp từ request để đảm bảo khớp với số tiền đã tính ở MVC
                     TongTien = request.TongTien,
+                    
+                    // BỔ SUNG DÒNG NÀY: Hứng phí vận chuyển từ Request (MVC) gán vào DB
+                    PhiVanChuyen = request.PhiVanChuyen,
                     
                     ChiTietDonHang = request.Items.Select(item => new ChiTietDonHang
                     {
@@ -47,6 +48,8 @@ namespace WebBanMoHinh.API.Controllers
                     }).ToList()
                 };
 
+                // Đẩy DonHang (đã có PhiVanChuyen) vào Facade. 
+                // Facade sẽ tự động xử lý Trừ Kho, Gọi Payment, và Lưu Database mượt mà!
                 var result = await _orderFacade.PlaceOrderAsync(donHang);
 
                 if (!result.Success)
